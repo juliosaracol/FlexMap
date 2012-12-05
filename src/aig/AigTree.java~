@@ -1,0 +1,332 @@
+/*
+ * Estrutura de árvore a partir de um AIG
+ * obs: No nodo AigTree o value representa se ele eh um OR = true ou uma AND=false
+ */
+package aig;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
+public class AigTree extends Aig 
+{
+    private     ArrayList<NodeAig> visited;                         
+    protected   ArrayList<String>  treeNodes;                       //treenodes que foram identificados
+    protected   ArrayList<NodeAig> trees;                           //referencia para a raiz de todas as arvores
+    protected   ArrayList<TreeMap<String,NodeAig>> allNodesTree;   //possui todos os nodos criados nas árvores
+    protected   TreeMap<Integer,EdgeAig> edgesTrees;                //possui todas as arestas criadas para as árvores
+    
+    public AigTree(String fileName) 
+    {
+        super(fileName);
+        this.treeNodes   = new ArrayList<String>();
+        this.visited     = new ArrayList();
+        updateTree();
+        System.out.println("#AIGTREE carregado com sucesso");
+    }
+    
+    //método que utiliza uma dfs para identificar OR no aig (avaliando as arestas negadas de entrada e um filho) e treeNodes
+    public void updateTree()
+    {
+        for(int i=0;i<o;i++)
+        {
+          NodeAig nodeCurrent = getVertexName(outputsAig[i][0]);
+          dfsUpdateTree(nodeCurrent);
+        }
+
+        //******instancia novas árvores***********************************
+        NodeAig aux       = null;
+        this.trees        = new ArrayList<NodeAig>();
+        this.edgesTrees   = new TreeMap<Integer, EdgeAig>();
+        this.allNodesTree = new ArrayList<TreeMap<String, NodeAig>>();
+        for(int i=0;i<o;i++)
+        {
+          NodeAig nodeCurrent = getVertexName(outputsAig[i][0]);
+          this.allNodesTree.add(new TreeMap<String, NodeAig>());
+          // System.out.println("Instanciando Arvore: "+nodeCurrent.getName());
+          if((nodeCurrent.getParents().size()==1)&&(!(Algorithms.isInverter(nodeCurrent, nodeCurrent.getParents().get(0))))) 
+          {
+              aux = dfsForestTree(nodeCurrent.getParents().get(0),false);
+              this.trees.add(aux);
+          }
+          else
+          {
+              aux = dfsForestTree(nodeCurrent,false);
+              this.trees.add(aux);
+          }
+        }
+        //**********************************************************************
+        //**************Instanciando arvores a partir dos treeNodes*************
+        for(int i=0;i<this.treeNodes.size();i++)
+        {
+          this.allNodesTree.add(new TreeMap<String, NodeAig>());
+          NodeAig nodeCurrent = getVertexName(this.treeNodes.get(i));
+          aux = dfsForestTree(nodeCurrent,true);
+          this.trees.add(aux);
+        }       
+    }
+    //método para percorrer o aig o identificar os treeNodes e OR
+    private void dfsUpdateTree(NodeAig nodeCurrent) 
+    {
+        //System.out.println("trabalhando com o nodo: "+nodeCurrent.getName());
+        NodeAig father1,father2 = null;
+        boolean treeNode=false,or = false;
+        this.visited.add(nodeCurrent);
+        if(nodeCurrent.isInput()) //entrada primaria
+          return;
+        else
+        {
+            if(nodeCurrent.isOutput())
+            {
+              //System.out.println("SAIDA NODO: "+nodeCurrent.getName());
+              if(nodeCurrent.getParents().size() > 1)
+                dfsUpdateTree(nodeCurrent.getParents().get(1));  
+              if(nodeCurrent.getParents().size() > 0)
+                dfsUpdateTree(nodeCurrent.getParents().get(0));
+              return;
+            }
+            else
+            {
+              if((nodeCurrent.getChildren().size() > 1)&&(!nodeCurrent.isInput())) //treeNodes
+              {
+                  for(int i=0;i<this.treeNodes.size();i++)
+                    if(this.treeNodes.get(i) == nodeCurrent.getName())
+                      treeNode = true;
+                  if(treeNode == false)
+                      this.treeNodes.add(nodeCurrent.getName());
+              }
+  
+              father1 = nodeCurrent.getParents().get(0);
+              father2 = nodeCurrent.getParents().get(1);
+              if((Algorithms.isInverter(nodeCurrent, father1))&&(Algorithms.isInverter(nodeCurrent, father2))
+                      &&(nodeCurrent.getChildren().size() == 1))
+              {
+                for(int i=0;i<nodeCurrent.getChildren().size();i++)
+                {
+                    if(Algorithms.isInverter(nodeCurrent.getChildren().get(i),nodeCurrent))//se acha uma aresta filha negada, seta todas as filhas
+                    {   
+                       for(int j=0;j<nodeCurrent.getAdjacencies().size();j++)
+                       {
+                         EdgeAig edgeCurrent = (EdgeAig) nodeCurrent.getAdjacencies().get(j);
+                          edgeCurrent.edgeInverter();                       
+                       }
+                       or=true;
+                    }
+                }
+                if(or==true)
+                    nodeCurrent.setValue(true);
+              }
+              if(!visited.contains(father1))
+                dfsUpdateTree(father1);
+              if(!visited.contains(father2))
+                dfsUpdateTree(father2);
+            }
+        }
+    }
+    //método que inicializa a floresta de árvores 
+    private NodeAig dfsForestTree(NodeAig nodeCurrent,boolean root) 
+    {
+        if(nodeCurrent.getParents().isEmpty()) //entrada primaria cria nodo de copia e retorna para adicionar a floresta 
+        { 
+          NodeAigInput copyNode = new NodeAigInput(nodeCurrent.getId(),nodeCurrent.getName());
+          this.allNodesTree.get(this.allNodesTree.size()-1).put(copyNode.getName(),copyNode);
+          return copyNode;
+        }
+        else
+        {
+            if(nodeCurrent.isOutput())
+            {
+              NodeAigOutput copyNode = new NodeAigOutput(nodeCurrent.getId(),nodeCurrent.getName());   
+              copyNode.setValue(nodeCurrent.getValue());
+              this.allNodesTree.get(this.allNodesTree.size()-1).put(copyNode.getName(),copyNode);
+              if(nodeCurrent.getParents().size() > 1)
+              {
+                NodeAig newFather1 = dfsForestTree(nodeCurrent.getParents().get(1),false);
+                addEdge(copyNode,newFather1,Algorithms.isInverter(nodeCurrent, nodeCurrent.getParents().get(1)));
+              }
+              NodeAig newFather2 =  dfsForestTree(nodeCurrent.getParents().get(0),false);
+              addEdge(copyNode,newFather2,Algorithms.isInverter(nodeCurrent, nodeCurrent.getParents().get(0)));
+              return copyNode;
+            }
+            else
+            {
+                 
+              if((nodeCurrent.getChildren().size()>1)&&(root==false)) //treeNodes so instancia com nodo copia e para a árvore
+              { 
+                 NodeAigInput copyNode = new NodeAigInput(nodeCurrent.getId(),nodeCurrent.getName());
+                 this.allNodesTree.get(this.allNodesTree.size()-1).put(copyNode.getName(),copyNode);
+                 return copyNode;
+              }   
+              else
+              {
+                 NodeAigGate copyNode = new NodeAigGate(nodeCurrent.getId(),nodeCurrent.getName()); 
+                 copyNode.setValue(nodeCurrent.getValue());
+                 this.allNodesTree.get(this.allNodesTree.size()-1).put(copyNode.getName(),copyNode);
+                 NodeAig newFather1  =  dfsForestTree(nodeCurrent.getParents().get(0),false);
+                 NodeAig newFather2  =  dfsForestTree(nodeCurrent.getParents().get(1),false);
+                 addEdge(copyNode,newFather1,(Algorithms.isInverter(nodeCurrent,nodeCurrent.getParents().get(0))));
+                 addEdge(copyNode,newFather2,(Algorithms.isInverter(nodeCurrent,nodeCurrent.getParents().get(1))));
+                 return copyNode;
+              }
+            }
+        }
+    }
+    
+    //sobrescrita do método addEdge para o caso de árvores
+    public int addEdge(NodeAig v1, NodeAig v2,boolean type) throws NullPointerException
+    {        
+        try {
+               if(v1 == null || v2 == null)
+                throw new NullPointerException("Vertices não instanciados");// dispara a Exeção throws
+               EdgeAig auxEdge = new EdgeAig(this.edgesCount,v1,v2);
+               if(type == true) //caso seja um inversor faz o set da aresta
+                auxEdge.createInverter();
+               this.edgesTrees.put(auxEdge.getId(), auxEdge);
+               v1.getAdjacencies().add(auxEdge);
+               v2.getAdjacencies().add(auxEdge);
+               this.edgesCount++;
+               return auxEdge.getId();
+            }
+            catch(Exception e) 
+            { System.out.print("não foi possivel inserir a aresta na AIGTREE" + e.toString());}
+            return 0;
+    }
+    //sobrescrita do método removeEdge para o caso de árvores que usa a lista de arestas edgesTree
+    @Override
+    public void removeEdge(int id) 
+    {
+        try 
+        {
+
+            Edge removedEdge = this.edgesTrees.get(id);
+            /* Remocao da aresta nas listas de adjacencia dos vertices queestao conectados a ela */
+            ArrayList<Edge> adjacencies = removedEdge.getVertex1().getAdjacencies();
+            adjacencies.remove(removedEdge);
+            ArrayList<Edge> adjacencies2 = removedEdge.getVertex2().getAdjacencies();
+            adjacencies2.remove(removedEdge);
+
+            /* Remove da lista de arestas do grafo */
+            this.edgesTrees.remove(id);
+        }
+        catch(Exception e) {
+            System.out.print(e.toString());
+        }
+    }
+    //método que remove um nodo da árvore criada
+    public void removeVertex(NodeAig root) 
+    {
+        ArrayList<Integer> index = new ArrayList<Integer>();
+        for(int j=0;j<this.allNodesTree.size();j++)
+        {
+          if(this.allNodesTree.get(j).get(root.getName()) == root)
+              index.add(j);
+        }
+        for(int j=0;j<index.size();j++)
+        {
+          //System.out.println("Deletando nodo: "+root.getName());
+          this.allNodesTree.get(index.get(j)).remove(root.getName());
+        }
+    }
+    @Override
+    public void showAig()
+    {
+        String porta ="";
+        for(int i=1;i<this.getVerticesCout();i++)
+        {
+            /*procura todas as adjacencias do nodo nameNode*/
+            NodeAig nodo = (NodeAig)this.getVertex(i);
+            if(nodo.isInput())
+                porta = "INPUT";
+            else
+            {
+                if(nodo.getValue() == true)
+                porta = "OR";
+                else
+                porta= "AND";
+            }
+            System.out.print("\nnodoTreeAig: "+nodo.getName()+" é uma: "+porta+"\n");
+            for(int z=0;z<nodo.getParents().size();z++)
+            {
+                System.out.println("É FILHO De:"+nodo.getParents().get(z).getName());
+            }
+            for(int j=0;j<nodo.getChildren().size();j++)
+            {
+                System.out.println("É PAI De:"+nodo.getChildren().get(j).getName());                
+            }
+        }
+    }
+    public void showTreeNodes()
+    {
+        System.out.println("####TREENODES IDENTIFICADOS#########");
+        for(int i=0;i<this.treeNodes.size();i++)
+        {
+            System.out.println(treeNodes.get(i));
+        }
+        System.out.println("####################################");
+    }
+    public void showForestTree()
+    {
+        for(int i=0;i<this.trees.size();i++)
+        {
+            /*procura todas as adjacencias do nodo nameNode*/
+            System.out.println("#######ARVORE#"+i+"#####");
+            NodeAig node = this.trees.get(i);
+            System.out.print("RAIZ :"+node.getName());
+            if((node.getParents().size() > 1))
+            {
+               for(int j=0;j<node.getParents().size();j++) 
+               {
+                   showtree(node.getParents().get(j));
+               }
+            }
+            System.out.println("\n####################################");
+        }
+    }
+        
+    public void showForestTreeMap()
+    {
+        /*procura todas as adjacencias do nodo nameNode*/
+        for(int j=0;j<getForestTrees().size();j++)
+        {
+          System.out.println("#######ARVORE#"+j+"#####");
+          Iterator<Map.Entry<String,NodeAig>> iteratorSymbol1 = getForestTrees().get(j).entrySet().iterator();
+          while(iteratorSymbol1.hasNext())
+          {
+            Map.Entry<String,NodeAig> currentElement = iteratorSymbol1.next();
+            if((currentElement.getValue().getChildren().size() == 0))
+            {
+                System.out.print("RAIZ=");
+                showtree(currentElement.getValue());
+            }
+          }
+          System.out.println("\n####################################");
+        }
+    }
+    private void showtree(NodeAig node) 
+    {
+        NodeAig aux=null;
+        System.out.print("\n"+node.getName());
+        if(!node.isInput())
+        {
+           if(node.getParents().size() > 1)
+           {
+             for(int j=0;j<node.getParents().size();j++) 
+             {
+                  aux = node.getParents().get(j);
+                  showtree(aux);
+             }
+           }
+        }
+    }
+    public ArrayList<NodeAig> getTrees ()
+    {
+        return this.trees;
+    }
+    
+    public ArrayList<TreeMap<String,NodeAig>> getForestTrees ()
+    {
+        return this.allNodesTree;
+    }
+  
+}

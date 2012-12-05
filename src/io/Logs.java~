@@ -1,0 +1,53 @@
+/**
+ * Classe para geração de logs 
+ **/
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+
+/**@author Julio**/
+
+public class Logs
+{
+  public static void LogsAigEqn(String fileLog, String eqn)throws FileNotFoundException, IOException
+  {
+        File outFile = new File(fileLog);
+        FileOutputStream buffStart;
+        
+        outFile.setWritable(true);
+        buffStart = new FileOutputStream(outFile,true);
+        buffStart.write(eqn.getBytes());
+        buffStart.write('\n');
+        buffStart.close();
+        System.out.println("#Log Eqn Executado com Sucesso");
+  }
+  
+  public static void LogsAigKcuts(String fileLog, ArrayList<ArrayList<NodeAig>> kcut,int sizeK)throws FileNotFoundException, IOException
+  {
+        File outFile = new File(fileLog);
+        FileOutputStream buffStart;
+        
+        outFile.setWritable(true);
+        buffStart = new FileOutputStream(outFile,true);
+        String out = "#############KCUTS###################\nSize Cut K= "+sizeK+"\n"+"Cuts:\n";
+        buffStart.write(out.getBytes());
+        for(int i=0;i<kcut.size();i++)
+        {
+            ArrayList<NodeAig> aux = kcut.get(i);
+            for(int j=0;j<aux.size();j++)
+            {
+              buffStart.write(aux.get(j).getName().getBytes());
+              buffStart.write('-');
+            }
+            buffStart.write('\n');      
+        }
+        out = kcut.size()+" Cuts\n";
+        buffStart.write(out.getBytes());
+        buffStart.close();
+        System.out.println("#Log Kcuts Executado com Sucesso");
+  }
+
+ 
+}
