@@ -16,7 +16,7 @@ public final class CutterKCutsLibrary extends CutterKCuts
     protected LibraryReader library;
     protected Map<NodeAig,Set<AigCutBrc>>    cutsBrc;
     protected Map<AigCutBrc,Set<FunctionData>> signature;
-    public String logs;
+    public String logs="";
     
     public CutterKCutsLibrary(Aig aig, int limit, String libraryName) throws Exception
     {
@@ -117,7 +117,7 @@ public final class CutterKCutsLibrary extends CutterKCuts
     public void showAllcutsLibrary()
     {
        System.out.println("############CUTS LIBRARY#######################");
-       logs +=("############CUTS LIBRARY#######################");
+       logs +=("\n############CUTS LIBRARY#######################");
        Iterator<Map.Entry<NodeAig,Set<AigCutBrc>>> node = cutsBrc.entrySet().iterator();
        while(node.hasNext())
        {
@@ -129,17 +129,21 @@ public final class CutterKCutsLibrary extends CutterKCuts
              singleCut.showCut(cut.getKey());
              if(this.signature.containsKey(singleCut))
              {
+                logs+="\n[";
+                for(NodeAig nodeCut: singleCut.getCut())
+                    logs+=nodeCut.getName()+",";
+                logs = logs.substring(0,logs.length()-1)+"] ";                         
                 for(FunctionData cell :this.signature.get(singleCut))
                 {
-                    logs+=("------------\nMatching com a biblioteca célula: "+cell.getGateName()+" função: "
-                    +cell.getFunction()+" custo: "+cell.getCost()+"\n------------");                    
+                    logs+=("------------ Matching com a biblioteca célula: "+cell.getGateName()+" função: "
+                    +cell.getFunction()+" custo: "+cell.getCost());                    
                     System.out.println("------------\nMatching com a biblioteca célula: "+cell.getGateName()+" função: "
                     +cell.getFunction()+" custo: "+cell.getCost()+"\n------------");
                 }
              }
            }   
        }
-       logs += (cuts.size()+" Cortes\n");
+       logs += ("\n"+cuts.size()+" Cortes\n");
        System.out.println(cuts.size()+" Cortes");
        logs += ("########################################\n");
        System.out.println("########################################");
