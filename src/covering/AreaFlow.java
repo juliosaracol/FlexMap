@@ -13,18 +13,18 @@ public class AreaFlow
     protected Aig                   myAig;
     protected Integer               sizeCut;
     protected CutterK               kcuts;
-    protected Float                 custCut;
+    protected Float                 CostCut;
     protected Map<NodeAig, AigCut>  covering;
     protected Map<NodeAig, AigCut>  bestCut;
     protected Map<NodeAig,Float>    tableArea;
     protected Map<NodeAig,Integer>  levelNode;
 
-    public AreaFlow(Aig myAig, int size, CutterK cutterK, Float cust) 
+    public AreaFlow(Aig myAig, int size, CutterK cutterK, Float Cost) 
     {
         this.myAig      = myAig;
         this.sizeCut    = size;
         this.kcuts      = cutterK;
-        this.custCut    = cust;
+        this.CostCut    = Cost;
         this.covering   = new HashMap<NodeAig, AigCut>();
         this.bestCut    = new HashMap<NodeAig, AigCut>();
         this.tableArea  = new HashMap<NodeAig, Float>();
@@ -53,9 +53,9 @@ public class AreaFlow
     {
         if(this.bestCut.containsKey(nodeActual))
           return;
-        Map<AigCut,Float> tableCust = new HashMap<AigCut,Float>();
-        Set<AigCut> cuts            = kcuts.getCuts().get(nodeActual);
-        Iterator<AigCut> iterator   = cuts.iterator();
+        Map<AigCut,Float> tableCost     = new HashMap<AigCut, Float>();
+        Set<AigCut> cuts                = kcuts.getCuts().get(nodeActual);
+        Iterator<AigCut> iterator       = cuts.iterator();
         do
         {          
            AigCut cut = iterator.next(); 
@@ -67,13 +67,13 @@ public class AreaFlow
            }
            else
            {
-              float cust  = sumCust(cut,nodeActual);
-              tableCust.put(cut, cust);              
+              float cost  = sumCost(cut,nodeActual);
+              tableCost.put(cut, (Float)cost);              
            }
            
         }while(iterator.hasNext()); //contabiliza areas
         if(!nodeActual.isInput())
-            choiceBestArea(nodeActual,tableCust);
+            choiceBestArea(nodeActual,tableCost);
         System.out.print(" BestArea Nodo: "+nodeActual.getName()+
          " Custo: "+tableArea.get(nodeActual)+
          " Profundidade: "+levelNode.get(nodeActual)+
@@ -81,9 +81,9 @@ public class AreaFlow
         bestCut.get(nodeActual).showCut();
     }
     //**Método contabiliza a área do Cut
-    private float sumCust(AigCut cut, NodeAig nodeActual) 
+    private float sumCost(AigCut cut, NodeAig nodeActual) 
     {
-        float cust=0;
+        float Cost=0;
         int outEdge=0;
         if(nodeActual.getChildren().isEmpty())
             outEdge =1;//fanouts
@@ -95,41 +95,36 @@ public class AreaFlow
           {
             if(!tableArea.containsKey(node))
                 getBestArea(node);
-            cust+=tableArea.get(node);
+            Cost+=tableArea.get(node);
           }
-          return (this.custCut+cust)/outEdge; 
+          return (this.CostCut+Cost)/outEdge; 
         }
         for(NodeAig node:cut)
         {
             if(!tableArea.containsKey(node))
                 getBestArea(node);
-            cust+=tableArea.get(node);
+            Cost+=tableArea.get(node);
         }
-        return (cust+this.custCut)/outEdge;
+        return (Cost+this.CostCut)/outEdge;
     }
     //**Método faz a melhor escolha entre os cortes do Nodo
-    private void choiceBestArea(NodeAig nodeActual, Map<AigCut, Float> tableCust) 
+    private void choiceBestArea(NodeAig nodeActual, Map<AigCut, Float> tableCost) 
     {
-        AigCut cut=null,cutBest = null;
+        AigCut cut      = null;
+        AigCut cutBest  = bestCost(tableCost);
         Set<AigCut> cuts = kcuts.getCuts().get(nodeActual); 
         Iterator<AigCut> iterator = cuts.iterator();
         do
         {    
-            if(cut==null)
-            {
-                cut = iterator.next();
-                cutBest  = cut;
-            }
-            else
-                cut = iterator.next();
-            if(((tableCust.get(cut)) <= (tableCust.get(cutBest))))
+            cut = iterator.next();
+            if(((tableCost.get(cut)) <= (tableCost.get(cutBest))))
               if(cut.size() >= cutBest.size())
                 if(sumLevel(cut,nodeActual) >= sumLevel(cutBest,nodeActual)) //compara a profundidade em relação ao circuito
                   cutBest = cut; 
                 
         }while(iterator.hasNext());
         bestCut.put(nodeActual,cutBest);      
-        tableArea.put(nodeActual, (tableCust.get(cutBest)));
+        tableArea.put(nodeActual, (tableCost.get(cutBest)));
     }
     //**Método contabiliza a profundidade utilizando bfs
     private Integer sumLevel(AigCut cut, NodeAig nodeActual)
@@ -172,8 +167,24 @@ public class AreaFlow
         }while(iterator.hasNext());
         System.out.println("############################################################");
     }
+    
     //** Método de acesso a cobetura gerada
     public Map<NodeAig, AigCut> getCovering() {
         return covering;
-    }    
+    }
+
+    //**Método que seleciona o menor custo possivel melhor Cut*/
+    private AigCut bestCost(Map<AigCut, Float> tableCost) 
+    {
+        AigCut best = null;
+        for(Map.Entry<AigCut,Float> nodes: tableCost.entrySet())
+        {
+            if(best == null)
+                best = nodes.getKey();
+            else
+                if(tableCost.get(best) > nodes.getValue())
+                    best = nodes.getKey();
+        }
+        return best;            
+    }
 }

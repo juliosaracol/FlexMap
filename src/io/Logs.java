@@ -122,34 +122,35 @@ public class Logs
             TreeMap<String,String> symbolsEqn     = new TreeMap<String,String>();
             ArrayList<String>      primaryInput   = new ArrayList<String>();
             
-            for(NodeAig input: myAig.getNodeInputsAig()){
-               if(!primaryInput.contains(input.getName())){
-                  defInputsEqn = defInputsEqn +" "+ inputSymbol+ input.getName();
-                  primaryInput.add(input.getName());
-                  symbolsEqn.put(input.getName(),inputSymbol+ input.getName());
+            for(int i=0;i<myAig.getNodeInputsAig().size();i++){
+                String name = myAig.getInputsAig()[i][0];
+                if(!primaryInput.contains(name)){
+                  defInputsEqn = defInputsEqn +" "+ inputSymbol+ name;
+                  primaryInput.add(name);
+                  symbolsEqn.put(name,inputSymbol+ name);
                }
             }
             defInputsEqn +=";";
-            for(NodeAig output: myAig.getNodeOutputsAig())
-            {
-               if(symbolsEqn.get(outputSymbol+output.getName()) == null) 
-               {
-                   if((Integer.parseInt(output.getName())%2) != 0)
-                   {
-                       if(!primaryInput.contains(String.valueOf(Integer.parseInt(output.getName())-1))) //testa se é entrada<->saida invertida
-                         symbolsEqn.put(outputSymbol+output.getName(),"!["+(Integer.parseInt(output.getName())-1)+"]");    // o_3=![2]
-                       else
-                          symbolsEqn.put(outputSymbol+output.getName(),"!["+inputSymbol+(Integer.parseInt(output.getName())-1)+"]"); // o_3=![2]
-                   }
-                   else
-                   {
-                       if(!primaryInput.contains(output.getName()))
-                          symbolsEqn.put(outputSymbol+output.getName(),"["+output.getName()+"]");     // o_2=[2]
-                       else
-                          symbolsEqn.put(outputSymbol+output.getName(),"["+inputSymbol+output.getName()+"]"); // o_2= i_2
-                   }  
-                   defOutputsEqn = defOutputsEqn +" "+ outputSymbol+output.getName(); 
-               }
+            for(int i=0;i<myAig.getNodeOutputsAig().size();i++){ 
+                NodeAig output = myAig.getVertexName(myAig.getOutputsAig()[i][0]); 
+                if(symbolsEqn.get(outputSymbol+output.getName()) == null) 
+                {
+                    if((Integer.parseInt(output.getName())%2) != 0)
+                    {
+                        if(!primaryInput.contains(String.valueOf(Integer.parseInt(output.getName())-1))) //testa se é entrada<->saida invertida
+                            symbolsEqn.put(outputSymbol+output.getName(),"!["+(Integer.parseInt(output.getName())-1)+"]");    // o_3=![2]
+                        else
+                            symbolsEqn.put(outputSymbol+output.getName(),"!["+inputSymbol+(Integer.parseInt(output.getName())-1)+"]"); // o_3=![2]
+                    }
+                    else
+                    {
+                        if(!primaryInput.contains(output.getName()))
+                            symbolsEqn.put(outputSymbol+output.getName(),"["+output.getName()+"]");     // o_2=[2]
+                        else
+                            symbolsEqn.put(outputSymbol+output.getName(),"["+inputSymbol+output.getName()+"]"); // o_2= i_2
+                    }  
+                    defOutputsEqn = defOutputsEqn +" "+ outputSymbol+output.getName(); 
+                }
             }
             defOutputsEqn += ";";      
             outString += defInputsEqn+"\n"+defOutputsEqn+"\n";
@@ -199,16 +200,17 @@ public class Logs
        TreeMap<String,String> symbolsEqn     = new TreeMap<String,String>();
        ArrayList<String>      primaryInput   = new ArrayList<String>();
        //--inputs and outputs--------------------------------------------------     
-       for(NodeAig input: myAig.getNodeInputsAig()){
-               if(!primaryInput.contains(input.getName())){
-                  defInputsEqn = defInputsEqn +" "+ inputSymbol+ input.getName();
-                  primaryInput.add(input.getName());
-                  symbolsEqn.put(input.getName(),inputSymbol+ input.getName());
+       for(int i=0;i<myAig.getNodeInputsAig().size();i++){
+                String name = myAig.getInputsAig()[i][0];
+                if(!primaryInput.contains(name)){
+                  defInputsEqn = defInputsEqn +" "+ inputSymbol+ name;
+                  primaryInput.add(name);
+                  symbolsEqn.put(name,inputSymbol+ name);
                }
-            }
+          }
         defInputsEqn +=";";
-        for(NodeAig output: myAig.getNodeOutputsAig())
-        {
+        for(int i=0;i<myAig.getNodeOutputsAig().size();i++){ 
+           NodeAig output = myAig.getVertexName(myAig.getOutputsAig()[i][0]); 
            if(symbolsEqn.get(outputSymbol+output.getName()) == null) 
            {
                if((Integer.parseInt(output.getName())%2) != 0)
