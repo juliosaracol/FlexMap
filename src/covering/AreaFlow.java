@@ -141,15 +141,27 @@ public class AreaFlow
         bfsNodeAigVisitorAreaCovering bfs = new bfsNodeAigVisitorAreaCovering(this);
         for(NodeAig nodeActual: myAig.getNodeOutputsAig())
         {
-            this.covering.put(nodeActual, this.bestCut.get(nodeActual));
-            nodeActual.accept(bfs);     
+            System.out.println("saida: "+nodeActual.getName());
+            if(!this.covering.containsKey(nodeActual))
+            {
+                this.covering.put(nodeActual, this.bestCut.get(nodeActual));
+                nodeActual.accept(bfs);     
+            }
         }
-        Map<NodeAig,AigCut> list = new HashMap<NodeAig, AigCut>();
-        for(Map.Entry<NodeAig,AigCut> element: this.covering.entrySet())
-           for(NodeAig node: element.getValue().getCut())
+        boolean signalOk = true;
+        while(signalOk == true)
+        {
+          Map<NodeAig,AigCut> list = new HashMap<NodeAig, AigCut>();
+          signalOk = false;  
+          for(Map.Entry<NodeAig,AigCut> element: this.covering.entrySet())
+              for(NodeAig node: element.getValue().getCut())
                 if((!node.isInput())&&(!this.covering.containsKey(node)))
+                {
                     list.put(node, this.bestCut.get(node));
-        this.covering.putAll(list);
+                    signalOk = true;
+                }
+          this.covering.putAll(list);
+        }
     }
     //**Método para visualização da cobetura final
     public void showCovering()
