@@ -25,15 +25,18 @@ public abstract class bfsNodeAigVisitor implements AigNodeVisitor
             nodesBfs.add(nodeAigGate);
             for(int i=0;i<nodeAigGate.getParents().size();i++)
             {
-                list.add(nodeAigGate.getParents().get(i));
-                this.states++;
+                if(!list.contains(nodeAigGate.getParents().get(i))&&(!nodesBfs.contains(nodeAigGate.getParents().get(i))))
+                {
+                    list.add(nodeAigGate.getParents().get(i));
+                    this.states++;
+                }
             }
             function(nodeAigGate);
-        }
+        }        
         if(list.size() > 0)
         {
             NodeAig temp =  list.get(0);
-            list.remove(0);        
+            list.remove(0);
             temp.accept(this);
         }
     }
@@ -67,8 +70,11 @@ public abstract class bfsNodeAigVisitor implements AigNodeVisitor
             nodesBfs.add(nodeAigOutput);
             for(int i=0;i<nodeAigOutput.getParents().size();i++)
             {
-                list.add(nodeAigOutput.getParents().get(i));
-                this.states++;
+                if(!list.contains(nodeAigOutput.getParents().get(i))&&(!nodesBfs.contains(nodeAigOutput.getParents().get(i))))
+                {
+                    list.add(nodeAigOutput.getParents().get(i));
+                    this.states++;
+                }
             }
             function(nodeAigOutput);
         }

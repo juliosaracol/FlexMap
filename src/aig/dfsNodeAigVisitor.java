@@ -21,22 +21,26 @@ public abstract class dfsNodeAigVisitor implements AigNodeVisitor
 
     @Override
     public void visit(NodeAigGate nodeAigGate) {
-        if(!nodesDfs.contains(nodeAigGate))
+        if((!nodesDfs.contains(nodeAigGate)))
         {
             nodesDfs.add(nodeAigGate);
             for(int i=0;i<nodeAigGate.getParents().size();i++)
             {
-                this.states++;
-                list.add(nodeAigGate.getParents().get(i));
+                if(!list.contains(nodeAigGate.getParents().get(i))&&(!nodesDfs.contains(nodeAigGate.getParents().get(i))))
+                {
+                    list.add(nodeAigGate.getParents().get(i));                    
+                    this.states++;
+                }
             }
         }
         if(list.size()>0)
         {
-            NodeAig temp = list.get(list.size()-1);
-            list.remove(list.size()-1); 
+            int sizeList = list.size()-1;
+            NodeAig temp = list.get(sizeList);
+            list.remove(sizeList); 
             temp.accept(this);
-            function(nodeAigGate);
         }
+        function(nodeAigGate);
     }
 
     @Override
@@ -47,34 +51,43 @@ public abstract class dfsNodeAigVisitor implements AigNodeVisitor
     @Override
     public void visit(NodeAigInput nodeAigInput) {
         if(!nodesDfs.contains(nodeAigInput))
+        {
             nodesDfs.add(nodeAigInput);
+            if(list.size() <= 0)
+                return;
+        }
         if(list.size()>0)
         {
-            function(nodeAigInput);
-            NodeAig temp = list.get(list.size()-1);
-            list.remove(list.size()-1);        
+            int sizeList = list.size()-1;
+            NodeAig temp = list.get(sizeList);
+            NodeAig remove = list.remove(sizeList);
             temp.accept(this);
         }
+        function(nodeAigInput);
     }
 
     @Override
     public void visit(NodeAigOutput nodeAigOutput) {
-        if(!nodesDfs.contains(nodeAigOutput))
+        if((!nodesDfs.contains(nodeAigOutput)))
         {
             nodesDfs.add(nodeAigOutput);
             for(int i=0;i<nodeAigOutput.getParents().size();i++)
             {
-                this.states++;
-                list.add(nodeAigOutput.getParents().get(i));
+                if(!list.contains(nodeAigOutput.getParents().get(i))&&(!nodesDfs.contains(nodeAigOutput.getParents().get(i))))
+                {
+                    list.add(nodeAigOutput.getParents().get(i));
+                    this.states++;
+                }
             }
         }
         if(list.size()>0)
         {
-            function(nodeAigOutput);
-            NodeAig temp = list.get(list.size()-1);
-            list.remove(list.size()-1);
+            int sizeList = list.size()-1;
+            NodeAig temp = list.get(sizeList);
+            list.remove(sizeList);
             temp.accept(this);
         }
+        function(nodeAigOutput);
     }
 
     public ArrayList<NodeAig> getList() {

@@ -117,6 +117,8 @@ public class AreaFlow
         do
         {    
             cut = iterator.next();
+            System.out.println("trabalhando com o nodo :"+nodeActual.getName()+" e corte :");
+            cut.showCut();
             if(((tableCost.get(cut)) <= (tableCost.get(cutBest))))
               if(cut.size() >= cutBest.size())
                 if(sumLevel(cut,nodeActual) >= sumLevel(cutBest,nodeActual)) //compara a profundidade em relação ao circuito

@@ -185,8 +185,9 @@ public class Main
               }
               else
               {
-                  for(NodeAig out : myAig.getNodeOutputsAig())
+                   for(NodeAig out : myAig.getNodeOutputsAig())
                     out.accept(myDfs);
+                   
               }
               System.out.println("DFS executada com sucesso");
               System.out.println("\n############ DFS #############################");
@@ -207,17 +208,19 @@ public class Main
               Aig myAig = new Aig(args[0]);
               if(args.length == 3)
               {
-                  NodeAig out= (NodeAig)myAig.getVertexName(args[2]);
+                  NodeAig out = (NodeAig)myAig.getVertexName(args[2]);
                   out.accept(myBfs);
               }
               else
               {
-                  for(int i=0;i<myAig.getO();i++)
-                  {
-                    String nameNode     = myAig.getOutputsAig()[i][0];
-                    NodeAig out   = myAig.getVertexName(nameNode);
+                  for(NodeAig out : myAig.getNodeOutputsAig())
                     out.accept(myBfs);
-                  }
+//                  for(int i=0;i<myAig.getO();i++)
+//                  {
+//                    String nameNode     = myAig.getOutputsAig()[i][0];
+//                    NodeAig out         = myAig.getVertexName(nameNode);
+//                    out.accept(myBfs);
+//                  }
               }
               System.out.println("BFS executada com sucesso");
               System.out.println("\n############ BFS #############################");

@@ -29,29 +29,58 @@ public class bfsNodeAigVisitorSumLevel extends bfsNodeAigVisitor
     }
     
     /** Override pois precisa abandonar a busca caso encontre entrada do corte*/
+//    @Override
+//    public void visit(NodeAigGate nodeAigGate) 
+//    {
+//        if(!nodesBfs.contains(nodeAigGate))
+//        {
+//            nodesBfs.add(nodeAigGate);
+//            function(nodeAigGate);
+//            if(!this.cut.contains(nodeAigGate))
+//            {
+//                for(int i=0;i<nodeAigGate.getParents().size();i++)
+//                {
+//                    if((!list.contains(nodeAigGate.getParents().get(i)))&&(!nodesBfs.contains(nodeAigGate.getParents().get(i))))
+//                    {
+//                        list.add(nodeAigGate.getParents().get(i));
+//                        this.states++;
+//                    }
+//                }
+//            }
+//        }
+//        if(list.size() > 0)
+//        {
+//            NodeAig temp =  list.get(0);
+//            list.remove(0);        
+//            temp.accept(this);
+//        }
+//    }
     @Override
-    public void visit(NodeAigGate nodeAigGate) 
-    {
+    public void visit(NodeAigGate nodeAigGate) {
         if(!nodesBfs.contains(nodeAigGate))
         {
             nodesBfs.add(nodeAigGate);
-            function(nodeAigGate);
             if(!this.cut.contains(nodeAigGate))
             {
                 for(int i=0;i<nodeAigGate.getParents().size();i++)
                 {
-                    list.add(nodeAigGate.getParents().get(i));
-                    this.states++;
+                    if(!list.contains(nodeAigGate.getParents().get(i))&&(!nodesBfs.contains(nodeAigGate.getParents().get(i))))
+                    {
+                      list.add(nodeAigGate.getParents().get(i));
+                      this.states++;
+                    }
                 }
             }
-        }
+            function(nodeAigGate);
+        }        
         if(list.size() > 0)
         {
             NodeAig temp =  list.get(0);
-            list.remove(0);        
+            list.remove(0);
             temp.accept(this);
         }
     }
+
     
     public Integer getLevel()
     {
