@@ -10,7 +10,7 @@ public class EdgeAig extends Edge
 
     protected boolean inverter;
     
-    protected EdgeAig(int edgesCount, Vertex vertex1, Vertex vertex2)
+    public EdgeAig(int edgesCount, Vertex vertex1, Vertex vertex2)
     {
         super(edgesCount, vertex1, vertex2);
         this.inverter = false;

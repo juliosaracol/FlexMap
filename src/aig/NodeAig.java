@@ -50,6 +50,8 @@ public abstract class NodeAig extends Vertex {
     /** Método que será implementado de acordo com o typeNodeAig*/
     public abstract boolean isAnd();
     /** Método que será implementado de acordo com o typeNodeAig*/
+    public abstract boolean isOR();
+    /** Método que será implementado de acordo com o typeNodeAig*/
     public abstract boolean isInverter();
     /** Método que será implementado de acordo com o typeNodeAig*/
     public abstract boolean isInput();

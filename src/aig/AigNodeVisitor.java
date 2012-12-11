@@ -13,6 +13,12 @@ public interface AigNodeVisitor {
     public void visit(NodeAigGate nodeAigGate);
 
     /**
+     * Visitor for an AigNodeOR
+     * @param aigNodeAnd    The node
+     */
+    public void visit(NodeAigGateOr nodeAigGateOr);
+
+    /**
      * Visitor for an AigNodeInput
      * @param aigNodeInput  The Node
      */

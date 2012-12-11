@@ -18,7 +18,13 @@ public class NodeAigLatch extends NodeAig
     {
         return false;
     }
-
+    
+    @Override
+    public boolean isOR()
+    {
+        return false;
+    }
+    
     @Override
     public boolean isInverter()
     {

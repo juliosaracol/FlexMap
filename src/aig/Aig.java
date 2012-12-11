@@ -35,9 +35,6 @@ public class Aig extends Graph
       parserAig(fileName);
       createNodesAig();
       System.out.println("#AIG carregado com sucesso");
-      //métodos para ver como o parser está pegando as definiçoes do aig
-      //viewTableAig();
-      //viewDefintionAig();               
    }    
    /** Método que realiza o parser do arquivo baseado no padrão AIGER carrega os vetores de inputs|outputs|latches|gates
     * @param nomeArquivoEntrada.aag*/
@@ -131,13 +128,9 @@ public class Aig extends Graph
                            else
                            {
                                if((token.length() == 2)&&(token.substring(0,1).equals("o")))
-                               {
                                    this.definitionAig.get(definitionAig.size()-1).add(token);
-                               }
                                else //comments
-                               {
                                    this.definitionAig.get(definitionAig.size()-1).add(token);
-                               }
                            }                               
                         }
                     }        
@@ -154,13 +147,8 @@ public class Aig extends Graph
         for(j=0;j<this.i;j++)
         {      
            if(this.getVertexName(this.inputsAig[j][0]) == null) //se não existe o nodo
-           {
                if((Integer.parseInt(this.inputsAig[j][0]) %2) == 0)
-               {
                    this.createInput(this.inputsAig[j][0]);
-                   //System.out.println("instâncio NodoAigInput: "+this.inputsAig[j][0]);
-               }
-           }
            else
                nodeInputsAig.add(this.getVertexName(this.inputsAig[j][0]));
         }
@@ -172,13 +160,8 @@ public class Aig extends Graph
             for(w=0;w<3;w++)
             {      
               if(this.getVertexName(this.gatesAig[j][w]) == null)
-              {
                 if(Integer.parseInt(this.gatesAig[j][w])%2==0)
-                {
                     this.createAnd(this.gatesAig[j][w]);   
-                    //System.out.println("instâncio NodoAigGate: "+this.gatesAig[j][w]);
-                }
-              }
               else
                   nodeGatesAig.add(this.getVertexName(this.gatesAig[j][w]));
             }
@@ -188,26 +171,14 @@ public class Aig extends Graph
         for(j=0;j<this.a;j++)
         {
             if(Integer.parseInt(this.gatesAig[j][1])%2==0) //se não inversor cria direto
-            {
-                //System.out.println("tento instâncio Aresta :: "+this.gatesAig[j][0]+"<=>"+this.gatesAig[j][1]);
                 this.addEdge(this.gatesAig[j][0],this.gatesAig[j][1],false);               
-            } 
             else
-            {
-                //System.out.println("tento instâncio ArestaInversora :: "+this.gatesAig[j][0]+"<=>"+(this.gatesAig[j][1]-1));
                 this.addEdge(this.gatesAig[j][0],String.valueOf(Integer.parseInt(this.gatesAig[j][1])-1),true);                             
-            }
             
             if(Integer.parseInt(this.gatesAig[j][2])%2==0) //se não inversor cria direto
-            {
-                //System.out.println("tento instâncio Aresta :: "+this.gatesAig[j][0]+"<=>"+this.gatesAig[j][2]);
                 this.addEdge(this.gatesAig[j][0],this.gatesAig[j][2],false);
-            } 
             else
-            {
-                //System.out.println("tento instâncio ArestaInversora :: "+this.gatesAig[j][0]+"<=>"+(this.gatesAig[j][2]-1));
                 this.addEdge(this.gatesAig[j][0],String.valueOf(Integer.parseInt(this.gatesAig[j][2])-1),true);                             
-            }
         }        
         
         /*instância nodos outputs*/
@@ -216,16 +187,11 @@ public class Aig extends Graph
            if(this.getVertexName(this.outputsAig[j][0]) == null)//se não existe o nodo
            {
                if(Integer.parseInt(this.outputsAig[j][0])%2==0)
-               {
                 this.createOutput(this.outputsAig[j][0]);
-                //System.out.println("instâncio NodoAigOutput: "+this.outputsAig[j][0]);
-               }
                else
                {
                    this.createOutput(this.outputsAig[j][0]); //cria a aresta inversora
                    this.addEdge(this.outputsAig[j][0],String.valueOf(Integer.parseInt(this.outputsAig[j][0])-1),true);
-                   //System.out.println("instâncio NodoAigOutput: "+this.outputsAig[j][0]);
-                   //System.out.println("instâncio Aresta :: "+this.outputsAig[j][0]+"<=>"+(this.outputsAig[j][0]-1));
                }
            }
            else
@@ -237,11 +203,8 @@ public class Aig extends Graph
         {
           String nameNodeAig = String.valueOf(nameLatch);
           this.createLatch(nameNodeAig);
-          //System.out.println("instâncio NodoAig Latch: "+nameLatch);
           this.addEdge(this.latchAig[j][0],nameNodeAig,false);
-          //System.out.println("instâncio ArestaLatch  : "+nameLatch+"<=>"+this.latchAig[j][0]);
           this.addEdge(nameNodeAig,this.latchAig[j][1],false);
-          //System.out.println("instâncio ArestaLatch  : "+this.latchAig[j][1]+"<=>"+nameLatch);
           nameLatch--;
         }       
     }        
@@ -342,24 +305,18 @@ public class Aig extends Graph
     {
         System.out.println("------TABELA inputAIG-------");
         for(int w=0;w<this.i;w++)
-        {
             System.out.print(w+"["+inputsAig[w][0]+"]\n");
-        }
         System.out.println("----------------------------");
         System.out.println("------TABELA outputAIG------");
         for(int w=0;w<this.o;w++)
-        {
             System.out.print(w+"["+outputsAig[w][0]+"]\n");
-        }
         System.out.println("----------------------------");
         System.out.println("------TABELA gatesAIG------");
         for(int w=0;w<this.a;w++)
         {
-           System.out.print("[");
+          System.out.print("[");
           for(int q=0;q<3;q++)
-          {
               System.out.print(gatesAig[w][q]+"-");
-          }
           System.out.print("]\n");
         }
         System.out.println("----------------------------");
@@ -371,9 +328,7 @@ public class Aig extends Graph
         for(int w=0;w<this.definitionAig.size();w++)
         {
            for(int j=0;j<this.definitionAig.get(w).size();j++)
-           { 
                System.out.print(this.definitionAig.get(w).get(j)+"-");
-           }
            System.out.print("\n");
         }
         System.out.println("----------------------------");
@@ -387,13 +342,9 @@ public class Aig extends Graph
             NodeAig nodo = (NodeAig)this.getVertex(i);
             System.out.print("\nnodoAig: "+nodo.getName()+"\n");
             for(int z=0;z<nodo.getParents().size();z++)
-            {
                 System.out.println("É FILHO De:"+nodo.getParents().get(z).getName());
-            }
             for(int j=0;j<nodo.getChildren().size();j++)
-            {
                 System.out.println("É PAI De:"+nodo.getChildren().get(j).getName());                
-            }
         }
     }
     /** Método que faz interface com ID <-> Name do NodeAig*/
@@ -467,8 +418,3 @@ public class Aig extends Graph
         return this.allNodesAig.iterator();
     }
  }
-
-
-
-                      
-                 

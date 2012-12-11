@@ -44,6 +44,30 @@ public abstract class dfsNodeAigVisitor implements AigNodeVisitor
     }
 
     @Override
+    public void visit(NodeAigGateOr NodeAigGateOr) {
+        if((!nodesDfs.contains(NodeAigGateOr)))
+        {
+            nodesDfs.add(NodeAigGateOr);
+            for(int i=0;i<NodeAigGateOr.getParents().size();i++)
+            {
+                if(!list.contains(NodeAigGateOr.getParents().get(i))&&(!nodesDfs.contains(NodeAigGateOr.getParents().get(i))))
+                {
+                    list.add(NodeAigGateOr.getParents().get(i));                    
+                    this.states++;
+                }
+            }
+        }
+        if(list.size()>0)
+        {
+            int sizeList = list.size()-1;
+            NodeAig temp = list.get(sizeList);
+            list.remove(sizeList); 
+            temp.accept(this);
+        }
+        function(NodeAigGateOr);
+    }
+
+    @Override
     public void visit(NodeAigLatch nodeAigLatch) {
         return;
     }

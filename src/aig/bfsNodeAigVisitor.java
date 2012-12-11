@@ -42,6 +42,29 @@ public abstract class bfsNodeAigVisitor implements AigNodeVisitor
     }
 
     @Override
+    public void visit(NodeAigGateOr nodeAigGateOr) {
+        if(!nodesBfs.contains(nodeAigGateOr))
+        {
+            nodesBfs.add(nodeAigGateOr);
+            for(int i=0;i<nodeAigGateOr.getParents().size();i++)
+            {
+                if(!list.contains(nodeAigGateOr.getParents().get(i))&&(!nodesBfs.contains(nodeAigGateOr.getParents().get(i))))
+                {
+                    list.add(nodeAigGateOr.getParents().get(i));
+                    this.states++;
+                }
+            }
+            function(nodeAigGateOr);
+        }        
+        if(list.size() > 0)
+        {
+            NodeAig temp =  list.get(0);
+            list.remove(0);
+            temp.accept(this);
+        }
+    }
+
+    @Override
     public void visit(NodeAigLatch nodeAigLatch) {
         return;
     }

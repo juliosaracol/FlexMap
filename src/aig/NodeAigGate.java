@@ -19,6 +19,12 @@ public class NodeAigGate extends NodeAig
     }
 
     @Override
+    public boolean isOR()
+    {
+        return false;
+    }
+
+    @Override
     public boolean isInverter()
     {
     return false;
