@@ -64,9 +64,10 @@ public class bfsNodeTreeVisitor extends bfsNodeAigVisitor
           }
           else
               newNode = (NodeAigGate) nodeAigActual;
-          for(NodeAig node: nodeAigActual.getChildren())
-              if(tree.contains(node.getName()))
-                tree.addEdge(node,newNode, false);              
+          for(NodeAig father: nodeAigActual.getChildren())
+              if(treeNodes.contains(father)&&father!=this.tree.getRoot())
+                if(tree.contains(father.getName()))
+                    tree.addEdge(father,newNode, false);              
         }
        }
     }
