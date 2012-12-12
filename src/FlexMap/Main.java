@@ -13,6 +13,7 @@ import covering.*;
  * */
 
 import java.io.*;
+import tree.Trees;
 
 public class Main 
 {
@@ -154,18 +155,20 @@ public class Main
              //return;
         //}
         ////------------------------------------------------------------------
-        ////--------------------ELIS------------------------------------------
-        //if(args[1].equals("-E")&&(args.length >= 4))
-        //{
-             //AigTree myAigTree = new AigTree(args[0]);
+        //--------------------ARVORES------------------------------------------
+        if(args[1].equals("-T")&&(args.length >= 2))
+        {
+             Aig myAigTree = new Aig(args[0]);
+             Trees myTrees = new Trees(myAigTree);
+             myTrees.show();
              //String out = Elis.mapElis(myAigTree,Integer.parseInt(args[2]),Integer.parseInt(args[3]));
              //if((args.length > 4)&&(args[4].contains(".eqn"))) 
              //{ //caso arquivo de log
-               //Logs.LogsAigEqn(args[4],out);  
+             //  Logs.LogsAigEqn(args[4],out);  
              //}
-             //return;
-        //}   
-        ////------------------------------------------------------------------
+             return;
+        }   
+        //------------------------------------------------------------------
         ////--------------------SWITCHING-------------------------------------
         //if(args[1].equals("-S")&&(args.length >= 3))
         //{

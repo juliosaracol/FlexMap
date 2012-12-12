@@ -138,4 +138,17 @@ public class Tree extends Graph
         return tree;
     }
     
+    public NodeAig getRoot() {
+        return root;
+    }
+    
+    
+    public void show()
+    {
+        System.out.println("##########ARVORE##############");
+        System.out.println("RAIZ: "+this.root.getName());
+        for(NodeAig node: tree)
+            System.out.print(node.getName()+"-");
+        System.out.println("\n###############################");
+    }
 }

@@ -8,32 +8,33 @@ import java.util.*;
  * Classe que da forma a descrição de Trees a partir de um Aig 
  * @author Julio Saraçol
  */
-public abstract class Trees 
+public class Trees 
 {
     protected Aig                   aig;
     protected Set<Tree>             roots       = new HashSet<Tree>();
-    protected ArrayList<NodeAig>    TreeNodes   = new ArrayList<NodeAig>();
+    protected ArrayList<NodeAig>    treeNodes   = new ArrayList<NodeAig>();
+    
     public Trees(Aig aig) 
     {
         this.aig = aig;
-        Trees();
-    }
-
-    protected void Trees()
-    {
         for(NodeAig node : aig.getAllNodesAig())
         {
-            if((!node.isAnd())||(!node.isOutput()))
-              if(node.getChildren().size() > 1)
+            if(!node.isInput())
+            {
+              if((node.getChildren().size() > 1)||(node.isOutput()))
               {
-                  this.TreeNodes.add(node);
-                  this.roots.add(new Tree(node));
-                  //bfs carregando resto dos nodos 
+                  this.treeNodes.add(node);
+                  Tree newTree = new Tree(node);
+                  this.roots.add(newTree);
+                  bfsNodeTreeVisitor bfs = new bfsNodeTreeVisitor(treeNodes,newTree);
+                  newTree.getRoot().accept(bfs);
               }
-            
+            }
         }
-        
-        
     }
-    
+
+    public void show() {
+        for(Tree cone: roots)
+            cone.show();
+    }
 }
