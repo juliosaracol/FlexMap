@@ -3,7 +3,6 @@ package tree;
 import aig.*;
 import java.util.*;
 
-
 /**
  * Classe que da forma a descrição de Trees a partir de um Aig 
  * @author Julio Saraçol
