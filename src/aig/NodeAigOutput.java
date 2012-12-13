@@ -1,5 +1,4 @@
 package aig;
-import graph.*;
 /**
  * Classe que especializa NodeAig para o tipo INPUT
  * @author Julio Saraçol

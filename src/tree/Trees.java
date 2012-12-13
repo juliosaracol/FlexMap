@@ -20,20 +20,20 @@ public class Trees
         {
             if(!node.isInput())
             {
-              if((node.getChildren().size() > 1)||(node.isOutput()))
+              if((aig.getNodeOutputsAig().contains(node))||(node.getChildren().size() > 1))
               {
                   NodeAig newNode = null;
                   this.treeNodes.add(node.getName());
-                  if(node.isOutput())
-                      newNode = new NodeAigOutput(node.getId(), node.getName());
-                  if(node.isAnd())
-                      newNode = new NodeAigGate(node.getId(), node.getName());
+                  newNode = new NodeAigOutput(node.getId(), node.getName());
                   Tree newTree = new Tree(newNode);
                   this.roots.add(newTree);
-                  bfsNodeTreeVisitor bfs = new bfsNodeTreeVisitor(treeNodes,newTree);
-                  newTree.getRoot().accept(bfs);
               }
             }
+        }
+        for(Tree tree: this.roots)
+        {
+            bfsNodeTreeVisitor bfs = new bfsNodeTreeVisitor(treeNodes,tree);
+            aig.getVertexName(tree.getRoot().getName()).accept(bfs);
         }
     }
 

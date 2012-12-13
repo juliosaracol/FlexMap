@@ -14,8 +14,8 @@ public class Tree extends Graph
     protected Set<NodeAig> tree  = new HashSet<NodeAig>();
     
     /**
-     * Construtor
-     */
+    * Construtor
+    */
     public Tree() {
     }
 
@@ -47,7 +47,7 @@ public class Tree extends Graph
     public int addEdge(NodeAig vertex1, NodeAig vertex2,boolean type) throws NullPointerException
     { 
         try {
-            if((vertex1 == null || vertex2 == null)||(this.tree.contains(vertex1)||this.tree.contains(vertex2)))
+            if((vertex1 == null || vertex2 == null))
                 throw new NullPointerException("Vertices inconsistentes");// dispara a Exceção throws
             EdgeAig auxEdge = new EdgeAig(this.edgesCount,vertex1,vertex2);
             if(type == true) //caso seja um inversor faz o set da aresta

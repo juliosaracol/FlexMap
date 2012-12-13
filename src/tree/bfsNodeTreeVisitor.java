@@ -11,63 +11,65 @@ public class bfsNodeTreeVisitor extends bfsNodeAigVisitor
 {
     protected ArrayList<String> treeNodes;
     protected Tree tree ;
-    protected ArrayList<String> nodesNames;
+    protected TreeMap<String,NodeAig> nodesNames;
 
     public bfsNodeTreeVisitor(ArrayList<String> TreeNodes,Tree tree) {
         this.treeNodes  = TreeNodes;
         this.tree       = tree;
-        this.nodesNames = new ArrayList<String>();
-        this.nodesNames.add(this.tree.getRoot().getName());
+        this.nodesNames = new TreeMap<String, NodeAig>();
+        this.nodesNames.put(this.tree.getRoot().getName(),this.tree.getRoot());
     }
 
     @Override
     public void function(NodeAig nodeAigActual) 
     {
-       if(!tree.contains(nodeAigActual))
-       {
-        if(nodeAigActual.isOutput())
+        if(!this.nodesNames.containsKey(nodeAigActual.getName()))
         {
-          NodeAigOutput newNode;
-          if(treeNodes.contains(nodeAigActual.getName()))
-          {
-              newNode = new NodeAigOutput(nodeAigActual.getId(), nodeAigActual.getName());
-              tree.add(newNode);
+            if(this.treeNodes.contains(nodeAigActual.getName())&&(!this.tree.getRoot().getName().equals(nodeAigActual.getName()))) //caso de treeNode no meio do subgrafo
+            {
               for(NodeAig child: nodeAigActual.getChildren())
-                  if(this.nodesNames.contains(child.getName()))
-                      tree.addEdge(child,newNode,  Algorithms.isInverter(child, newNode));              
-          }
-        }
-        if(nodeAigActual.isInput())
-        {
-          if(!this.nodesNames.contains(nodeAigActual.getName()))
-          {
-            NodeAigInput newNode;  
-            newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
+                if((this.nodesNames.containsKey(child.getName()))&&((this.treeNodes.contains(child.getName()))))
+                {
+                      NodeAigInput newNode;
+                      newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
+                      if(!this.nodesNames.containsKey(nodeAigActual.getName()))
+                      {
+                       tree.add(newNode);
+                       this.nodesNames.put(newNode.getName(),newNode);
+                      }
+                }
+              return;
+            }
+            if(nodeAigActual.isInput()) //caso de entrada primaria do circuito
+            {
+                NodeAigInput newNode;  
+                newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
+                for(NodeAig child: nodeAigActual.getChildren())
+                   if(((this.treeNodes.contains(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
+                       ||((!this.treeNodes.contains(child.getName()))&&(this.nodesNames.containsKey(child.getName()))))//insere se o treenode pai é a raiz ou se não é treenode e o pai esta na arvore
+                   {
+                           if(!this.nodesNames.containsKey(nodeAigActual.getName()))
+                           {
+                            tree.addEdge(this.nodesNames.get(child.getName()),newNode, Algorithms.isInverter(child, nodeAigActual));
+                            this.nodesNames.put(newNode.getName(),newNode);
+                            tree.add(newNode);
+                           }
+                   }                       
+                return;
+            }
             for(NodeAig child: nodeAigActual.getChildren())
-               if((this.treeNodes.contains(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
-               {
-                   tree.addEdge(child,newNode,  Algorithms.isInverter(child, newNode));
-                   tree.add(newNode);
-                   this.nodesNames.add(newNode.getName());
-               }
-          }
+                   if(((this.treeNodes.contains(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
+                       ||((!this.treeNodes.contains(child.getName()))&&(this.nodesNames.containsKey(child.getName()))))
+                   {
+                       NodeAigGate newNode;  
+                       newNode = new NodeAigGate(nodeAigActual.getId(), nodeAigActual.getName());
+                       if(!this.nodesNames.containsKey(nodeAigActual.getName()))
+                       {
+                         tree.addEdge(this.nodesNames.get(child.getName()),newNode, Algorithms.isInverter(child, nodeAigActual));
+                         tree.add(newNode);
+                         this.nodesNames.put(newNode.getName(),newNode);
+                       }
+                   }          
         }
-        if(nodeAigActual.isAnd())
-        {
-          if(!this.nodesNames.contains(nodeAigActual.getName()))
-          {
-            for(NodeAig child: nodeAigActual.getChildren())
-               if((this.treeNodes.contains(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
-               {
-                   NodeAigGate newNode;  
-                   newNode = new NodeAigGate(nodeAigActual.getId(), nodeAigActual.getName());
-                   tree.addEdge(child,newNode,  Algorithms.isInverter(child, newNode));
-                   tree.add(newNode);
-                   this.nodesNames.add(newNode.getName());
-               }
-          }
-
-         }
-       }
     }
 }
