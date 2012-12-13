@@ -3,6 +3,7 @@ import aig.*;
 import io.*;
 import kcutter.*;
 import covering.*;
+import tree.*;
 
 /**
  * Classe principal ferramenta FlexMap
@@ -218,12 +219,6 @@ public class Main
               {
                   for(NodeAig out : myAig.getNodeOutputsAig())
                     out.accept(myBfs);
-//                  for(int i=0;i<myAig.getO();i++)
-//                  {
-//                    String nameNode     = myAig.getOutputsAig()[i][0];
-//                    NodeAig out         = myAig.getVertexName(nameNode);
-//                    out.accept(myBfs);
-//                  }
               }
               System.out.println("BFS executada com sucesso");
               System.out.println("\n############ BFS #############################");

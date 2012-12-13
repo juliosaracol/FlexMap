@@ -1,74 +1,73 @@
 package tree;
 
-import aig.NodeAig;
-import aig.NodeAigGate;
-import aig.NodeAigInput;
-import aig.NodeAigOutput;
-import aig.bfsNodeAigVisitor;
-import expanderExpression.Node;
-import java.util.ArrayList;
-
+import FlexMap.Algorithms;
+import aig.*;
+import java.util.*;
 /**
  * Classe que implementa caminhamento para gerar a cópia do subgrafo do Aig
  * @author Julio Saraçol
  */
 public class bfsNodeTreeVisitor extends bfsNodeAigVisitor
 {
-    protected ArrayList<NodeAig> treeNodes;
+    protected ArrayList<String> treeNodes;
     protected Tree tree ;
-    public bfsNodeTreeVisitor(ArrayList<NodeAig> TreeNodes,Tree tree) {
+    protected ArrayList<String> nodesNames;
+
+    public bfsNodeTreeVisitor(ArrayList<String> TreeNodes,Tree tree) {
         this.treeNodes  = TreeNodes;
         this.tree       = tree;
+        this.nodesNames = new ArrayList<String>();
+        this.nodesNames.add(this.tree.getRoot().getName());
     }
 
     @Override
     public void function(NodeAig nodeAigActual) 
     {
-       if(!treeNodes.contains(nodeAigActual))
+       if(!tree.contains(nodeAigActual))
        {
-        if(nodeAigActual.isInput())
-        {
-          NodeAigInput newNode;  
-          if(!tree.contains(nodeAigActual))
-          {
-           newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
-           tree.add(newNode);
-          }
-          else
-              newNode = (NodeAigInput) nodeAigActual;
-          for(NodeAig node: nodeAigActual.getChildren())
-              if(tree.contains(node.getName()))
-                tree.addEdge(node, newNode, false);              
-        }
         if(nodeAigActual.isOutput())
         {
           NodeAigOutput newNode;
-          if(!tree.contains(nodeAigActual))
+          if(treeNodes.contains(nodeAigActual.getName()))
           {
               newNode = new NodeAigOutput(nodeAigActual.getId(), nodeAigActual.getName());
               tree.add(newNode);
+              for(NodeAig child: nodeAigActual.getChildren())
+                  if(this.nodesNames.contains(child.getName()))
+                      tree.addEdge(child,newNode,  Algorithms.isInverter(child, newNode));              
           }
-          else
-              newNode = (NodeAigOutput) nodeAigActual;
-          for(NodeAig node: nodeAigActual.getChildren())
-             if(tree.contains(node.getName()))
-               tree.addEdge(node,newNode, false);              
+        }
+        if(nodeAigActual.isInput())
+        {
+          if(!this.nodesNames.contains(nodeAigActual.getName()))
+          {
+            NodeAigInput newNode;  
+            newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
+            for(NodeAig child: nodeAigActual.getChildren())
+               if((this.treeNodes.contains(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
+               {
+                   tree.addEdge(child,newNode,  Algorithms.isInverter(child, newNode));
+                   tree.add(newNode);
+                   this.nodesNames.add(newNode.getName());
+               }
+          }
         }
         if(nodeAigActual.isAnd())
         {
-          NodeAigGate newNode;
-          if(!tree.contains(nodeAigActual))
+          if(!this.nodesNames.contains(nodeAigActual.getName()))
           {
-            newNode = new NodeAigGate(nodeAigActual.getId(), nodeAigActual.getName());
-            tree.add(newNode);
+            for(NodeAig child: nodeAigActual.getChildren())
+               if((this.treeNodes.contains(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
+               {
+                   NodeAigGate newNode;  
+                   newNode = new NodeAigGate(nodeAigActual.getId(), nodeAigActual.getName());
+                   tree.addEdge(child,newNode,  Algorithms.isInverter(child, newNode));
+                   tree.add(newNode);
+                   this.nodesNames.add(newNode.getName());
+               }
           }
-          else
-              newNode = (NodeAigGate) nodeAigActual;
-          for(NodeAig father: nodeAigActual.getChildren())
-              if(treeNodes.contains(father)&&father!=this.tree.getRoot())
-                if(tree.contains(father.getName()))
-                    tree.addEdge(father,newNode, false);              
-        }
+
+         }
        }
     }
 }
