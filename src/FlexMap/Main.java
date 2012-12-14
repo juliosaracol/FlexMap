@@ -134,10 +134,9 @@ public class Main
              float   custFunction   = Float.valueOf(args[3]); //TORNAR CONFIGURAVEL
              AreaFlow area          = new AreaFlow(myAig,sizeCut,kcuts,custFunction);
              area.showCovering();
-             String eqn             = Logs.coveringToEqn(myAig,area.getCovering());
              if((args.length > 4)&&(args[4].contains(".eqn"))) 
              { //caso arquivo de log
-               Logs.LogsWriteEqn(eqn,args[4]);  
+               Logs.LogsWriteEqn(area.getEqn(),args[4]);  
              }
              return;
         }
@@ -162,11 +161,11 @@ public class Main
              Aig myAigTree = new Aig(args[0]);
              Trees myTrees = new Trees(myAigTree);
              myTrees.show();
-             //String out = Elis.mapElis(myAigTree,Integer.parseInt(args[2]),Integer.parseInt(args[3]));
-             //if((args.length > 4)&&(args[4].contains(".eqn"))) 
-             //{ //caso arquivo de log
-             //  Logs.LogsAigEqn(args[4],out);  
-             //}
+             myTrees.getEqn();
+             if((args.length > 4)&&(args[2].contains(".eqn"))) 
+             { //caso arquivo de log
+               Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  
+             }
              return;
         }   
         //------------------------------------------------------------------

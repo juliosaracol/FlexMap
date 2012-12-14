@@ -28,13 +28,14 @@ public class bfsNodeTreeVisitor extends bfsNodeAigVisitor
             if(this.treeNodes.contains(nodeAigActual.getName())&&(!this.tree.getRoot().getName().equals(nodeAigActual.getName()))) //caso de treeNode no meio do subgrafo
             {
               for(NodeAig child: nodeAigActual.getChildren())
-                if((this.nodesNames.containsKey(child.getName()))&&((this.treeNodes.contains(child.getName()))))
+                if((this.nodesNames.containsKey(child.getName()))&&(!(this.nodesNames.get(child.getName()).isInput())))
                 {
                       NodeAigInput newNode;
                       newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
                       if(!this.nodesNames.containsKey(nodeAigActual.getName()))
                       {
                        tree.add(newNode);
+                       tree.addEdge(this.nodesNames.get(child.getName()),newNode, Algorithms.isInverter(child, nodeAigActual));
                        this.nodesNames.put(newNode.getName(),newNode);
                       }
                 }

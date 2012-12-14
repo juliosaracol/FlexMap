@@ -1,6 +1,8 @@
 package covering;
 
 import aig.*;
+import io.*;
+import java.io.FileNotFoundException;
 import kcutter.*;
 
 import java.util.*;
@@ -200,5 +202,11 @@ public class AreaFlow
                     best = nodes.getKey();
         }
         return best;            
+    }
+    
+    public String getEqn() throws FileNotFoundException
+    {
+       String eqn = Logs.coveringToEqn(myAig, getCovering());
+       return eqn;
     }
 }

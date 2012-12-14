@@ -1,6 +1,8 @@
 package tree;
 
 import aig.*;
+import io.*;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 /**
@@ -41,4 +43,24 @@ public class Trees
         for(Tree cone: roots)
             cone.show();
     }
+
+    public Aig getAig() {
+        return aig;
+    }
+
+    public Set<Tree> getRoots() {
+        return roots;
+    }
+
+    public ArrayList<String> getTreeNodes() {
+        return treeNodes;
+    }
+    
+    public String getEqn() throws FileNotFoundException
+    {
+        String out = Logs.TreeToEqn(this);
+        return out;
+    }
+    
+    
 }
