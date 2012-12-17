@@ -162,7 +162,7 @@ public class Main
              Trees myTrees = new Trees(myAigTree);
              myTrees.show();
              myTrees.getEqn();
-             if((args.length > 4)&&(args[2].contains(".eqn"))) 
+             if((args.length > 2)&&(args[2].contains(".eqn"))) 
              { //caso arquivo de log
                Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  
              }

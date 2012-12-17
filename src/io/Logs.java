@@ -22,15 +22,15 @@ public class Logs
        {
            if((Integer.parseInt(tree.getRoot().getName())%2) != 0)
            {
-               bfsNodeAigVisitorTreetoEqn bfsEqn = new bfsNodeAigVisitorTreetoEqn();
-               tree.getRoot().getParents().get(0).accept(bfsEqn);  
-               outString1 += "["+tree.getRoot().getParents().get(0).getName()+"]="+bfsEqn.getEqnDescription(tree.getRoot().getParents().get(0))+"\n";   
+                bfsNodeAigVisitorTreetoEqn bfsEqn = new bfsNodeAigVisitorTreetoEqn();
+                tree.getRoot().getParents().get(0).accept(bfsEqn);  
+                outString1 += "["+tree.getRoot().getParents().get(0).getName()+"]="+bfsEqn.getEqnDescription(tree.getRoot().getParents().get(0))+";\n";   
            }
            else
            {
                bfsNodeAigVisitorTreetoEqn bfsEqn = new bfsNodeAigVisitorTreetoEqn();
                tree.getRoot().accept(bfsEqn);  
-               outString1 += "["+tree.getRoot().getName()+"]="+bfsEqn.getEqnDescription(tree.getRoot())+"\n";   
+               outString1 += "["+tree.getRoot().getName()+"]="+bfsEqn.getEqnDescription(tree.getRoot())+";\n";   
            }
        }
        outString+=outString1;

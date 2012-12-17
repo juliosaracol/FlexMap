@@ -37,24 +37,14 @@ public class bfsNodeAigVisitorTreetoEqn extends bfsNodeAigVisitor
     // Método que a partir de um nodo gera a string que representa a equação da Tree em função das entradas do corte
     public String getEqn(NodeAig nodeAigActual) 
     {
+         String type="";
          String subEqn = "";
          if((nodeAigActual.getName().equals("0"))||(nodeAigActual.getName().equals("1"))) //constant
          {
              subEqn += "_"+nodeAigActual.getName();
              return subEqn;
          }
-//            Set<NodeAig> nodeEqns = this.eqn.get(nodeAigActual);
-//            for(NodeAig node: nodeEqns)
-//            {
-//              if(Algorithms.isInverter(nodeAigActual, node))
-//                   subEqn += "!(["+node.getName()+"])*";
-//              else
-//                   subEqn += "["+node.getName()+"]*";
-//            }
-//            subEqn = subEqn.substring(0, subEqn.length()-1);
-//            return subEqn;
-//        }
-        if(nodeAigActual.isInput())
+         if(nodeAigActual.isInput())
             return "["+nodeAigActual.getName()+"]";
         else
         {
@@ -66,7 +56,7 @@ public class bfsNodeAigVisitorTreetoEqn extends bfsNodeAigVisitor
             }
             for(NodeAig node: nodeEqns)
             {
-              String type = "*";
+              type = "*";
               if(node.isOR())
                   type = "+";
               if(Algorithms.isInverter(nodeAigActual, node))
@@ -74,7 +64,8 @@ public class bfsNodeAigVisitorTreetoEqn extends bfsNodeAigVisitor
               else
                    subEqn += getEqn(node)+type;
             }
-            subEqn = subEqn.substring(0, subEqn.length()-1);
+            if((subEqn.length() > 1)&&(subEqn.substring(subEqn.length()-1,subEqn.length()).equals(type)))
+              subEqn = subEqn.substring(0, subEqn.length()-1);
             return subEqn;
         }
     }
