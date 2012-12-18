@@ -111,7 +111,6 @@ public class Logs
         buffStart.close();
         System.out.println("#Log Kcuts Executado com Sucesso");
   }
-  
   public static void LogsAigKcuts(String fileLog, CutterK cutterK,NodeAig nodeSelect)throws FileNotFoundException, IOException
   {
         File outFile = new File(fileLog);
@@ -133,7 +132,6 @@ public class Logs
         buffStart.close();
         System.out.println("#Log Kcuts Executado com Sucesso");
   }
-  
   public static void LogsAigKcuts(String fileLog, CutterKCutsLibrary cutterKLibrary)throws FileNotFoundException, IOException
   {
         File outFile = new File(fileLog);
@@ -160,7 +158,6 @@ public class Logs
         buffStart.close();
         System.out.println("#Log Kcuts Library Executado com Sucesso");
   }
-  
   public static void LogsAigKcuts(String fileLog, CutterKCutsLibrary cutterKLibrary,NodeAig nodeSelect)throws FileNotFoundException, IOException
   {
         File outFile = new File(fileLog);
@@ -237,8 +234,60 @@ public class Logs
         }  
         return outString;
    }
-   /**Método que gera eqn para arquivo de saída*/
-   public static void LogsWriteEqn(String eqn,String fileLog)throws FileNotFoundException, IOException
+   /** Método que cria definições de entradas e saídas do eqn*/
+    public static String createTreetoEqn(Tree tree) 
+    {
+       String outString = "###############EQN GERADO#########################\n";
+       String inputSymbol    = "pi_";
+       String outputSymbol   = "po_";
+       String defInputsEqn   = "INORDER = ";
+       String defOutputsEqn  = "OUTORDER = ";
+       TreeMap<String,String> symbolsEqn     = new TreeMap<String,String>();
+       ArrayList<String>      primaryInput   = new ArrayList<String>();
+       //--inputs and outputs--------------------------------------------------     
+       for(NodeAig node:tree.getTree())
+       {
+          if(node.isInput())
+          {
+             defInputsEqn += " "+inputSymbol+node.getName();
+             primaryInput.add(node.getName());
+             symbolsEqn.put(node.getName(),inputSymbol+node.getName());
+          }
+          if(node.isOutput())
+          {
+               if((Integer.parseInt(node.getName())%2) != 0)
+               {
+                   if(!primaryInput.contains(String.valueOf(Integer.parseInt(node.getName())-1))) //testa se é entrada<->saida invertida
+                     symbolsEqn.put(outputSymbol+node.getName(),"!["+(Integer.parseInt(node.getName())-1)+"]");    // o_3=![2]
+                   else
+                      symbolsEqn.put(outputSymbol+node.getName(),"!["+inputSymbol+(Integer.parseInt(node.getName())-1)+"]"); // o_3=![2]
+               }
+               else
+               {
+                   if(!primaryInput.contains(node.getName()))
+                      symbolsEqn.put(outputSymbol+node.getName(),"["+node.getName()+"]");     // o_2=[2]
+                   else
+                      symbolsEqn.put(outputSymbol+node.getName(),"["+inputSymbol+node.getName()+"]"); // o_2= i_2
+               }  
+               defOutputsEqn = defOutputsEqn +" "+ outputSymbol+node.getName();           
+          }
+       }
+        defInputsEqn +=";";
+        defOutputsEqn += ";";      
+        outString += defInputsEqn+"\n"+defOutputsEqn+"\n";
+        Iterator<Map.Entry<String,String>> iteratorSymbol = symbolsEqn.entrySet().iterator();
+        while(iteratorSymbol.hasNext())
+        {
+           Map.Entry<String,String> current = iteratorSymbol.next();
+           if(current.getKey().contains("po_"))
+                outString += current.getKey()+" = "+current.getValue()+";\n";
+           else
+                outString += "["+current.getKey()+"]"+" = "+current.getValue()+";\n";
+        }  
+        return outString;        
+    }  
+  /**Método que gera eqn para arquivo de saída*/
+  public static void LogsWriteEqn(String eqn,String fileLog)throws FileNotFoundException, IOException
    {
         if(!fileLog.contains(".eqn"))
         {
@@ -255,5 +304,6 @@ public class Logs
         buffStart.close();
         System.out.println("#Log Eqn Executado com Sucesso");
    }
+
 
 }

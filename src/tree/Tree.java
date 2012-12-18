@@ -2,6 +2,7 @@ package tree;
 
 import graph.*;
 import aig.*;
+import io.Logs;
 import java.util.*;
 
 /**
@@ -142,13 +143,28 @@ public class Tree extends Graph
         return root;
     }
     
+    public String getEqn()
+    {
+       String outString = Logs.createTreetoEqn(this);
+        bfsNodeAigVisitorAigtoEqn bfsEqn = new bfsNodeAigVisitorAigtoEqn();
+        for(NodeAig node: this.getTree())
+            if(node.isOutput())
+            {
+              node.accept(bfsEqn);  
+              outString += bfsEqn.getEqnDescription();   
+            }
+       System.out.println(outString);
+       return outString;                
+    }
     
     public void show()
     {
         System.out.println("##########ARVORE##############");
         System.out.println("RAIZ: "+this.root.getName());
         for(NodeAig node: tree)
+        {
             System.out.print(node.getName()+"-");
+        }       
         System.out.println("\n###############################");
     }
 }

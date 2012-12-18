@@ -45,7 +45,10 @@ public class Trees
 
     public void show() {
         for(Tree cone: roots)
+        {
             cone.show();
+            cone.getEqn();
+        }
     }
 
     public Aig getAig() {

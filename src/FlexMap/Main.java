@@ -161,10 +161,10 @@ public class Main
              Aig myAigTree = new Aig(args[0]);
              Trees myTrees = new Trees(myAigTree);
              myTrees.show();
-             myTrees.getEqn();
+             //myTrees.getEqn();
              if((args.length > 2)&&(args[2].contains(".eqn"))) 
              { //caso arquivo de log
-               Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  
+               //Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  
              }
              return;
         }   
