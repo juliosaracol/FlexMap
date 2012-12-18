@@ -9,11 +9,11 @@ import java.util.*;
  */
 public class bfsNodeTreeVisitorCopy extends bfsNodeAigVisitor
 {
-    protected ArrayList<String> treeNodes;
+    protected Map<String,Integer> treeNodes;
     protected Tree tree ;
     protected TreeMap<String,NodeAig> nodesNames;
 
-    public bfsNodeTreeVisitorCopy(ArrayList<String> TreeNodes,Tree tree) {
+    public bfsNodeTreeVisitorCopy(Map<String,Integer> TreeNodes,Tree tree) {
         super();
         this.treeNodes  = TreeNodes;
         this.tree       = tree;
@@ -31,8 +31,8 @@ public class bfsNodeTreeVisitorCopy extends bfsNodeAigVisitor
             newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
             for(NodeAig child: nodeAigActual.getChildren())
             {   
-                if(((this.treeNodes.contains(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
-                   ||((!this.treeNodes.contains(child.getName()))&&(this.nodesNames.containsKey(child.getName()))))//insere se o treenode pai é a raiz, ou se o pai esta na árvore
+                if(((this.treeNodes.containsKey(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
+                   ||((!this.treeNodes.containsKey(child.getName()))&&(this.nodesNames.containsKey(child.getName()))))//insere se o treenode pai é a raiz, ou se o pai esta na árvore
                {
                    flag= true;
                    if(!this.nodesNames.containsKey(nodeAigActual.getName()))
@@ -49,14 +49,17 @@ public class bfsNodeTreeVisitorCopy extends bfsNodeAigVisitor
                 this.nodesBfs.remove(nodeAigActual);  
             return;
         }
-        if(this.treeNodes.contains(nodeAigActual.getName())&&(!this.tree.getRoot().getName().equals(nodeAigActual.getName()))) //caso de treeNode no meio do subgrafo
+        if(this.treeNodes.containsKey(nodeAigActual.getName())&&(!this.tree.getRoot().getName().equals(nodeAigActual.getName()))) //caso de treeNode no meio do subgrafo
         {
-          boolean flag = false;
-          for(NodeAig child: nodeAigActual.getChildren())
+          if(this.treeNodes.get(nodeAigActual.getName()) > 0)
           {
+           for(NodeAig child: nodeAigActual.getChildren())
+           {
             if((this.nodesNames.containsKey(child.getName()))&&(!(this.nodesNames.get(child.getName()).isInput())))
             {
-              flag = true;  
+              this.nodesBfs.remove(nodeAigActual); //recoloca para ser visitado por outra aresta  
+              int EdgesOut = this.treeNodes.get(nodeAigActual.getName());
+              this.treeNodes.put(nodeAigActual.getName(),EdgesOut--);
               NodeAigInput newNode;
               newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
               if(!this.nodesNames.containsKey(nodeAigActual.getName()))
@@ -68,14 +71,13 @@ public class bfsNodeTreeVisitorCopy extends bfsNodeAigVisitor
               else
                 tree.addEdge(this.nodesNames.get(child.getName()),this.nodesNames.get(nodeAigActual.getName()), Algorithms.isInverter(child, nodeAigActual));                               
             }
+           }
           }
-          if(flag == false) //nodos reconvergentes
-           this.nodesBfs.remove(nodeAigActual);  
           return;
         }
         for(NodeAig child: nodeAigActual.getChildren())
-          if(((this.treeNodes.contains(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
-                      ||((!this.treeNodes.contains(child.getName()))&&(this.nodesNames.containsKey(child.getName()))))
+          if(((this.treeNodes.containsKey(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
+                      ||((!this.treeNodes.containsKey(child.getName()))&&(this.nodesNames.containsKey(child.getName()))&&(!(this.nodesNames.get(child.getName()).isInput()))))
           {
                NodeAigGate newNode;  
                newNode = new NodeAigGate(nodeAigActual.getId(), nodeAigActual.getName());

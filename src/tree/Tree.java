@@ -145,15 +145,19 @@ public class Tree extends Graph
     
     public String getEqn()
     {
+       System.out.println("Gerando arvore :"+getRoot().getName());
        String outString = Logs.createTreetoEqn(this);
-        for(NodeAig node: this.getTree())
-            if(node.isOutput())
-            {
-              bfsNodeAigVisitorAigtoEqn bfsEqn = new bfsNodeAigVisitorAigtoEqn();
-              node.accept(bfsEqn);  
-              outString += bfsEqn.getEqnDescription();   
-            }
-       System.out.println(outString);
+       bfsNodeAigVisitorMiniTreetoEqn bfsEqn = new bfsNodeAigVisitorMiniTreetoEqn(this);
+       if((Integer.parseInt(this.root.getName())%2)!=0)
+       {
+            this.root.getParents().get(0).accept(bfsEqn);
+            outString += bfsEqn.getEqnDescription();              
+       }
+       else
+       {
+           this.root.accept(bfsEqn);
+           outString += bfsEqn.getEqnDescription();              
+       }
        return outString;                
     }
     
