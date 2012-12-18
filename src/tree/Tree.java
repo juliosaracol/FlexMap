@@ -145,7 +145,6 @@ public class Tree extends Graph
     
     public String getEqn()
     {
-       System.out.println("Gerando arvore :"+getRoot().getName());
        String outString = Logs.createTreetoEqn(this);
        bfsNodeAigVisitorMiniTreetoEqn bfsEqn = new bfsNodeAigVisitorMiniTreetoEqn(this);
        if((Integer.parseInt(this.root.getName())%2)!=0)

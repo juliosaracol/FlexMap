@@ -58,8 +58,6 @@ public class bfsNodeTreeVisitorCopy extends bfsNodeAigVisitor
             if((this.nodesNames.containsKey(child.getName()))&&(!(this.nodesNames.get(child.getName()).isInput())))
             {
               this.nodesBfs.remove(nodeAigActual); //recoloca para ser visitado por outra aresta  
-              int EdgesOut = this.treeNodes.get(nodeAigActual.getName());
-              this.treeNodes.put(nodeAigActual.getName(),EdgesOut--);
               NodeAigInput newNode;
               newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
               if(!this.nodesNames.containsKey(nodeAigActual.getName()))

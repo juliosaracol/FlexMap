@@ -24,7 +24,7 @@ public class Trees
             {
               if((aig.getNodeOutputsAig().contains(node))||(node.getChildren().size() > 1))
               {
-                  if(!((Integer.parseInt(node.getName())%2)!= 0))//&&(node.getParents().get(0).getChildren().size() > 1)))
+                  if(!(((Integer.parseInt(node.getName())%2)!= 0)&&(node.getParents().get(0).getChildren().size() > 1)))
                   {
                       int sizeEdgesOut = node.getChildren().size();
                       NodeAig newNode = null;
