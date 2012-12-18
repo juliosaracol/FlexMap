@@ -146,10 +146,10 @@ public class Tree extends Graph
     public String getEqn()
     {
        String outString = Logs.createTreetoEqn(this);
-        bfsNodeAigVisitorAigtoEqn bfsEqn = new bfsNodeAigVisitorAigtoEqn();
         for(NodeAig node: this.getTree())
             if(node.isOutput())
             {
+              bfsNodeAigVisitorAigtoEqn bfsEqn = new bfsNodeAigVisitorAigtoEqn();
               node.accept(bfsEqn);  
               outString += bfsEqn.getEqnDescription();   
             }
