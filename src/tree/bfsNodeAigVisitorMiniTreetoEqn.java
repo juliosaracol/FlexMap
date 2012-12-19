@@ -5,7 +5,7 @@ import aig.NodeAig;
 import aig.bfsNodeAigVisitorAigtoEqn;
 
 /**
- * Classe que aplica caminhamento para gerar eqn de cada árvore
+ * Classe que aplica caminhamento para gerar eqn de cada Tree
  * @author Julio Saraçol
  */
 public class bfsNodeAigVisitorMiniTreetoEqn extends bfsNodeAigVisitorAigtoEqn
@@ -18,7 +18,7 @@ public class bfsNodeAigVisitorMiniTreetoEqn extends bfsNodeAigVisitorAigtoEqn
     
     @Override
     public void function(NodeAig nodeAigActual) {
-        if((nodeAigActual.isInput()))
+        if((nodeAigActual.isInput())||((nodeAigActual.getName().equals("0"))||(nodeAigActual.getName().equals("1")))) //constant
             return;
         if(this.handler.contains(nodeAigActual))
             return;

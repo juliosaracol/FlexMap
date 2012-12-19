@@ -7,8 +7,9 @@ import kcutter.*;
 
 import java.util.*;
 /**
- *@author Julio Saraçol
  * Classe que aplica a cobertura de acordo com  algoritmo de AreaFlow (Valavan,2006)
+ * @author Julio Saraçol
+ * 
  */
 public class AreaFlow 
 {

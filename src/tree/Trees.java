@@ -20,17 +20,28 @@ public abstract class Trees
         this.aig = aig;
         for(NodeAig node :aig.getAllNodesAig())
         {
-            if((!node.isInput())&&(!this.roots.contains(node)))
+            if((!node.isInput())&&(!this.treeNodes.contains(node.getName())))
             {
               if((aig.getNodeOutputsAig().contains(node))||(node.getChildren().size() > 1))
               {
-                  if(!(((Integer.parseInt(node.getName())%2)!= 0)&&(node.getParents().get(0).getChildren().size() > 1)))
+                  if((Integer.parseInt(node.getName())%2)!= 0)
                   {
-                      NodeAig newNode = null;
-                      this.treeNodes.add(node.getName());
-                      newNode = new NodeAigOutput(node.getId(), node.getName());
-                      Tree newTree = new Tree(newNode);
-                      this.roots.add(newTree);
+                     if(node.getParents().get(0).getChildren().size() == 1)
+                     {
+                            NodeAig newNode = null;
+                            this.treeNodes.add(node.getName());
+                            newNode = new NodeAigOutput(node.getId(),node.getName());
+                            Tree newTree = new Tree(newNode);
+                            this.roots.add(newTree);
+                     }                      
+                  }
+                  else
+                  {
+                            NodeAig newNode = null;
+                            this.treeNodes.add(node.getName());
+                            newNode = new NodeAigOutput(node.getId(),node.getName());
+                            Tree newTree = new Tree(newNode);
+                            this.roots.add(newTree);
                   }
               }
               
@@ -41,6 +52,7 @@ public abstract class Trees
             bfsNodeTreeVisitorCopy bfs = new bfsNodeTreeVisitorCopy(treeNodes,tree);
             aig.getVertexName(tree.getRoot().getName()).accept(bfs);
         }
+        Set<Tree> deleteTree = new HashSet<Tree>();
     }
 
     public void show() {
@@ -73,9 +85,12 @@ public abstract class Trees
         ArrayList<String> out= new ArrayList<String>();
         for(Tree tree: this.getRoots())
         {
-            String out1 = tree.getEqn();
-            out.add(out1);
-            System.out.println(out.get(out.size()-1));
+            if(tree.getTree().size()>2)
+            {
+             String out1 = tree.getEqn();
+             out.add(out1);
+             System.out.println(out.get(out.size()-1));
+            }
         }
         return out;
     }

@@ -1,9 +1,8 @@
 package tree;
-
 import aig.Aig;
 
 /**
- * Classe que aplica árvores no Aig somente segmentando em ponstos de reconvergências
+ * Classe transforma o Aig em trees somente segmentando em pontos de reconvergências
  * @author Julio Saraçol
  */
 public class TreesBasic extends Trees

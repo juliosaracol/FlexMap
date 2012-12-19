@@ -30,6 +30,21 @@ public class Main
           warning();
           return;
         }  
+        //--------------------ÁRVORES-----------------------------------------
+        if((args[1].equals("-T")||args[1].equals("-TM"))&&(args.length >= 2))
+        {
+             Aig myAigTree      = new Aig(args[0]);
+             TreesBasic myTrees = new TreesBasic(myAigTree);
+             if(args[1].equals("-TM"))
+                     myTrees.getEqnTrees();
+             myTrees.getEqn();
+             if((args.length > 2)&&(args[2].contains(".eqn"))) 
+             { //caso arquivo de log
+               Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  
+             }
+             return;
+        }   
+        //------------------------------------------------------------------
         //--------------------KCUTS---------------------------------------------
         if(args[1].equals("-K")&&(args.length >= 3)){
           Aig myAig = new Aig(args[0]);
@@ -155,16 +170,18 @@ public class Main
              //return;
         //}
         ////------------------------------------------------------------------
-        //--------------------ARVORES------------------------------------------
-        if(args[1].equals("-T")&&(args.length >= 2))
+        //--------------------ARVORES-----------------------------------------
+        if(args[1].equals("-E")&&(args.length >= 4))
         {
              Aig myAigTree = new Aig(args[0]);
+             int s = Integer.parseInt(args[2]);
+             int p = Integer.parseInt(args[3]);
              Trees myTrees = new TreesBasic(myAigTree);
-             myTrees.getEqn();
-             if((args.length > 2)&&(args[2].contains(".eqn"))) 
-             { //caso arquivo de log
-               Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  
-             }
+             Elis elis     = new Elis(myTrees,s,p);
+//             if((args.length > 2)&&(args[2].contains(".eqn"))) 
+//             { //caso arquivo de log
+//               Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  
+//             }
              return;
         }   
         //------------------------------------------------------------------
@@ -251,6 +268,10 @@ public class Main
     {
       System.out.println("############################# FLEXMAP ########################################");
       System.out.println("-- Parametros Invalidos. O programa deve ser inicializado da seguinte maneira:");
+      System.out.println("--ÁRVORES--");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -T [arquivoSaida.txt(opcional)]");
+      System.out.println("--ÁRVORES e SUBÁRVORES--");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -TM [arquivoSaida.txt(opcional)]");
       System.out.println("--KCUTS--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -K TamanhoDoCorte [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
       System.out.println("--KCUTS C/LIMITE DE TREENODES--");

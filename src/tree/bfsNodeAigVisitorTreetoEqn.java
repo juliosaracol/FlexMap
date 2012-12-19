@@ -4,7 +4,7 @@ import FlexMap.Algorithms;
 import aig.*;
 import java.util.*;
 /**
- * Classe que aplica caminhamento para gerar eqn da Tree
+ * Classe que aplica caminhamento para gerar eqn da classe TREES
  * @author Julio Saraçol
  */
 public class bfsNodeAigVisitorTreetoEqn extends bfsNodeAigVisitor

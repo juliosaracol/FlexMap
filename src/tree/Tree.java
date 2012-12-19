@@ -64,25 +64,7 @@ public class Tree extends Graph
         }
         return 0;
     }       
-        
-    
-    /**Método para geração de logs*/
-    public String getBytesForLog()
-    {
-       String treeString="";
-       treeString +="[";
-       int i=0;
-       for(NodeAig node: this.tree)
-       {
-           if(i < this.tree.size()-1)
-               treeString +=node.getName()+",";
-           else
-               treeString +=node.getName()+"]\n";
-           i++;
-       }
-       return treeString;
-    }
-    
+            
     //-------Basic Methods--------------
     public int size() {
         return tree.size();

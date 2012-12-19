@@ -67,28 +67,4 @@ public class bfsNodeTreeVisitorCopy extends bfsNodeAigVisitor
          }
         }
       }         
-    
-
-    @Override
-    public void visit(NodeAigGate NodeAigGate) {
-        if(!nodesBfs.contains(NodeAigGate))
-        {
-            nodesBfs.add(NodeAigGate);
-            for(int i=0;i<NodeAigGate.getParents().size();i++)
-            {
-                if(!list.contains(NodeAigGate.getParents().get(i))&&(!nodesBfs.contains(NodeAigGate.getParents().get(i))))
-                {
-                    list.add(NodeAigGate.getParents().get(i));
-                    this.states++;
-                }
-            }
-        }        
-        function(NodeAigGate);
-        if(list.size() > 0)
-        {
-            NodeAig temp =  list.get(0);
-            list.remove(0);
-            temp.accept(this);
-        }
-    }    
 }
