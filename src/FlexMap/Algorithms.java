@@ -24,4 +24,14 @@ public class Algorithms
        }
        return edge.isInverter();
    }
+  public static EdgeAig getEdge(NodeAig nodeCurrent,NodeAig father)
+  {
+       EdgeAig edge = null;
+       for(int i=0;i<nodeCurrent.getAdjacencies().size();i++)
+       {
+           if(nodeCurrent.getAdjacencies().get(i).getVertex2().equals(father))
+            edge = (EdgeAig) nodeCurrent.getAdjacencies().get(i);
+       }
+       return edge;
+   }
 }

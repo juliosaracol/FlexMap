@@ -12,8 +12,8 @@ import java.util.*;
 
 public class Logs
 {
-   /**Método que gera descrição eqn a partir de uma TREE*/
-   public static String TreeToEqn(Trees trees) throws FileNotFoundException 
+   /**Método que gera descrição eqn a partir de uma TREES*/
+   public static String TreesToEqn(Trees trees) throws FileNotFoundException 
    {
        String outString ="";
        outString = createEqn(trees.getAig());

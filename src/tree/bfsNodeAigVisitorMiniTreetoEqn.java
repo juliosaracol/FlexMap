@@ -23,13 +23,16 @@ public class bfsNodeAigVisitorMiniTreetoEqn extends bfsNodeAigVisitorAigtoEqn
         if(this.handler.contains(nodeAigActual))
             return;
         else
-        {            
+        {    
+            String type = "*";
+            if(nodeAigActual.isOR())
+              type = "+";
             this.handler.add(nodeAigActual);
             String eqn = "["+nodeAigActual.getName()+"]=";
             if(Algorithms.isInverter(nodeAigActual, nodeAigActual.getParents().get(0)))
-                eqn += "(!["+nodeAigActual.getParents().get(0).getName()+"])*(";
+                eqn += "(!["+nodeAigActual.getParents().get(0).getName()+"])"+type+"(";
             else
-                eqn += "(["+nodeAigActual.getParents().get(0).getName()+"])*(";
+                eqn += "(["+nodeAigActual.getParents().get(0).getName()+"])"+type+"(";
             if(Algorithms.isInverter(nodeAigActual, nodeAigActual.getParents().get(1)))
                eqn += "!["+nodeAigActual.getParents().get(1).getName()+"]);\n";
             else

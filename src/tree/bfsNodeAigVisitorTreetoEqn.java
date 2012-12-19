@@ -57,7 +57,7 @@ public class bfsNodeAigVisitorTreetoEqn extends bfsNodeAigVisitor
             for(NodeAig node: nodeEqns)
             {
               type = "*";
-              if(node.isOR())
+              if(nodeAigActual.getTypeNodeAig() == TypeNode.OR)
                   type = "+";
               if(Algorithms.isInverter(nodeAigActual, node))
                    subEqn += "!("+getEqn(node)+")"+type;

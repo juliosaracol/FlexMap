@@ -21,7 +21,26 @@ public class Elis
         this.s = s;
         this.p = p;
         this.trees = trees;
+        Set<Tree> roots = trees.getRoots();
+        for(Tree root : roots)
+        {
+            dfsNodeAigVisitorOrTree dfsOrGate = new dfsNodeAigVisitorOrTree(trees,root);
+            root.getRoot().accept(dfsOrGate);
+        }
+//        deMorgan();
+        
     }
-    
+
+    public Integer getP() {
+        return p;
+    }
+
+    public Integer getS() {
+        return s;
+    }
+
+    public Trees getTrees() {
+        return trees;
+    }
     
 }

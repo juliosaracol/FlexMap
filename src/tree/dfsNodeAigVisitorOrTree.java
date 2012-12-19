@@ -1,0 +1,54 @@
+package tree;
+
+import aig.*;
+import FlexMap.Algorithms;
+/**
+ * Classe que aplica caminhamento transformando nodos da TREE em nodos OR
+ * @author Julio Saraçol
+ */
+public class dfsNodeAigVisitorOrTree extends dfsNodeAigVisitor
+{
+    protected Trees trees;
+    protected Tree tree;
+
+    public dfsNodeAigVisitorOrTree(Trees trees,Tree tree) 
+    {
+        super();
+        this.trees = trees;
+        this.tree = tree;
+    }
+
+    @Override
+    public void function(NodeAig nodeAigActual) 
+    {
+        if(nodeAigActual.isInput()||nodeAigActual.isOutput())
+            return;
+        if(nodeAigActual.getChildren().size() > 1)
+            return;
+        for(NodeAig father : nodeAigActual.getParents())
+            if(!Algorithms.isInverter(nodeAigActual, father))
+                return;
+        if(Algorithms.isInverter(nodeAigActual.getChildren().get(0),nodeAigActual))
+            setOr(nodeAigActual);        
+    }
+
+    private void setOr(NodeAig nodeAigActual)
+    {
+        NodeAigGateOr newNode = new NodeAigGateOr(nodeAigActual.getId(),nodeAigActual.getName());
+        for(NodeAig neighbours : nodeAigActual.getParents())
+            tree.addEdge(newNode, neighbours, false);
+        tree.add(newNode);
+        if(!nodeAigActual.getChildren().get(0).isOutput())
+            tree.addEdge(nodeAigActual.getChildren().get(0),newNode, false);
+        else
+        {
+            tree.getTree().remove(nodeAigActual.getChildren().get(0));
+            tree.setRoot(newNode);            
+        }
+        for(NodeAig neighbours : nodeAigActual.getParents())
+            tree.removeEdge(Algorithms.getEdge(nodeAigActual,neighbours).getId());
+        tree.removeEdge(Algorithms.getEdge(nodeAigActual.getChildren().get(0),nodeAigActual).getId());
+        this.tree.getTree().remove(nodeAigActual);
+        System.out.println("SET NODO :"+newNode.getName()+" "+newNode.isOR());
+    }
+}

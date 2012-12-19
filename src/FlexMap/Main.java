@@ -178,6 +178,7 @@ public class Main
              int p = Integer.parseInt(args[3]);
              Trees myTrees = new TreesBasic(myAigTree);
              Elis elis     = new Elis(myTrees,s,p);
+             elis.getTrees().getEqn();
 //             if((args.length > 2)&&(args[2].contains(".eqn"))) 
 //             { //caso arquivo de log
 //               Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  

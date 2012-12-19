@@ -76,7 +76,7 @@ public abstract class Trees
     
     public String getEqn() throws FileNotFoundException
     {
-        String out = Logs.TreeToEqn(this);
+        String out = Logs.TreesToEqn(this);
         return out;
     }
     
