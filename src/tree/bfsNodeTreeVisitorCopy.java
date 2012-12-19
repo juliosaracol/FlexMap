@@ -9,11 +9,11 @@ import java.util.*;
  */
 public class bfsNodeTreeVisitorCopy extends bfsNodeAigVisitor
 {
-    protected Map<String,Integer> treeNodes;
+    protected ArrayList<String> treeNodes;
     protected Tree tree ;
     protected TreeMap<String,NodeAig> nodesNames;
 
-    public bfsNodeTreeVisitorCopy(Map<String,Integer> TreeNodes,Tree tree) {
+    public bfsNodeTreeVisitorCopy(ArrayList<String> TreeNodes,Tree tree) {
         super();
         this.treeNodes  = TreeNodes;
         this.tree       = tree;
@@ -24,71 +24,50 @@ public class bfsNodeTreeVisitorCopy extends bfsNodeAigVisitor
     @Override
     public void function(NodeAig nodeAigActual) 
     {
-        if(nodeAigActual.isInput()) //caso de entrada primaria do circuito
-        {
-            boolean flag = false;
-            NodeAigInput newNode;  
-            newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
-            for(NodeAig child: nodeAigActual.getChildren())
-            {   
-                if(((this.treeNodes.containsKey(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
-                   ||((!this.treeNodes.containsKey(child.getName()))&&(this.nodesNames.containsKey(child.getName()))))//insere se o treenode pai é a raiz, ou se o pai esta na árvore
-               {
-                   flag= true;
-                   if(!this.nodesNames.containsKey(nodeAigActual.getName()))
-                   {
-                    tree.addEdge(this.nodesNames.get(child.getName()),newNode, Algorithms.isInverter(child, nodeAigActual));
-                    this.nodesNames.put(newNode.getName(),newNode);
-                    tree.add(newNode);
-                   }
-                   else
-                    tree.addEdge(this.nodesNames.get(child.getName()),this.nodesNames.get(nodeAigActual.getName()), Algorithms.isInverter(child, nodeAigActual));                               
-               }                
-            }
-            if(flag == false) //nodos reconvergentes
-                this.nodesBfs.remove(nodeAigActual);  
+       if(this.nodesNames.containsKey(nodeAigActual.getName()))
+       {
+        NodeAig node=null;
+        if(nodeAigActual.isInput())
+           return;
+        if((treeNodes.contains(nodeAigActual.getName()))&&(!this.tree.getRoot().getName().equals(nodeAigActual.getName())))
             return;
-        }
-        if(this.treeNodes.containsKey(nodeAigActual.getName())&&(!this.tree.getRoot().getName().equals(nodeAigActual.getName()))) //caso de treeNode no meio do subgrafo
+        for(NodeAig father: nodeAigActual.getParents())
         {
-          if(this.treeNodes.get(nodeAigActual.getName()) > 0)
-          {
-           for(NodeAig child: nodeAigActual.getChildren())
-           {
-            if((this.nodesNames.containsKey(child.getName()))&&(!(this.nodesNames.get(child.getName()).isInput())))
+            if(this.treeNodes.contains(father.getName()))
             {
-              this.nodesBfs.remove(nodeAigActual); //recoloca para ser visitado por outra aresta  
-              NodeAigInput newNode;
-              newNode = new NodeAigInput(nodeAigActual.getId(), nodeAigActual.getName());
-              if(!this.nodesNames.containsKey(nodeAigActual.getName()))
+              if(!this.nodesNames.containsKey(father.getName()))
               {
-               tree.add(newNode);
-               tree.addEdge(this.nodesNames.get(child.getName()),newNode, Algorithms.isInverter(child, nodeAigActual));
-               this.nodesNames.put(newNode.getName(),newNode);
+                NodeAig newNode = new NodeAigInput(father.getId(), father.getName());
+                tree.addEdge(this.nodesNames.get(nodeAigActual.getName()),newNode, Algorithms.isInverter(nodeAigActual,father));
+                this.nodesNames.put(newNode.getName(),newNode);
+                tree.add(newNode);
               }
               else
-                tree.addEdge(this.nodesNames.get(child.getName()),this.nodesNames.get(nodeAigActual.getName()), Algorithms.isInverter(child, nodeAigActual));                               
+                tree.addEdge(this.nodesNames.get(nodeAigActual.getName()),this.nodesNames.get(father.getName()),
+                        Algorithms.isInverter(nodeAigActual,father));                  
             }
-           }
-          }
-          return;
+            else
+            {
+              if(!this.nodesNames.containsKey(father.getName()))
+              {
+                if(father.isInput())
+                  node = new NodeAigInput(father.getId(), father.getName());                
+                if(father.isAnd())
+                  node = new NodeAigGate(father.getId(), father.getName());
+                if(father.isOR())
+                  node = new NodeAigGateOr(father.getId(), father.getName());
+                tree.addEdge(this.nodesNames.get(nodeAigActual.getName()),node, Algorithms.isInverter(nodeAigActual,father));
+                this.nodesNames.put(node.getName(),node);
+                tree.add(node);                
+              }
+              else
+                tree.addEdge(this.nodesNames.get(nodeAigActual.getName()),this.nodesNames.get(father.getName()), 
+                        Algorithms.isInverter(nodeAigActual,father));                             
+            }
+         }
         }
-        for(NodeAig child: nodeAigActual.getChildren())
-          if(((this.treeNodes.containsKey(child.getName()))&&(this.tree.getRoot().getName().equals(child.getName())))
-                      ||((!this.treeNodes.containsKey(child.getName()))&&(this.nodesNames.containsKey(child.getName()))&&(!(this.nodesNames.get(child.getName()).isInput()))))
-          {
-               NodeAigGate newNode;  
-               newNode = new NodeAigGate(nodeAigActual.getId(), nodeAigActual.getName());
-               if(!this.nodesNames.containsKey(nodeAigActual.getName()))
-               {
-                 tree.addEdge(this.nodesNames.get(child.getName()),newNode, Algorithms.isInverter(child, nodeAigActual));
-                 tree.add(newNode);
-                 this.nodesNames.put(newNode.getName(),newNode);
-               }
-               else
-                 tree.addEdge(this.nodesNames.get(child.getName()),this.nodesNames.get(nodeAigActual.getName()), Algorithms.isInverter(child, nodeAigActual));                               
-          }          
-    }
+      }         
+    
 
     @Override
     public void visit(NodeAigGate NodeAigGate) {

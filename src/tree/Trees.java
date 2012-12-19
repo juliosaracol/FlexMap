@@ -9,11 +9,11 @@ import java.util.*;
  * Classe que da forma a descrição de Trees a partir de um Aig 
  * @author Julio Saraçol
  */
-public class Trees 
+public abstract class Trees 
 {
     protected Aig                 aig;
     protected Set<Tree>           roots     = new HashSet<Tree>();
-    protected Map<String,Integer> treeNodes = new HashMap<String, Integer>();
+    protected ArrayList<String> treeNodes   = new ArrayList<String>();
     
     public Trees(Aig aig) 
     {
@@ -26,12 +26,8 @@ public class Trees
               {
                   if(!(((Integer.parseInt(node.getName())%2)!= 0)&&(node.getParents().get(0).getChildren().size() > 1)))
                   {
-                      int sizeEdgesOut = node.getChildren().size();
                       NodeAig newNode = null;
-                      for(NodeAig nodeChildren :node.getChildren())
-                          if((Integer.parseInt(node.getName())%2)!=0)
-                              sizeEdgesOut--;
-                      this.treeNodes.put(node.getName(),sizeEdgesOut);
+                      this.treeNodes.add(node.getName());
                       newNode = new NodeAigOutput(node.getId(), node.getName());
                       Tree newTree = new Tree(newNode);
                       this.roots.add(newTree);
@@ -62,7 +58,7 @@ public class Trees
         return roots;
     }
 
-    public Map<String,Integer> getTreeNodes() {
+    public ArrayList<String> getTreeNodes() {
         return treeNodes;
     }
     

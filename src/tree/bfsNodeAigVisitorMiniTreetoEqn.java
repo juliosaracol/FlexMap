@@ -30,20 +30,10 @@ public class bfsNodeAigVisitorMiniTreetoEqn extends bfsNodeAigVisitorAigtoEqn
                 eqn += "(!["+nodeAigActual.getParents().get(0).getName()+"])*(";
             else
                 eqn += "(["+nodeAigActual.getParents().get(0).getName()+"])*(";
-            if(nodeAigActual.getParents().size()> 1)
-            {if(Algorithms.isInverter(nodeAigActual, nodeAigActual.getParents().get(1)))
+            if(Algorithms.isInverter(nodeAigActual, nodeAigActual.getParents().get(1)))
                eqn += "!["+nodeAigActual.getParents().get(1).getName()+"]);\n";
             else
                eqn += "["+nodeAigActual.getParents().get(1).getName()+"]);\n";
-            }
-             else
-            {
-                if(this.tree.contains(nodeAigActual.getChildren().get(0)))
-                    System.out.println("NODO SOLITARIO"+ nodeAigActual.getName()+" "+ eqn+ " ligado em :"+ nodeAigActual.getChildren().get(0).getName()+" na arvore ligado a "+nodeAigActual.getChildren().get(0).getChildren().get(0).getName() );
-                else
-                    System.out.println("NODO SOLITARIO"+ nodeAigActual.getName()+" "+ eqn+ " ligado em :"+ nodeAigActual.getChildren().get(0).getName()+" NAO esta na arvore e mais "+nodeAigActual.getChildren().size() );
-                eqn=eqn.substring(0,eqn.length()-2)+";\n";
-            }
             this.eqnDescription.put(nodeAigActual,eqn);
         }
     }

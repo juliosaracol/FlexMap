@@ -6,7 +6,7 @@ import io.Logs;
 import java.util.*;
 
 /**
- * Classe que re-implementa o SET de nodeAig para representar uma árvore
+ * Classe que da forma a representaçã de árvores
  * @author Julio Saraçol
  */
 public class Tree extends Graph 

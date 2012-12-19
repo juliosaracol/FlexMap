@@ -159,10 +159,8 @@ public class Main
         if(args[1].equals("-T")&&(args.length >= 2))
         {
              Aig myAigTree = new Aig(args[0]);
-             Trees myTrees = new Trees(myAigTree);
-             myTrees.show();
-             myTrees.getEqnTrees();
-             //myTrees.getEqn();
+             Trees myTrees = new TreesBasic(myAigTree);
+             myTrees.getEqn();
              if((args.length > 2)&&(args[2].contains(".eqn"))) 
              { //caso arquivo de log
                Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  
