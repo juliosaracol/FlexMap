@@ -16,7 +16,7 @@ public class Logs
    public static String TreesToEqn(Trees trees) throws FileNotFoundException 
    {
        String outString ="";
-       outString = createTreesEqn(trees);
+       outString = createEqn(trees.getAig());
        String outString1="";
        for(Tree tree: trees.getRoots())
        {
@@ -124,36 +124,55 @@ public class Logs
                }
           }
         defInputsEqn +=";";
+        
         for(int i=0;i<trees.getAig().getO();i++){ 
            NodeAig output = trees.getAig().getVertexName(trees.getAig().getOutputsAig()[i][0]); 
-           if(symbolsEqn.get(outputSymbol+output.getName()) == null) 
+           if(!symbolsEqn.containsKey(outputSymbol+output.getName())) 
            {
                if((Integer.parseInt(output.getName())%2) != 0)
-               {
+               {   
+                   String nameOutput;
                    Boolean flag =false;
-                   String nameOutput = String.valueOf(Integer.parseInt(output.getName())-1);
-                   for(Tree tree : trees.getRoots())
-                      if(output.getName().equals(tree.getRoot().getName()))
-                      {
-                          flag = true;
-                          nameOutput = output.getName();                                                   
-                      }
-                   if(flag == true)
+                   if((output.getParents().get(0).getChildren().size() > 1)||(primaryInput.contains(String.valueOf(Integer.parseInt(output.getName())-1))))
                    {
-                        if(!primaryInput.contains(nameOutput)) //testa se é entrada<->saida invertida
-                            symbolsEqn.put(outputSymbol+nameOutput,"!["+nameOutput+"]");    // o_3=![2]
-                        else
-                            symbolsEqn.put(outputSymbol+output.getName(),"!["+inputSymbol+(Integer.parseInt(output.getName())-1)+"]"); // o_3=![pi_2]
-                        defOutputsEqn = defOutputsEqn +" "+ outputSymbol+nameOutput;               
+                     nameOutput = output.getName();
+                     flag = true;
                    }
                    else
                    {
-                       flag = false;
-                       for(NodeAig nodes: trees.getAig().getNodeOutputsAig())
+                       nameOutput = String.valueOf(Integer.parseInt(output.getName())-1);
+                       for(Tree tree : trees.getRoots())
+                          if(output.getName().equals(tree.getRoot().getName())) //se ainda existe esta saída == true
+                          {
+                              flag = true;
+                              nameOutput = output.getName();                                                   
+                          }
+                   }
+                   if(flag == true)
+                   {
+                       if(!symbolsEqn.containsKey(outputSymbol+nameOutput))
+                       {
+                         if(!primaryInput.contains(String.valueOf(Integer.parseInt(output.getName())-1))) //testa se é entrada<->saida invertida
+                            symbolsEqn.put(outputSymbol+nameOutput,"!["+output.getParents().get(0).getName()+"]");    // o_3=![2]
+                         else
+                            symbolsEqn.put(outputSymbol+nameOutput,"!["+inputSymbol+nameOutput+"]"); // o_3=![pi_2]
+                         defOutputsEqn = defOutputsEqn +" "+ outputSymbol+nameOutput;               
+                       }
+                   }
+                   else
+                   {
+                       if(!symbolsEqn.containsKey(outputSymbol+nameOutput))
+                       {
+                        flag = false;
+                        for(NodeAig nodes: trees.getAig().getNodeOutputsAig()) //testa se ja não existe a saída
                            if(nodes.getName().equals(nameOutput))
                                flag = true;
-                       if(flag == false)
-                           symbolsEqn.put(outputSymbol+(Integer.parseInt(output.getName())-1),"["+(Integer.parseInt(output.getName())-1)+"]");// o_2=[2]
+                        if(flag == false)
+                        {
+                           symbolsEqn.put(outputSymbol+(output.getName()),"["+(Integer.parseInt(output.getName())-1)+"]");// o_2=[2]
+                           defOutputsEqn = defOutputsEqn +" "+ outputSymbol+output.getName();
+                        }
+                       }
                    }
                }
                else
@@ -180,8 +199,8 @@ public class Logs
         return outString;
    }
   /** Método que inicializa a descrição do eqn com base na TREE*/
-    public static String createTreetoEqn(Tree tree) 
-    {
+   public static String createTreetoEqn(Tree tree) 
+   {
        String outString = "###############EQN GERADO#########################\n";
        String inputSymbol    = "pi_";
        String outputSymbol   = "po_";

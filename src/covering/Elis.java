@@ -16,7 +16,7 @@ public class Elis
     protected Integer s;
     protected Integer p;
     
-    public Elis(Trees trees, Integer s, Integer p)
+    public Elis(TreesElis trees, Integer s, Integer p)
     {
         this.s = s;
         this.p = p;
@@ -42,5 +42,4 @@ public class Elis
     public Trees getTrees() {
         return trees;
     }
-    
 }

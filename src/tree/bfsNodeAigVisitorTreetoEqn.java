@@ -66,7 +66,7 @@ public class bfsNodeAigVisitorTreetoEqn extends bfsNodeAigVisitor
             }
             if((subEqn.length() > 1)&&(subEqn.substring(subEqn.length()-1,subEqn.length()).equals(type)))
               subEqn = subEqn.substring(0, subEqn.length()-1);
-            return subEqn;
+            return "("+subEqn+")";
         }
     }
     

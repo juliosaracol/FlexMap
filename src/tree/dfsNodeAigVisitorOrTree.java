@@ -38,15 +38,16 @@ public class dfsNodeAigVisitorOrTree extends dfsNodeAigVisitor
         for(NodeAig neighbours : nodeAigActual.getParents())
             tree.addEdge(newNode, neighbours, false);
         tree.add(newNode);
-        if(!nodeAigActual.getChildren().get(0).isOutput())
-            tree.addEdge(nodeAigActual.getChildren().get(0),newNode, false);
-        else
+        if(((nodeAigActual.getChildren().get(0).isOutput())&&((Integer.parseInt(nodeAigActual.getChildren().get(0).getName()))%2!=0)))
         {
             tree.getTree().remove(nodeAigActual.getChildren().get(0));
             tree.setRoot(newNode);            
         }
-        for(NodeAig neighbours : nodeAigActual.getParents())
-            tree.removeEdge(Algorithms.getEdge(nodeAigActual,neighbours).getId());
+        else
+            tree.addEdge(nodeAigActual.getChildren().get(0),newNode, false);
+       for(NodeAig neighbours : nodeAigActual.getParents())
+            if(Algorithms.isInverter(nodeAigActual, neighbours))
+                tree.removeEdge(Algorithms.getEdge(nodeAigActual,neighbours).getId());
         tree.removeEdge(Algorithms.getEdge(nodeAigActual.getChildren().get(0),nodeAigActual).getId());
         this.tree.getTree().remove(nodeAigActual);
         System.out.println("SET NODO :"+newNode.getName()+" "+newNode.isOR());
