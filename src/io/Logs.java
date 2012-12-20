@@ -16,7 +16,7 @@ public class Logs
    public static String TreesToEqn(Trees trees) throws FileNotFoundException 
    {
        String outString ="";
-       outString = createEqn(trees.getAig());
+       outString = createTreesEqn(trees);
        String outString1="";
        for(Tree tree: trees.getRoots())
        {
@@ -50,44 +50,6 @@ public class Logs
         outString += bfsEqn.getEqnDescription();   
         return outString;
    }  
-   /**Método que gera descrição eqn a partir da cobertura em Kcuts*/
-   public static String coveringToEqn(Aig myAig, Map<NodeAig,AigCut> covering) throws FileNotFoundException 
-   {
-        String outString = createEqn(myAig); 
-        ArrayList<NodeAig> nodesPath = new ArrayList<NodeAig>();
-        String outString1="";
-        for(Map.Entry<NodeAig,AigCut> cell: covering.entrySet())
-        {
-            if((!cell.getKey().isInput())&&(!nodesPath.contains(cell.getKey())))
-            {
-                if(!(((Integer.parseInt(cell.getKey().getName())%2) != 0)&&(cell.getValue().size()==1)))
-                {
-                  dfsNodeAigVisitorCutToEqn dfsEqn = new dfsNodeAigVisitorCutToEqn(cell.getValue());
-                  if((Integer.parseInt(cell.getKey().getName())%2) != 0)
-                  {
-                      if(!nodesPath.contains(cell.getKey().getParents().get(0)))
-                      {
-                        nodesPath.add(cell.getKey().getParents().get(0));
-                        cell.getKey().getParents().get(0).accept(dfsEqn);
-                        outString1 += "["+(String.valueOf(Integer.parseInt(cell.getKey().getName())-1))+"]="+dfsEqn.getEqnDescription(cell.getKey().getParents().get(0))+";\n";
-                      }
-                  }
-                  else
-                  {
-                      if(!nodesPath.contains(cell.getKey()))
-                      {
-                        nodesPath.add(cell.getKey());
-                        cell.getKey().accept(dfsEqn);
-                        outString1 += "["+cell.getKey().getName()+"]="+dfsEqn.getEqnDescription(cell.getKey())+";\n";
-                      }
-                  }
-                }
-            }
-        }
-        outString+=outString1;
-        System.out.println(outString);
-        return outString;
-  }    
   /**Método que inicializa a descrição do eqn com base no AIG*/
   public static String createEqn(Aig aig)
   {
@@ -142,7 +104,82 @@ public class Logs
         }  
         return outString;
    }
-   /** Método que inicializa a descrição do eqn com base na TREE*/
+  /**Método que inicializa a descrição do eqn com base na TREES*/
+  public static String createTreesEqn(Trees trees)
+  {
+       String outString = "###############EQN GERADO#########################\n";
+       String inputSymbol    = "pi_";
+       String outputSymbol   = "po_";
+       String defInputsEqn   = "INORDER = ";
+       String defOutputsEqn  = "OUTORDER = ";
+       TreeMap<String,String> symbolsEqn     = new TreeMap<String,String>();
+       ArrayList<String>      primaryInput   = new ArrayList<String>();
+       //--inputs and outputs--------------------------------------------------     
+       for(int i=0;i<trees.getAig().getI();i++){
+                String name = trees.getAig().getInputsAig()[i][0];
+                if(!primaryInput.contains(name)){
+                  defInputsEqn = defInputsEqn +" "+ inputSymbol+ name;
+                  primaryInput.add(name);
+                  symbolsEqn.put(name,inputSymbol+ name);
+               }
+          }
+        defInputsEqn +=";";
+        for(int i=0;i<trees.getAig().getO();i++){ 
+           NodeAig output = trees.getAig().getVertexName(trees.getAig().getOutputsAig()[i][0]); 
+           if(symbolsEqn.get(outputSymbol+output.getName()) == null) 
+           {
+               if((Integer.parseInt(output.getName())%2) != 0)
+               {
+                   Boolean flag =false;
+                   String nameOutput = String.valueOf(Integer.parseInt(output.getName())-1);
+                   for(Tree tree : trees.getRoots())
+                      if(output.getName().equals(tree.getRoot().getName()))
+                      {
+                          flag = true;
+                          nameOutput = output.getName();                                                   
+                      }
+                   if(flag == true)
+                   {
+                        if(!primaryInput.contains(nameOutput)) //testa se é entrada<->saida invertida
+                            symbolsEqn.put(outputSymbol+nameOutput,"!["+nameOutput+"]");    // o_3=![2]
+                        else
+                            symbolsEqn.put(outputSymbol+output.getName(),"!["+inputSymbol+(Integer.parseInt(output.getName())-1)+"]"); // o_3=![pi_2]
+                        defOutputsEqn = defOutputsEqn +" "+ outputSymbol+nameOutput;               
+                   }
+                   else
+                   {
+                       flag = false;
+                       for(NodeAig nodes: trees.getAig().getNodeOutputsAig())
+                           if(nodes.getName().equals(nameOutput))
+                               flag = true;
+                       if(flag == false)
+                           symbolsEqn.put(outputSymbol+(Integer.parseInt(output.getName())-1),"["+(Integer.parseInt(output.getName())-1)+"]");// o_2=[2]
+                   }
+               }
+               else
+               {
+                   if(!primaryInput.contains(output.getName()))
+                      symbolsEqn.put(outputSymbol+output.getName(),"["+output.getName()+"]");     // o_2=[2]
+                   else
+                      symbolsEqn.put(outputSymbol+output.getName(),"["+inputSymbol+output.getName()+"]"); // o_2= i_2
+                   defOutputsEqn = defOutputsEqn +" "+ outputSymbol+output.getName(); 
+               }  
+           }
+        }
+        defOutputsEqn += ";";      
+        outString += defInputsEqn+"\n"+defOutputsEqn+"\n";
+        Iterator<Map.Entry<String,String>> iteratorSymbol = symbolsEqn.entrySet().iterator();
+        while(iteratorSymbol.hasNext())
+        {
+           Map.Entry<String,String> current = iteratorSymbol.next();
+           if(current.getKey().contains("po_"))
+                outString += current.getKey()+" = "+current.getValue()+";\n";
+           else
+                outString += "["+current.getKey()+"]"+" = "+current.getValue()+";\n";
+        }  
+        return outString;
+   }
+  /** Método que inicializa a descrição do eqn com base na TREE*/
     public static String createTreetoEqn(Tree tree) 
     {
        String outString = "###############EQN GERADO#########################\n";
@@ -194,6 +231,44 @@ public class Logs
         }  
         return outString;        
     }  
+   /**Método que gera descrição eqn a partir da cobertura em Kcuts*/
+   public static String coveringToEqn(Aig myAig, Map<NodeAig,AigCut> covering) throws FileNotFoundException 
+   {
+        String outString = createEqn(myAig); 
+        ArrayList<NodeAig> nodesPath = new ArrayList<NodeAig>();
+        String outString1="";
+        for(Map.Entry<NodeAig,AigCut> cell: covering.entrySet())
+        {
+            if((!cell.getKey().isInput())&&(!nodesPath.contains(cell.getKey())))
+            {
+                if(!(((Integer.parseInt(cell.getKey().getName())%2) != 0)&&(cell.getValue().size()==1)))
+                {
+                  dfsNodeAigVisitorCutToEqn dfsEqn = new dfsNodeAigVisitorCutToEqn(cell.getValue());
+                  if((Integer.parseInt(cell.getKey().getName())%2) != 0)
+                  {
+                      if(!nodesPath.contains(cell.getKey().getParents().get(0)))
+                      {
+                        nodesPath.add(cell.getKey().getParents().get(0));
+                        cell.getKey().getParents().get(0).accept(dfsEqn);
+                        outString1 += "["+(String.valueOf(Integer.parseInt(cell.getKey().getName())-1))+"]="+dfsEqn.getEqnDescription(cell.getKey().getParents().get(0))+";\n";
+                      }
+                  }
+                  else
+                  {
+                      if(!nodesPath.contains(cell.getKey()))
+                      {
+                        nodesPath.add(cell.getKey());
+                        cell.getKey().accept(dfsEqn);
+                        outString1 += "["+cell.getKey().getName()+"]="+dfsEqn.getEqnDescription(cell.getKey())+";\n";
+                      }
+                  }
+                }
+            }
+        }
+        outString+=outString1;
+        System.out.println(outString);
+        return outString;
+  }    
   /**Método que escreve eqn para arquivo de saída*/
   public static void LogsWriteEqn(String eqn,String fileLog)throws FileNotFoundException, IOException
    {

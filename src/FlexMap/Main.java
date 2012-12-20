@@ -179,10 +179,10 @@ public class Main
              Trees myTrees = new TreesBasic(myAigTree);
              Elis elis     = new Elis(myTrees,s,p);
              elis.getTrees().getEqn();
-//             if((args.length > 2)&&(args[2].contains(".eqn"))) 
-//             { //caso arquivo de log
-//               Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  
-//             }
+             if((args.length > 4)&&(args[4].contains(".eqn"))) 
+             { //caso arquivo de log
+               Logs.LogsWriteEqn(elis.getTrees().getEqn(),args[4]);  
+             }
              return;
         }   
         //------------------------------------------------------------------
