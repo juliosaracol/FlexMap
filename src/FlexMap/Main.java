@@ -176,11 +176,7 @@ public class Main
              Aig myAigTree = new Aig(args[0]);
              int s = Integer.parseInt(args[2]);
              int p = Integer.parseInt(args[3]);
-             Trees myTres = new TreesBasic(myAigTree);
-             myTres.getEqn();
              TreesElis myTrees = new TreesElis(myAigTree);
-//             myTrees.getEqnTrees();
-//             myTrees.getEqn();
              Elis elis     = new Elis(myTrees,s,p);
              elis.getTrees().getEqn();
              if((args.length > 4)&&(args[4].contains(".eqn"))) 

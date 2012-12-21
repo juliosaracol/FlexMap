@@ -153,7 +153,7 @@ public class Tree extends Graph
         System.out.println("\n###############################");
     }
 
-    public void setRoot(NodeAigGateOr newNode) {
+    public void setRoot(NodeAig newNode) {
         this.root= newNode;
     }
 }
