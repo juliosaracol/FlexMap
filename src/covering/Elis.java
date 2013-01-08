@@ -30,8 +30,7 @@ public class Elis
         for(Tree root: this.trees.getRoots())
         {
             System.out.println("**************TREE root:"+root.getRoot().getName());
-            deMorgan(root,root.getRoot(),false);
-            
+            deMorgan(root,root.getRoot(),false);           
         }
         
     }
@@ -40,7 +39,7 @@ public class Elis
      * @param root (nodo atual) 
      * @param type (boolean indica se ja encontrou o inversor antes)
      */
-    public void deMorgan(Tree tree, NodeAig root, boolean type)
+    private void deMorgan(Tree tree, NodeAig root, boolean type)
     {
       if(root.isInput())
           return;
@@ -49,8 +48,9 @@ public class Elis
         if((root.getParents().size()==1))//caso se tiver saida negada elimina o nodo
         {
             NodeAig newRoot = createGate(tree,root.getParents().get(0));
-            tree.removeEdge(Algorithms.getEdge(root, root.getParents().get(0)).getId());
             tree.setRoot(newRoot);
+            tree.removeEdge(Algorithms.getEdge(root, root.getParents().get(0)).getId());
+            tree.removeVertex(root.getId());
             for(NodeAig father: tree.getRoot().getParents())
                 deMorgan(tree, father,true);
             return;
@@ -64,25 +64,27 @@ public class Elis
           else
               porta = "OR";
           System.out.println("Set Nodo deMorgan: "+root.getName()+" "+porta);
-          for(int i=0;i<root.getParents().size();i++)
+          ArrayList<NodeAig> fathers = root.getParents();
+          for(int i=0;i<fathers.size();i++)
           {
-              createGate(tree, root);  
-              if(!Algorithms.isInverter(root,root.getParents().get(i)))
-                deMorgan(tree,root.getParents().get(i), false);          
+              if(!Algorithms.isInverter(root,fathers.get(i)))
+                deMorgan(tree,fathers.get(i), false);          
               else
-                deMorgan(tree,root.getParents().get(i), true);          
+                deMorgan(tree,fathers.get(i), true);          
           }
-        }        
-        else
-        {
-         for(int i=0;i<root.getParents().size();i++)
-         {
-           if(Algorithms.isInverter(root,root.getParents().get(i))&&(!root.getParents().get(i).isInput()))
-             deMorgan(tree,root.getParents().get(i), true);          
-           else
-             deMorgan(tree,root.getParents().get(i), false);          
-         }
-        }
+          createGate(tree, root);  
+       }        
+       else
+       {
+          ArrayList<NodeAig> fathers = root.getParents();
+          for(int i=0;i<fathers.size();i++)
+          {
+              if(!Algorithms.isInverter(root,fathers.get(i)))
+                deMorgan(tree,fathers.get(i), false);          
+              else
+                deMorgan(tree,fathers.get(i), true);          
+          }
+       }
      }            
         
     }
@@ -99,26 +101,33 @@ public class Elis
         return trees;
     }
     
-    /**Método que instancia um nodo cópia trocando a operação lógica do nodo and->or || or->and invertendo as arestas */
+    /**Método que instancia um nodo cópia trocando a operação lógica do nodo and->or || or->and invertendo as arestas dos pais e mantendo a aresta do filho */
     public NodeAig createGate(Tree tree, NodeAig gate)
     {
         if(gate.isOR())
         {
             NodeAigGate newNode = new NodeAigGate(gate.getId(), gate.getName());
+            //tree.removeVertex(gate.getId());
             for(NodeAig father: gate.getParents())
+            {
+                System.out.println("set aresta de "+gate.getName()+" para "+father.getName()+" :"+!(Algorithms.isInverter(gate, father)));
                 tree.addEdge(newNode,father, !(Algorithms.isInverter(gate, father)));
-            tree.addEdge(gate.getChildren().get(0),newNode, !(Algorithms.isInverter(gate.getChildren().get(0),gate)));
-            tree.removeVertex(gate.getId());
+            }
+            tree.addEdge(gate.getChildren().get(0),newNode, (Algorithms.isInverter(gate.getChildren().get(0),gate)));
             tree.add(newNode);
             return newNode;
         }
         if(gate.isAnd()||gate.isOutput())
         {
+            
             NodeAigGateOr newNode = new NodeAigGateOr(gate.getId(), gate.getName());
             for(NodeAig father: gate.getParents())
+            {
+                System.out.println("set aresta de "+gate.getName()+" para "+father.getName()+" :"+!(Algorithms.isInverter(gate, father)));
                 tree.addEdge(newNode,father, !(Algorithms.isInverter(gate, father)));
-            tree.addEdge(gate.getChildren().get(0),newNode, !(Algorithms.isInverter(gate.getChildren().get(0),gate)));
-            tree.removeVertex(gate.getId());
+            }
+            //tree.removeVertex(gate.getId());
+            tree.addEdge(gate.getChildren().get(0),newNode, (Algorithms.isInverter(gate.getChildren().get(0),gate)));
             tree.add(newNode);
             return newNode;
         }
