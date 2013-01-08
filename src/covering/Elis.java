@@ -27,10 +27,12 @@ public class Elis
             dfsNodeAigVisitorOrTree dfsOrGate = new dfsNodeAigVisitorOrTree(trees,root);
             root.getRoot().accept(dfsOrGate);
         }
-//        for(Tree root: this.trees.getRoots())
-//        {
-//            deMorgan(root,root.getRoot(),false);
-//        }
+        for(Tree root: this.trees.getRoots())
+        {
+            System.out.println("**************TREE root:"+root.getRoot().getName());
+            deMorgan(root,root.getRoot(),false);
+            
+        }
         
     }
     /**Método que aplica deMorgan na árvore até as entradas
@@ -46,9 +48,9 @@ public class Elis
       {
         if((root.getParents().size()==1))//caso se tiver saida negada elimina o nodo
         {
-            createGate(tree,root.getParents().get(0));
-            tree.setRoot(root.getParents().get(0));
+            NodeAig newRoot = createGate(tree,root.getParents().get(0));
             tree.removeEdge(Algorithms.getEdge(root, root.getParents().get(0)).getId());
+            tree.setRoot(newRoot);
             for(NodeAig father: tree.getRoot().getParents())
                 deMorgan(tree, father,true);
             return;
@@ -97,8 +99,8 @@ public class Elis
         return trees;
     }
     
-    /**Método que instancia um nodo cópia na trocando a operção lógica do nodo and->or || or->and invertendo as arestas */
-    public void createGate(Tree tree, NodeAig gate)
+    /**Método que instancia um nodo cópia trocando a operação lógica do nodo and->or || or->and invertendo as arestas */
+    public NodeAig createGate(Tree tree, NodeAig gate)
     {
         if(gate.isOR())
         {
@@ -108,7 +110,7 @@ public class Elis
             tree.addEdge(gate.getChildren().get(0),newNode, !(Algorithms.isInverter(gate.getChildren().get(0),gate)));
             tree.removeVertex(gate.getId());
             tree.add(newNode);
-            return;
+            return newNode;
         }
         if(gate.isAnd()||gate.isOutput())
         {
@@ -118,7 +120,8 @@ public class Elis
             tree.addEdge(gate.getChildren().get(0),newNode, !(Algorithms.isInverter(gate.getChildren().get(0),gate)));
             tree.removeVertex(gate.getId());
             tree.add(newNode);
-            return;
+            return newNode;
         }
+        return null;
     }
 }
