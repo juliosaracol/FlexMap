@@ -1,7 +1,7 @@
 package aig;
 import graph.*;
 /**
- * Classe que especializa NODO de AIG a partir de Vertex
+ * Classe que especializa NodeAig de AIG a partir de Vertex
  * @author Julio Saraçol
  * obs: classe que da forma ao NODO, porém utilizar especialização com métodos 'abstract' implementados
  * */

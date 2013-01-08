@@ -1,7 +1,7 @@
 package aig;
 
 /**
- * Classe que especializa NODO de AIG a partir de Vertex pa
+ * Classe que especializa NodeAig de AIG a partir de Vertex pa
  * @author Julio Saraçol
  * obs: classe que da forma ao NODO, porém utilizar especialização com métodos 'abstract' implementados
  */

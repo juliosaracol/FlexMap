@@ -139,8 +139,8 @@ public class Main
                return;
           }
         }
-        //--------------------------------------------------------------------
-        //--------------------MAP AREA FLOW----------------------------------
+        //----------------------------------------------------------------------
+        //--------------------MAP AREA FLOW-------------------------------------
         if(args[1].equals("-A")&&(args.length >= 4))
         {
              Aig myAig              = new Aig(args[0]);
@@ -155,8 +155,8 @@ public class Main
              }
              return;
         }
-        //------------------------------------------------------------------
-        ////--------------------MAP AREA FLOW COM KCUTS e BIB-----------------
+        //----------------------------------------------------------------------
+        ////--------------------MAP AREA FLOW LIBRARY---------------------------
         //if(args[1].equals("-AL")&&(args.length >= 4))
         //{
              //Aig myAig = new Aig(args[0]);
@@ -169,15 +169,16 @@ public class Main
              //}
              //return;
         //}
-        ////------------------------------------------------------------------
-        //--------------------ARVORES-----------------------------------------
+        ////--------------------------------------------------------------------
+        //--------------------ELIS----------------------------------------------
         if(args[1].equals("-E")&&(args.length >= 4))
         {
              Aig myAigTree = new Aig(args[0]);
              int s = Integer.parseInt(args[2]);
              int p = Integer.parseInt(args[3]);
-             TreesElis myTrees = new TreesElis(myAigTree);
-             Elis elis     = new Elis(myTrees,s,p);
+             TreesElis myTrees  = new TreesElis(myAigTree);
+             Elis elis          = new Elis(myTrees,s,p);
+             elis.getTrees().show();
              elis.getTrees().getEqn();
              if((args.length > 4)&&(args[4].contains(".eqn"))) 
              { //caso arquivo de log
@@ -185,15 +186,15 @@ public class Main
              }
              return;
         }   
-        //------------------------------------------------------------------
-        ////--------------------SWITCHING-------------------------------------
+        //----------------------------------------------------------------------
+        ////--------------------SWITCHING---------------------------------------
         //if(args[1].equals("-S")&&(args.length >= 3))
         //{
                 //Simulator simulator = new Simulator(args[0], args[2]);
                 //simulator.run();
         //}
-        ////------------------------------------------------------------------
-       //--------------------DFS-------------------------------------
+        ////--------------------------------------------------------------------
+       //--------------------DFS------------------------------------------------
         if(args[1].equals("-DFS")&&(args.length >= 2))
         {
               Aig myAig = new Aig(args[0]);
@@ -221,7 +222,7 @@ public class Main
               System.out.println("\n#########################################");   
               return;
         }
-        //--------------------BFS-------------------------------------
+        //--------------------BFS-----------------------------------------------
         if(args[1].equals("-BFS")&&(args.length >= 2))
         {
               bfsNodeAigVisitorBasic myBfs = new bfsNodeAigVisitorBasic();
@@ -261,7 +262,7 @@ public class Main
       }
       warning(); //caso de nenhuma opção erro
       return;
-      //------------------------------------------------------------------
+      //------------------------------------------------------------------------
     }
         
     /** Informa o procedimento correto para executar a ferramenta*/

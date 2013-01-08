@@ -14,8 +14,8 @@ public class dfsNodeAigVisitorOrTree extends dfsNodeAigVisitor
     public dfsNodeAigVisitorOrTree(Trees trees,Tree tree) 
     {
         super();
-        this.trees = trees;
-        this.tree = tree;
+        this.trees  = trees;
+        this.tree   = tree;
     }
 
     @Override

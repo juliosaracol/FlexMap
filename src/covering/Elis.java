@@ -1,6 +1,5 @@
 package covering;
 
-import graph.*;
 import aig.*;
 import tree.*;
 import FlexMap.Algorithms;
@@ -21,22 +20,23 @@ public class Elis
     {
         this.s = s;
         this.p = p;
-        this.trees = trees;
+        this.trees      = trees;
         Set<Tree> roots = trees.getRoots();
         for(Tree root : roots)
         {
             dfsNodeAigVisitorOrTree dfsOrGate = new dfsNodeAigVisitorOrTree(trees,root);
             root.getRoot().accept(dfsOrGate);
         }
-        for(Tree root: this.trees.getRoots())
-        {
-            deMorgan(root,root.getRoot(),false);
-        }
+//        for(Tree root: this.trees.getRoots())
+//        {
+//            deMorgan(root,root.getRoot(),false);
+//        }
         
     }
     /**Método que aplica deMorgan na árvore até as entradas
-     * @param nodo
-     * @param boolean indica se ja encontrou o inversor antes
+     * @param tree (árvore do nodo)
+     * @param root (nodo atual) 
+     * @param type (boolean indica se ja encontrou o inversor antes)
      */
     public void deMorgan(Tree tree, NodeAig root, boolean type)
     {
@@ -76,13 +76,9 @@ public class Elis
          for(int i=0;i<root.getParents().size();i++)
          {
            if(Algorithms.isInverter(root,root.getParents().get(i))&&(!root.getParents().get(i).isInput()))
-           {
              deMorgan(tree,root.getParents().get(i), true);          
-           }
            else
-           {
              deMorgan(tree,root.getParents().get(i), false);          
-           }
          }
         }
      }            

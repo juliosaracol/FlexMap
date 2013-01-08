@@ -38,8 +38,8 @@ public abstract class Cutter
     /**
      * Combines two sets of cuts and assures that the cuts in the resulting set
      * of cuts are irredundant
-     * @param cuts0 Set of cuts to be combined
-     * @param cuts1 Set of cuts to be combined
+     * @param k1 Set of cuts to be combined
+     * @param k2 Set of cuts to be combined
      * @return  A set of cuts, irredundant, and respecting size limit
      */
     protected Set<AigCut> combineIrredundant(Set<AigCut> k1, Set<AigCut> k2)

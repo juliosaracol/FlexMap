@@ -8,31 +8,31 @@ public interface AigNodeVisitor {
 
     /**
      * Visitor for an AigNodeAnd
-     * @param aigNodeAnd    The node
+     * @param nodeAigGate The node
      */
     public void visit(NodeAigGate nodeAigGate);
 
     /**
      * Visitor for an AigNodeOR
-     * @param aigNodeAnd    The node
+     * @param nodeAigGateOr The node
      */
     public void visit(NodeAigGateOr nodeAigGateOr);
 
     /**
      * Visitor for an AigNodeInput
-     * @param aigNodeInput  The Node
+     * @param nodeAigInput  The Node
      */
     public void visit(NodeAigInput nodeAigInput);
 
     /**
      * Visitor for an AigNodeOutput
-     * @param aigNodeOutput The Node
+     * @param nodeAigOutput The Node
      */
     public void visit(NodeAigOutput nodeAigOutput);
 
     /**
      * Visitor for an AigNodeLatch
-     * @param aigNodeLatch The Node
+     * @param nodeAigLatch The Node
      */
     public void visit(NodeAigLatch nodeAigLatch);
 }

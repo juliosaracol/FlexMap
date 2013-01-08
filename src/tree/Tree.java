@@ -30,7 +30,7 @@ public class Tree extends Graph
         this.add(node);
     }
     
-    /**@override do Método de inserção de nodos no graph*/
+    /**override do Método de inserção de nodos no graph*/
     public void add(NodeAig node)
     {
          try 

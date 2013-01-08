@@ -21,7 +21,7 @@ public class Aig extends Graph
     protected Set<NodeAig>  nodeInputsAig;
     protected Set<NodeAig>  nodeGatesAig;
    /**Construtor 
-   *@param nomeArquivo de Aig em ascii '.aag'
+   *@param fileName (omeArquivo de Aig em ascii '.aag')
    * */
    public Aig(String fileName)
    {
@@ -37,7 +37,7 @@ public class Aig extends Graph
       System.out.println("#AIG carregado com sucesso");
    }    
    /** Método que realiza o parser do arquivo baseado no padrão AIGER carrega os vetores de inputs|outputs|latches|gates
-    * @param nomeArquivoEntrada.aag*/
+    * @param file (nomeArquivoEntrada.aag)*/
    public void parserAig(String file)
    {            
     StringTokenizer lines,line;
@@ -275,7 +275,7 @@ public class Aig extends Graph
         }
         return null;   
     }    
-    /** @override do Método addEdge para trabalhar com EdgesAig*/
+    /**override do Método addEdge para trabalhar com EdgesAig*/
     public int addEdge(String vertex1, String vertex2,boolean type) throws NullPointerException
     {        
         try {
