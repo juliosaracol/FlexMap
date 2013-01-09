@@ -8,6 +8,7 @@ import java.util.*;
 /**
  * Classe que aplica a cobertura de acordo com  algoritmo da Elis (Correia,2005)
  * @author Julio Saraçol
+
  */
 public class Elis 
 {
@@ -54,7 +55,15 @@ public class Elis
             tree.setRoot(newRoot);
             ArrayList<NodeAig> fathers = tree.getRoot().getParents();
             for(NodeAig father: fathers)
-                deMorgan(tree, father,true);
+            {
+                if(Algorithms.isInverter(newRoot, father))
+                {
+                    Algorithms.getEdge(newRoot, father).edgeInverter();
+                    deMorgan(tree, father,true);
+                }
+                else
+                    deMorgan(tree, father,false);
+            }
             return;
         }  
         
@@ -75,10 +84,10 @@ public class Elis
               {
                 if(!fathers.get(i).isInput())
                   Algorithms.getEdge(newNode, fathers.get(i)).edgeInverter();  
-                deMorgan(tree,fathers.get(i), false);                            
+                deMorgan(tree,fathers.get(i), true);                            
               }
               else
-                  deMorgan(tree,fathers.get(i), true);          
+                  deMorgan(tree,fathers.get(i), false);          
           }
        }        
        else
@@ -128,7 +137,7 @@ public class Elis
             return newNode;
         }
         if(gate.isAnd()||gate.isOutput())
-        {
+        { 
             NodeAigGateOr newNode = new NodeAigGateOr(gate.getId(), gate.getName());
             for(NodeAig father: gate.getParents())
             {

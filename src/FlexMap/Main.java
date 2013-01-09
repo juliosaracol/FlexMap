@@ -207,8 +207,7 @@ public class Main
               else
               {
                    for(NodeAig out : myAig.getNodeOutputsAig())
-                    out.accept(myDfs);
-                   
+                    out.accept(myDfs);                   
               }
               System.out.println("DFS executada com sucesso");
               System.out.println("\n############ DFS #############################");
