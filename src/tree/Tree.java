@@ -156,4 +156,30 @@ public class Tree extends Graph
     public void setRoot(NodeAig newNode) {
         this.root= newNode;
     }
+
+    public void removeVertex(NodeAig gate) {
+          try {
+            
+            Vertex removedVertex = gate;
+            Vertex auxVertex;
+            
+            /* Remove arestas das listas de adjacencia dos vertices vizinhos */
+            for(Edge edge: removedVertex.getAdjacencies()) {
+                
+                auxVertex = removedVertex.getNextVertex(edge);
+                auxVertex.getAdjacencies().remove(edge);
+                this.edges.remove(edge.getId());
+            }
+
+            /* Remove todas as arestas que estao conectadas ao vertice que esta sendo removido */
+            removedVertex.getAdjacencies().clear();
+
+            /* Remove o vertice do TreeMap */
+            this.vertices.remove(gate.getId());
+            this.tree.remove(gate);
+        }
+        catch(Exception e) {
+            System.out.print(e.toString());
+        }
+    }
 }
