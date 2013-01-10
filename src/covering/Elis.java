@@ -31,7 +31,8 @@ public class Elis
         for(Tree root: this.trees.getRoots())
         {
             System.out.println("**************TREE root:"+root.getRoot().getName());
-            deMorgan(root,root.getRoot(),false);           
+            if(root.getTree().size() > 2)
+                deMorgan(root,root.getRoot(),false);           
         }
         
     }
@@ -48,21 +49,25 @@ public class Elis
       {
         if((root.getParents().size()==1)&&(Integer.parseInt(root.getName())%2 !=0))//caso se tiver saida negada elimina o nodo
         {
+           if(root.getParents().get(0).getChildren().size()==1)
+           {
             NodeAig newRoot = createGate(tree,root.getParents().get(0));
             tree.removeEdge(Algorithms.getEdge(root, root.getParents().get(0)).getId());
             tree.removeVertex(root);
             tree.add(newRoot);
             tree.setRoot(newRoot);
-            ArrayList<NodeAig> fathers = tree.getRoot().getParents();
-            for(NodeAig father: fathers)
-            {
-                if(Algorithms.isInverter(newRoot, father))
-                {
-                    Algorithms.getEdge(newRoot, father).edgeInverter();
-                    deMorgan(tree, father,true);
-                }
-                else
-                    deMorgan(tree, father,false);
+           }
+           ArrayList<NodeAig> fathers = tree.getRoot().getParents();
+           for(NodeAig father: fathers)
+           {
+               if(Algorithms.isInverter(tree.getRoot(), father))
+               {
+                   if(!father.isInput())
+                    Algorithms.getEdge(tree.getRoot(), father).edgeInverter();
+                   deMorgan(tree, father,true);
+               }
+               else
+                  deMorgan(tree, father,false);
             }
             return;
         }  
