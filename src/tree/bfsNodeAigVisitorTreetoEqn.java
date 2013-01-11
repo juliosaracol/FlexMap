@@ -2,7 +2,9 @@ package tree;
 
 import FlexMap.Algorithms;
 import aig.*;
+import graph.*;
 import java.util.*;
+
 /**
  * Classe que aplica caminhamento para gerar eqn da classe TREES
  * @author Julio Saraçol
@@ -48,14 +50,37 @@ public class bfsNodeAigVisitorTreetoEqn extends bfsNodeAigVisitor
             return "["+nodeAigActual.getName()+"]";
         else
         {
-            Set<NodeAig> nodeEqns =this.eqn.get(nodeAigActual);
+            Set<NodeAig> nodeEqns = this.eqn.get(nodeAigActual);
             if(nodeEqns == null)
             {
                 function(nodeAigActual);
                 nodeEqns = this.eqn.get(nodeAigActual);
             }
-            for(NodeAig node: nodeEqns)
+            if(this.eqn.get(nodeAigActual).size() != (nodeAigActual.getAdjacencies().size()-nodeAigActual.getChildren().size()))
             {
+                //sinal que tem aresta dupla pra mesmo nodo 
+                for(Edge edge: nodeAigActual.getAdjacencies())
+                {                   
+                  if(edge.getVertex1().equals(nodeAigActual)) 
+                  {
+                   EdgeAig edgeActual = (EdgeAig) edge;
+                   NodeAig node       = (NodeAig) edge.getVertex2();
+                   type = "*";
+                   if(nodeAigActual.getTypeNodeAig() == TypeNode.OR)
+                      type = "+";
+                   if(edgeActual.isInverter())
+                       subEqn += "!("+getEqn(node)+")"+type;
+                   else
+                       subEqn += getEqn(node)+type;
+                  }
+                }
+                 if((subEqn.length() > 1)&&(subEqn.substring(subEqn.length()-1,subEqn.length()).equals(type)))
+                  subEqn = subEqn.substring(0, subEqn.length()-1);
+            }
+            else
+            {
+             for(NodeAig node: nodeEqns)
+             {
               type = "*";
               if(nodeAigActual.getTypeNodeAig() == TypeNode.OR)
                   type = "+";
@@ -63,9 +88,10 @@ public class bfsNodeAigVisitorTreetoEqn extends bfsNodeAigVisitor
                    subEqn += "!("+getEqn(node)+")"+type;
               else
                    subEqn += getEqn(node)+type;
-            }
-            if((subEqn.length() > 1)&&(subEqn.substring(subEqn.length()-1,subEqn.length()).equals(type)))
+             }
+             if((subEqn.length() > 1)&&(subEqn.substring(subEqn.length()-1,subEqn.length()).equals(type)))
               subEqn = subEqn.substring(0, subEqn.length()-1);
+            }
             return "("+subEqn+")";
         }
     }

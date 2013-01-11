@@ -32,11 +32,13 @@ public class Elis
         {
             System.out.println("**************TREE root:"+root.getRoot().getName());
             if(root.getTree().size() > 2)
-                deMorgan(root,root.getRoot(),false);           
+              deMorgan(root,root.getRoot(),false);
         }
-        
+        for(Tree root: this.trees.getRoots())
+           equivalenceNodes(root,root.getRoot());
+         
     }
-    /**Método que aplica deMorgan na árvore até as entradas
+    /**Método que aplica deMorgan em cada árvore até as entradas
      * @param tree (árvore do nodo)
      * @param root (nodo atual) 
      * @param type (boolean indica se ja encontrou o inversor antes)
@@ -114,6 +116,30 @@ public class Elis
         
     }
 
+    /**Método que encontra nodos filhos equivalentes transformando em um unico nodo 
+     * @param tree (árvore do nodo)
+     * @param root (nodo atual)
+     */
+    private void equivalenceNodes(Tree tree, NodeAig root) 
+    {
+        ArrayList<NodeAig> fathers          = root.getParents();
+        ArrayList<NodeAig> fathersEquals    = new ArrayList<NodeAig>();
+        for(NodeAig father: fathers)
+        {
+           if((!father.isInput())&&
+                   ((root.isAnd() && father.isAnd())||(root.isOutput() && father.isAnd())||(root.isOR() && father.isOR())))
+               fathersEquals.add(father);
+        }
+        for(NodeAig fatherEqual: fathersEquals)
+        { 
+            System.out.println("UNION em: "+root.getName()+" e "+fatherEqual.getName());  
+            unionGates(tree,root,fatherEqual);//deleta filho e instancia um só nodo
+        }
+        fathers = root.getParents();
+        for(NodeAig father: fathers)
+            equivalenceNodes(tree, father);        
+    }
+    
     public Integer getP() {
         return p;
     }
@@ -126,8 +152,8 @@ public class Elis
         return trees;
     }
     
-    /**Método que instancia um nodo cópia trocando a operação lógica do nodo and->or || or->and invertendo as arestas dos pais e mantendo a aresta do filho */
-    public NodeAig createGate(Tree tree, NodeAig gate)
+    /**Método que instância um nodo cópia trocando a operação lógica do nodo and->or || or->and invertendo as arestas dos pais e mantendo a aresta do filho */
+    private NodeAig createGate(Tree tree, NodeAig gate)
     {
         if(gate.isOR())
         {
@@ -155,4 +181,18 @@ public class Elis
         }
         return null;
     }
+
+    /**Método que aplica a deleção do nodo e acertas as arestas para o pai do pai do nodo 
+     * @param tree (árvore em questão)
+     * @param root (nodo atual)
+     * @param fatherEqual (nodo a ser retirado)
+     */
+    private void unionGates(Tree tree, NodeAig root, NodeAig fatherEqual) 
+    {
+        ArrayList<NodeAig> granFathers = fatherEqual.getParents();
+        for(NodeAig granFather : granFathers)
+            tree.addEdge(root, granFather, Algorithms.isInverter(fatherEqual, granFather));
+        tree.removeVertex(fatherEqual);            
+    }
+
 }
