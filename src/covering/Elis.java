@@ -3,7 +3,6 @@ package covering;
 import aig.*;
 import tree.*;
 import FlexMap.Algorithms;
-
 import java.util.*;
 /**
  * Classe que aplica a cobertura de acordo com  algoritmo da Elis (Correia,2005)
@@ -12,7 +11,6 @@ import java.util.*;
  */
 public class Elis 
 {
-
     protected Trees trees;
     protected Integer s;
     protected Integer p;
@@ -36,7 +34,7 @@ public class Elis
         }
         for(Tree root: this.trees.getRoots())
            equivalenceNodes(root,root.getRoot());
-         
+        mapping(); 
     }
     /**Método que aplica deMorgan em cada árvore até as entradas
      * @param tree (árvore do nodo)
@@ -140,18 +138,6 @@ public class Elis
             equivalenceNodes(tree, father);        
     }
     
-    public Integer getP() {
-        return p;
-    }
-
-    public Integer getS() {
-        return s;
-    }
-
-    public Trees getTrees() {
-        return trees;
-    }
-    
     /**Método que instância um nodo cópia trocando a operação lógica do nodo and->or || or->and invertendo as arestas dos pais e mantendo a aresta do filho */
     private NodeAig createGate(Tree tree, NodeAig gate)
     {
@@ -194,5 +180,27 @@ public class Elis
             tree.addEdge(root, granFather, Algorithms.isInverter(fatherEqual, granFather));
         tree.removeVertex(fatherEqual);            
     }
+    
+    /**Método que aplica o particionamento nas árvores de acordo com a restrição 's' e 'p'*/
+    private void mapping() 
+    {
+     for(Tree tree : this.trees.getRoots())
+     {
+       System.out.println("\nStart Mapping nas Árvores: "+tree.getRoot().getName());
+       dfsNodeAigVisitorTreeCutsp dfs = new dfsNodeAigVisitorTreeCutsp(this.trees,tree,s,p);
+       tree.getRoot().accept(dfs);
+     }
+     System.out.println("################################################");
+    }
+    public Integer getP() {
+        return p;
+    }
 
+    public Integer getS() {
+        return s;
+    }
+
+    public Trees getTrees() {
+        return trees;
+    }
 }

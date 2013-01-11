@@ -4,7 +4,7 @@ import FlexMap.Algorithms;
 import aig.*;
 import java.util.*;
 /**
- * Classe que implementa caminhamento para gerar a cópia do subgrafo do Aig
+ * Classe que implementa caminhamento para gerar a cópia do subgrafo do Aig/Tree
  * @author Julio Saraçol
  */
 public class bfsNodeTreeVisitorCopy extends bfsNodeAigVisitor
