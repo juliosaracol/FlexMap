@@ -5,6 +5,7 @@ package covering;
  * @author Julio Saraçol
  */
 
+import FlexMap.*;
 import aig.*;
 import tree.*;
 import java.util.*;
@@ -99,17 +100,98 @@ public class dfsNodeAigVisitorTreeCutsp extends dfsNodeAigVisitor
 
     private void cutTree(NodeAig nodeAigActual) 
     {
-        //faz todas a combinações -> seleciona melhor cost
-        //define qual nodo corta cria nodo fake e chama a parte debaixo ae 
-        
-        Tree newTree = new Tree();
-        bfsNodeTreeVisitorCopy bfsCopy =  new bfsNodeTreeVisitorCopy(null, newTree);
-        nodeAigActual.accept(bfsCopy);
-        this.newTrees.add(newTree);
+        ArrayList<ArrayList<Integer>> cost      = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<NodeAig>> choices   = new ArrayList<ArrayList<NodeAig>>();
+        boolean solution=false;
+        int selected = choiceDinamic(nodeAigActual,choices,cost);
+        for(int i=0;i<choices.get(selected).size();i++)
+        {
+            if((coveringP.get(choices.get(selected).get(i).getName()) > 1)||
+                    (coveringS.get(choices.get(selected).get(i).getName()) > 1))
+            {   solution = false; break; }            
+        }
+        if(solution == false) //caso de corte na árvore
+        {
+           Tree newTree = new Tree();
+           bfsNodeTreeVisitorCopy bfsCopy =  new bfsNodeTreeVisitorCopy(null, newTree);
+           nodeAigActual.accept(bfsCopy);
+           this.newTrees.add(newTree);
+           for(NodeAig deleted: newTree.getTree())
+               tree.removeVertex(deleted.getId());
+        }
+        else //nodos com cost 1,1
+        {
+            
+        }
     }
     
-    
-    
-    
-    
+    //**Método que faz todas a combinações de corte e seleciona a melhor alternativa do conjunto de nodos disponiveis
+    private int choiceDinamic(NodeAig nodeAigActual, ArrayList<ArrayList<NodeAig>> choices, ArrayList<ArrayList<Integer>> cost)
+    {
+        int costS,costP,indexBest=0,levelMax=0,combination;
+        ArrayList<Integer> levelCombination = new ArrayList<Integer>();
+        if(nodeAigActual.isOR())
+            combination = p;
+        else
+            combination = s;           
+            
+        for(int i=1;i<=combination;i++)
+        {
+          //gera todas as combinações dos filhos
+          ArrayList<ArrayList<Integer>> indexCombinations  = 
+                  CombinationGenerator.getCombinations(nodeAigActual.getParents().size(),i);
+          for(int j=0;j<indexCombinations.size();j++) 
+          {
+              choices.add(new ArrayList<NodeAig>()); //separa combinacao
+              cost.add(new ArrayList<Integer>());    //calcula o custo da combinacao
+              costS =0;
+              costP =0;
+              levelMax=0;
+              for(int w=0;w<indexCombinations.get(j).size();w++)
+              {
+                  choices.get(choices.size()-1).add(nodeAigActual.getParents().get(indexCombinations.get(j).get(w)));
+                  if(nodeAigActual.isOR())
+                  {
+                     if(costS < coveringS.get(nodeAigActual.getParents().get(indexCombinations.get(j).get(w)).getName()))
+                         costS = coveringS.get(nodeAigActual.getParents().get(indexCombinations.get(j).get(w)).getName());
+                     costP += coveringP.get(nodeAigActual.getParents().get(indexCombinations.get(j).get(w)).getName());                  
+                     levelMax +=level.get(nodeAigActual.getParents().get(indexCombinations.get(j).get(w)).getName());
+                  }    
+                  else
+                  {
+                     costS += coveringS.get(nodeAigActual.getParents().get(indexCombinations.get(j).get(w)).getName());
+                     if(costP < coveringP.get(nodeAigActual.getParents().get(indexCombinations.get(j).get(w)).getName()))
+                        costP = coveringP.get(nodeAigActual.getParents().get(indexCombinations.get(j).get(w)).getName());                     
+                     levelMax +=level.get(nodeAigActual.getParents().get(indexCombinations.get(j).get(w)).getName());
+                  }
+              }
+              levelCombination.add(levelMax);
+              if(nodeAigActual.isOR())
+              {
+                  cost.get(cost.size()-1).add(costP);
+                  cost.get(cost.size()-1).add(costS);
+                  if((cost.get(indexBest).get(0) <= costP)&&(costP <= p))
+                    if((cost.get(indexBest).get(1) <= costS)&&(costS <= s))
+                        if((cost.get(indexBest).get(0) < costP)||(cost.get(indexBest).get(1) < costS))
+                            indexBest = cost.size()-1;                        
+                        else
+                            if(levelCombination.get(levelCombination.size()-1) <= levelCombination.get(indexBest))
+                                indexBest = cost.size()-1;
+              }
+              else
+              {
+                  cost.get(cost.size()-1).add(costS);
+                  cost.get(cost.size()-1).add(costP);
+                  if((cost.get(indexBest).get(0) <= costS)&&(costS <= s))
+                    if((cost.get(indexBest).get(1) <= costP)&&(costP <= p))
+                        if((cost.get(indexBest).get(0) < costS)||(cost.get(indexBest).get(1) < costP))
+                             indexBest = cost.size()-1;
+                        else
+                            if(levelCombination.get(levelCombination.size()-1) <= levelCombination.get(indexBest))
+                             indexBest = cost.size()-1;
+              }
+           } 
+        }
+        return indexBest;
+    }    
 }
