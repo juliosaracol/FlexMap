@@ -50,7 +50,8 @@ public class dfsNodeAigVisitorTreeCutsp extends dfsNodeAigVisitor
             this.level.put(nodeAigActual.getName(), (getBiggerLevel(nodeAigActual)+1));
         else
         {
-          cutTree(nodeAigActual);
+          System.out.println("CutTree nodo: "+nodeAigActual.getName());
+          //cutTree(nodeAigActual);
           function(nodeAigActual);
         }
     }
@@ -63,20 +64,24 @@ public class dfsNodeAigVisitorTreeCutsp extends dfsNodeAigVisitor
        int costS=0,costP=0;
        if(nodeCurrent.isOR()) //caso OR
        {
-           for(int i=0;i<nodeCurrent.getParents().size();i++)
+           for(NodeAig father: nodeCurrent.getParents())
            {
-              if(coveringS.get(nodeCurrent.getParents().get(i).getName()) > costS)
-                costS = coveringS.get(nodeCurrent.getParents().get(i).getName());
-              costP += coveringP.get(nodeCurrent.getParents().get(i).getName());
+              if((!coveringP.containsKey(father.getName()))||(!coveringS.containsKey(father.getName())))
+                      function(father);
+              if(coveringS.get(father.getName()) > costS)
+                costS = coveringS.get(father.getName());
+              costP += coveringP.get(father.getName());
            }
        }
        else
        {
-           for(int i=0;i<nodeCurrent.getParents().size();i++)
+           for(NodeAig father: nodeCurrent.getParents())
            {
-              if(coveringP.get(nodeCurrent.getParents().get(i).getName()) > costP)
-               costP = coveringP.get(nodeCurrent.getParents().get(i).getName());
-              costS += coveringS.get(nodeCurrent.getParents().get(i).getName());
+              if((!coveringP.containsKey(father.getName()))||(!coveringS.containsKey(father.getName())))
+                      function(father);
+              if(coveringP.get(father.getName()) > costP)
+               costP = coveringP.get(father.getName());
+              costS += coveringS.get(father.getName());
            }   
        }
        if((costP > p)||(costS > s))
