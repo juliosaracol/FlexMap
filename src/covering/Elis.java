@@ -32,6 +32,7 @@ public class Elis
             if(root.getTree().size() > 2)
               deMorgan(root,root.getRoot(),false);
         }
+        System.out.println("**************Equivalence************");
         for(Tree root: this.trees.getRoots())
            equivalenceNodes(root,root.getRoot());
         mapping(); 

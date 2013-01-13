@@ -26,7 +26,7 @@ public class Graph {
         this.vertices = new TreeMap<Integer, Vertex>();
         this.edges = new TreeMap<Integer, Edge>();
         verticesCount = graph.getVerticesCount();
-        edgesCount = graph.getEdgesCout();
+        edgesCount = graph.getEdgesCount();
 
         this.copyGraph(graph); // Metodo que faz a copia profundo dos objetos
     }
@@ -210,7 +210,7 @@ public class Graph {
         return verticesCount;
     }
 
-    public int getEdgesCout() {
+    public int getEdgesCount() {
         return edgesCount;
     }
     
