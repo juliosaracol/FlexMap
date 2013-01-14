@@ -128,8 +128,8 @@ public class Tree extends Graph
     public String getEqn()
     {
        String outString = Logs.createTreetoEqn(this);
-       bfsNodeAigVisitorMiniTreetoEqn bfsEqn = new bfsNodeAigVisitorMiniTreetoEqn(this);
-       if((Integer.parseInt(this.root.getName())%2)!=0)
+       bfsTreeVisitorMiniTreetoEqn bfsEqn = new bfsTreeVisitorMiniTreetoEqn(this);
+       if((!this.root.getName().contains("X"))&&(Integer.parseInt(this.root.getName())%2)!=0)
        {
             this.root.getParents().get(0).accept(bfsEqn);
             outString += bfsEqn.getEqnDescription();              

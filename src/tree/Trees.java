@@ -49,7 +49,7 @@ public abstract class Trees
         }
         for(Tree tree: this.roots)
         {
-            bfsNodeTreeVisitorCopy bfs = new bfsNodeTreeVisitorCopy(treeNodes,tree);
+            bfsTreeVisitorCopy bfs = new bfsTreeVisitorCopy(treeNodes,tree);
             aig.getVertexName(tree.getRoot().getName()).accept(bfs);
         }
         Set<Tree> deleteTree = new HashSet<Tree>();

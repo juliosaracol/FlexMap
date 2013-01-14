@@ -23,9 +23,9 @@ public class TreesElis extends Trees{
        String outString1="";
        for(Tree tree: getRoots())
        {
-           if((Integer.parseInt(tree.getRoot().getName())%2) != 0)
+           if((!tree.getRoot().getName().contains("X"))&&((Integer.parseInt(tree.getRoot().getName())%2) != 0))
            {
-                bfsNodeAigVisitorTreetoEqn bfsEqn = new bfsNodeAigVisitorTreetoEqn();
+                bfsTreeVisitorToEqn bfsEqn = new bfsTreeVisitorToEqn();
                 if(tree.getRoot().getParents().get(0).getParents().size() > 1)
                 {
                  tree.getRoot().getParents().get(0).accept(bfsEqn);  
@@ -34,7 +34,7 @@ public class TreesElis extends Trees{
            }
            else
            {
-               bfsNodeAigVisitorTreetoEqn bfsEqn = new bfsNodeAigVisitorTreetoEqn();
+               bfsTreeVisitorToEqn bfsEqn = new bfsTreeVisitorToEqn();
                tree.getRoot().accept(bfsEqn);  
                outString1 += "["+tree.getRoot().getName()+"]="+bfsEqn.getEqnDescription(tree.getRoot())+";\n";   
            }

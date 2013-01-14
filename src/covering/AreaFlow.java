@@ -38,7 +38,7 @@ public class AreaFlow
     //** Método que aplica a cobertura baseado no AreaFlow
     private void mapAreaFlow() 
     {
-        dfsNodeAigVisitorGetLevel dfs = new dfsNodeAigVisitorGetLevel(this);
+        dfsAigVisitorAreaGetLevel dfs = new dfsAigVisitorAreaGetLevel(this);
         for(NodeAig node: myAig.getNodeInputsAig())
             this.levelNode.put(node,1);
         for(NodeAig node: myAig.getNodeOutputsAig())
@@ -136,14 +136,14 @@ public class AreaFlow
     {
         if((nodeActual.isOutput())&&(nodeActual.getParents().isEmpty())) //constant
             return 1;
-        bfsNodeAigVisitorSumLevel bfs = new bfsNodeAigVisitorSumLevel(levelNode, cut);
+        bfsAigVisitorAreaSumLevel bfs = new bfsAigVisitorAreaSumLevel(levelNode, cut);
         nodeActual.accept(bfs);
         return bfs.getLevel();
     }
     //**Método que aplica a cobertura baseado em bfs utilizando as areas calculadas
     protected void covering()
     {
-        bfsNodeAigVisitorAreaCovering bfs = new bfsNodeAigVisitorAreaCovering(this);
+        bfsAigVisitorAreaCovering bfs = new bfsAigVisitorAreaCovering(this);
         for(NodeAig nodeActual: myAig.getNodeOutputsAig())
         {
             System.out.println("saida: "+nodeActual.getName());

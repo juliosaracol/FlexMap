@@ -23,7 +23,7 @@ public class Elis
         Set<Tree> roots = trees.getRoots();
         for(Tree root : roots)
         {
-            dfsNodeAigVisitorOrTree dfsOrGate = new dfsNodeAigVisitorOrTree(trees,root);
+            dfsTreeVisitorOr dfsOrGate = new dfsTreeVisitorOr(trees,root);
             root.getRoot().accept(dfsOrGate);
         }
         for(Tree root: this.trees.getRoots())
@@ -185,12 +185,15 @@ public class Elis
     /**Método que aplica o particionamento nas árvores de acordo com a restrição 's' e 'p'*/
     private void mapping() 
     {
+      Set<Tree> newTrees = new HashSet<Tree>();   
      for(Tree tree : this.trees.getRoots())
      {
        System.out.println("\nStart Mapping nas Árvores: "+tree.getRoot().getName());
-       dfsNodeAigVisitorTreeCutsp dfs = new dfsNodeAigVisitorTreeCutsp(this.trees,tree,s,p);
+       dfsTreeVisitorElisCutsp dfs = new dfsTreeVisitorElisCutsp(this.trees,tree,s,p);
        tree.getRoot().accept(dfs);
+       newTrees.addAll(dfs.getNewTrees());
      }
+     this.trees.getRoots().addAll(newTrees);
      System.out.println("################################################");
     }
     public Integer getP() {
