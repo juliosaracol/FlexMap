@@ -15,13 +15,13 @@ public class bfsTreeVisitorElisCopyAndCut extends bfsNodeAigVisitor
 
     protected Tree tree;
     protected TreeMap<String,NodeAig> nodesNames;
-    protected Set<NodeAig> deletedNodes;
+    protected ArrayList<EdgeAig> deletedEdges;
     
     public bfsTreeVisitorElisCopyAndCut() 
     {
         super();
         nodesNames          = new TreeMap<String, NodeAig>();
-        this.deletedNodes   = new HashSet<NodeAig>();
+        this.deletedEdges   = new ArrayList<EdgeAig>(); 
     }
 
     
@@ -37,7 +37,6 @@ public class bfsTreeVisitorElisCopyAndCut extends bfsNodeAigVisitor
                newNode = new NodeAigGateOr(nodeAigActual.getId(), nodeAigActual.getName());
            if(nodeAigActual.isAnd()||nodeAigActual.isOutput())
                newNode = new NodeAigGate(nodeAigActual.getId(), nodeAigActual.getName());
-           this.deletedNodes.add(nodeAigActual);
            this.nodesNames.put(newNode.getName(), newNode);
            this.tree = new Tree(newNode);           
         }
@@ -53,12 +52,17 @@ public class bfsTreeVisitorElisCopyAndCut extends bfsNodeAigVisitor
                    newNode = new NodeAigGate(father.getId(), father.getName());
                NodeAig child = this.nodesNames.get(nodeAigActual.getName());
                tree.addEdge(child,newNode, Algorithms.isInverter(nodeAigActual,father));
-               this.deletedNodes.add(father);
+               this.deletedEdges.add(Algorithms.getEdge(nodeAigActual, father));
                this.nodesNames.put(newNode.getName(),newNode);
                tree.add(newNode);
+               System.out.println("Nova Aresta de "+child.getName()+" para :"+newNode.getName()+Algorithms.isInverter(nodeAigActual,father));
            }
            else
+           {
+              this.deletedEdges.add(Algorithms.getEdge(nodeAigActual, father)); 
               tree.addEdge(this.nodesNames.get(nodeAigActual.getName()),this.nodesNames.get(father.getName()),Algorithms.isInverter(nodeAigActual,father));                  
+              System.out.println("Nova Aresta de "+nodeAigActual.getName()+" para :"+father.getName()+Algorithms.isInverter(nodeAigActual,father));
+           }
         }
     }
 
@@ -70,8 +74,8 @@ public class bfsTreeVisitorElisCopyAndCut extends bfsNodeAigVisitor
         return tree;
     }
 
-    public Set<NodeAig> getDeletedNodes() {
-        return deletedNodes;
+    public ArrayList<EdgeAig> getDeletedEdges() {
+        return deletedEdges;
     }
     
     

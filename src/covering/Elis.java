@@ -26,12 +26,17 @@ public class Elis
             dfsTreeVisitorOr dfsOrGate = new dfsTreeVisitorOr(trees,root);
             root.getRoot().accept(dfsOrGate);
         }
+        ArrayList<Tree> deleted = new ArrayList<Tree>();
         for(Tree root: this.trees.getRoots())
         {
             System.out.println("**************TREE root:"+root.getRoot().getName());
             if(root.getTree().size() > 2)
               deMorgan(root,root.getRoot(),false);
+            else
+              deleted.add(root);  
         }
+        for(Tree tree: deleted)
+            trees.get
         System.out.println("**************Equivalence************");
         for(Tree root: this.trees.getRoots())
            equivalenceNodes(root,root.getRoot());
@@ -178,7 +183,10 @@ public class Elis
     {
         ArrayList<NodeAig> granFathers = fatherEqual.getParents();
         for(NodeAig granFather : granFathers)
+        {
+            System.out.println("Aresta de "+root.getName()+" para "+granFather.getName()+" :"+Algorithms.isInverter(fatherEqual, granFather));
             tree.addEdge(root, granFather, Algorithms.isInverter(fatherEqual, granFather));
+        }
         tree.removeVertex(fatherEqual);            
     }
     
@@ -188,10 +196,13 @@ public class Elis
       Set<Tree> newTrees = new HashSet<Tree>();   
      for(Tree tree : this.trees.getRoots())
      {
-       System.out.println("\nStart Mapping nas Árvores: "+tree.getRoot().getName());
-       dfsTreeVisitorElisCutsp dfs = new dfsTreeVisitorElisCutsp(this.trees,tree,s,p);
-       tree.getRoot().accept(dfs);
-       newTrees.addAll(dfs.getNewTrees());
+       if(tree.getTree().size() > 2)
+       {
+        System.out.println("\nStart Mapping nas Árvores: "+tree.getRoot().getName());
+        dfsTreeVisitorElisCutsp dfs = new dfsTreeVisitorElisCutsp(this.trees,tree,s,p);
+        tree.getRoot().accept(dfs);
+        newTrees.addAll(dfs.getNewTrees());
+       }
      }
      this.trees.getRoots().addAll(newTrees);
      System.out.println("################################################");
