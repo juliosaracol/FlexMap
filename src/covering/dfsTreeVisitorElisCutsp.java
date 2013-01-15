@@ -177,15 +177,19 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                 root    = new NodeAigGateOr(choices.get(selected).get(0).getId(),choices.get(selected).get(0).getName()); 
                else
                 root    = new NodeAigGate(choices.get(selected).get(0).getId(),choices.get(selected).get(0).getName()); 
-               Tree newTree = new Tree(root);       
-               bfsTreeVisitorCopy bfsCopy =  new bfsTreeVisitorCopy(new ArrayList<String>(), newTree);
-               nodeAigActual.accept(bfsCopy);
+               //Tree newTree = new Tree(root);       
+               bfsTreeVisitorElisCopyAndCut bfsCopy =  new bfsTreeVisitorElisCopyAndCut();
+               choices.get(selected).get(0).accept(bfsCopy);
+               for(NodeAig deleted: bfsCopy.getTree().getTree())
+               {
+                  System.out.println("deletando: "+deleted.getName());
+                  //if(nodeAigActual.getId() != deleted.getId())
+                    tree.removeVertex(deleted.getId());
+               }
                coveringP.put(nodeAigActual.getName(),1);
                coveringS.put(nodeAigActual.getName(),1);
-               this.newTrees.add(newTree);
-               for(NodeAig deleted: newTree.getTree())
-                  if(nodeAigActual.getId() != deleted.getId())
-                    tree.removeVertex(deleted.getId());
+               //newTree.getTree().addAll(bfsCopy.getTree().getTree());
+               this.newTrees.add(bfsCopy.getTree());
                return null;
             }
         }
