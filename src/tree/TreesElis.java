@@ -3,8 +3,6 @@ package tree;
 import aig.*;
 import io.*;
 import java.io.*;
-import java.util.*;
-
 
 /**
  *

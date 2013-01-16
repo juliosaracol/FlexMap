@@ -19,24 +19,19 @@ public class Elis
     {
         this.s = s;
         this.p = p;
-        this.trees      = trees;
+        this.trees  = trees;
+        Algorithms.deletedTreeInverter(this.trees);
         Set<Tree> roots = trees.getRoots();
         for(Tree root : roots)
         {
             dfsTreeVisitorOr dfsOrGate = new dfsTreeVisitorOr(trees,root);
             root.getRoot().accept(dfsOrGate);
         }
-        ArrayList<Tree> deleted = new ArrayList<Tree>();
         for(Tree root: this.trees.getRoots())
         {
             System.out.println("**************TREE root:"+root.getRoot().getName());
-            if(root.getTree().size() > 2)
-              deMorgan(root,root.getRoot(),false);
-            else
-              deleted.add(root);  
+            deMorgan(root,root.getRoot(),false);
         }
-        for(Tree tree: deleted)
-            trees.getRoots().remove(tree);
         System.out.println("**************Equivalence************");
         for(Tree root: this.trees.getRoots())
            equivalenceNodes(root,root.getRoot());
@@ -57,11 +52,12 @@ public class Elis
         {
            if(root.getParents().get(0).getChildren().size()==1)
            {
+            System.out.println("NOVO NODO RAIZ CRIADO NO LUGAR DO NOME"+root.getName());
             NodeAig newRoot = createGate(tree,root.getParents().get(0));
             tree.removeEdge(Algorithms.getEdge(root, root.getParents().get(0)).getId());
             tree.removeVertex(root);
             tree.add(newRoot);
-            tree.setRoot(newRoot);
+            tree.setRoot(newRoot);            
            }
            ArrayList<NodeAig> fathers = tree.getRoot().getParents();
            for(NodeAig father: fathers)
@@ -74,7 +70,7 @@ public class Elis
                }
                else
                   deMorgan(tree, father,false);
-            }
+           }
             return;
         }  
         

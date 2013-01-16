@@ -128,8 +128,6 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
             coveringP.put(newInput.getName(),1);
             coveringS.put(newInput.getName(),1);
             level.put(newInput.getName(),newLevel);         
-//                           coveringP.put(choices.get(selected).get(0).getName(),1);
- //              coveringS.put(choices.get(selected).get(0).getName(),1);
             System.out.println("Nova Aresta de "+nodeAigActual.getName()+" para :"+newInput.getName()+inverter);
           } 
           System.out.print("Nodo novo: "+newInput.getName()
@@ -141,6 +139,11 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
         else //nodos com custo 1,1
         {
           System.out.println("CORTA SO ENTRE 1-1"); 
+          System.out.println("NODO:"+nodeAigActual.getName());
+          System.out.print("FILHOS:");
+          for(NodeAig node:nodeAigActual.getParents())
+            System.out.print(node.getName()+" ");
+          System.out.print("\n");         
           copyAndCutTree(nodeAigActual,choices,selected,cost,solution);           
         }
         cost.clear();
@@ -237,17 +240,21 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
             int newNodesCut = nodeAigActual.getParents().size()/index; //quantidade de vezes que vai aplica o corte de entradas 1,1 
             while(newNodesCut > 0)
             {
+               NodeAig newRoot  = null;
                NodeAig newInput = new NodeAigInput(tree.getEdgesCount(),createName(nodeAigActual.getName(),"X"));
-               NodeAig newRoot  = new NodeAigGate(newInput.getId(),newInput.getName());               
+               if(nodeAigActual.isOR())
+                   newRoot  = new NodeAigGateOr(newInput.getId(),newInput.getName());               
+               else
+                   newRoot  = new NodeAigGate(newInput.getId(),newInput.getName());               
                Tree newTree     = new Tree(newRoot);
                for(NodeAig fatherDeleted: choices.get(selected))
                {
                    EdgeAig edge = Algorithms.getEdge(nodeAigActual, fatherDeleted);
                    boolean inverter = edge.isInverter();
                    tree.removeEdge(edge.getId());
-                   //if(fatherDeleted.getChildren().isEmpty())
-                   tree.removeVertex(fatherDeleted);
                    newTree.addEdge(newRoot, fatherDeleted,inverter);
+                   if(fatherDeleted.getAdjacencies().isEmpty())
+                    tree.removeVertex(fatherDeleted);
                    System.out.println("Nova Aresta de "+newRoot.getName()+" para :"+fatherDeleted.getName()+inverter);
                    newTree.add(newRoot);
                }    
@@ -296,7 +303,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
         {
           //gera todas as combinações dos filhos
           ArrayList<ArrayList<Integer>> indexCombinations  = 
-                  CombinationGenerator.getCombinations(nodeAigActual.getParents().size(),i);
+                  CombinationGenerator.getCombinations((nodeAigActual.getAdjacencies().size()-nodeAigActual.getChildren().size()),i);
           for(int j=0;j<indexCombinations.size();j++) 
           {
               choices.add(new ArrayList<NodeAig>()); //separa combinacao

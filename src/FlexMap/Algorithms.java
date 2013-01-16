@@ -1,5 +1,7 @@
 package FlexMap;
 import aig.*;
+import java.util.ArrayList;
+import tree.*;
 
 /**
  * Classe que concentra diversos algoritmos utilizados nas diversas estruturas
@@ -34,4 +36,41 @@ public class Algorithms
        }
        return edge;
    }
+  /**Método que identifica subárvores que possuem somente nodo-inversor, caso aconteça coloca a saída-invertida na árvore original como raíz*/
+  public static boolean deletedTreeInverter(Trees trees)
+  {
+      ArrayList<Tree>    setRootTree    = new ArrayList<Tree>();
+      ArrayList<Tree>    removeTree     = new ArrayList<Tree>();
+      ArrayList<NodeAig> rootsTree      = new ArrayList<NodeAig>();
+      for(Tree treeActual : trees.getRoots())
+      {
+        if(treeActual.getTree().size()==2)
+        {
+          System.out.println("ARVORE @ NODOS "+treeActual.getRoot().getName());
+          for(Tree trueTree : trees.getRoots())
+          {  
+            if(trueTree.getRoot().getId() == treeActual.getRoot().getParents().get(0).getId()) // acha a árvore do pai da saida invertida
+            {
+                System.out.println("SET DE NOVA RAIZ de: "+treeActual.getRoot().getName()+" PARA "+trueTree.getRoot().getName());
+                setRootTree.add(trueTree);
+                removeTree.add(treeActual);
+                rootsTree.add(treeActual.getRoot());
+            }
+          }
+        }
+      }
+      if(setRootTree.isEmpty())
+          return false;
+      else
+      {
+          for(int i=0;i<setRootTree.size();i++)
+          {
+              removeTree.get(i).getRoot().getAdjacencies().clear();
+              setRootTree.get(i).addEdge(removeTree.get(i).getRoot(),setRootTree.get(i).getRoot(), true);
+              setRootTree.get(i).setRoot(removeTree.get(i).getRoot());
+          }
+          trees.getRoots().removeAll(removeTree);
+          return true;
+      }
+  }
 }
