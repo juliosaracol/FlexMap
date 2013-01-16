@@ -101,7 +101,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
         NodeAig newInput = null;
         ArrayList<ArrayList<Integer>> cost      = new ArrayList<ArrayList<Integer>>();
         ArrayList<ArrayList<NodeAig>> choices   = new ArrayList<ArrayList<NodeAig>>();
-        boolean solution=false;
+        boolean solution=true;
         int selected = choiceDinamic(nodeAigActual,choices,cost); //escolhe melhores nodos pra cortar
         for(int i=0;i<choices.get(selected).size();i++)
            if((coveringP.get(choices.get(selected).get(i).getName()) > 1)||(coveringS.get(choices.get(selected).get(i).getName()) > 1))
@@ -121,19 +121,28 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
           else
           {
             boolean inverter = Algorithms.isInverter(nodeAigActual, choices.get(selected).get(0));
+            int newLevel     = getBiggerLevel(choices.get(selected)); 
             newInput = new NodeAigInput(choices.get(selected).get(0).getId(),choices.get(selected).get(0).getName());
             copyAndCutTree(nodeAigActual, choices, selected, cost, solution);
             tree.addEdge(nodeAigActual, newInput,inverter);
+            coveringP.put(newInput.getName(),1);
+            coveringS.put(newInput.getName(),1);
+            level.put(newInput.getName(),newLevel);         
+//                           coveringP.put(choices.get(selected).get(0).getName(),1);
+ //              coveringS.put(choices.get(selected).get(0).getName(),1);
             System.out.println("Nova Aresta de "+nodeAigActual.getName()+" para :"+newInput.getName()+inverter);
           } 
           System.out.print("Nodo novo: "+newInput.getName()
-                       +" com cobertura:"+coveringP.get(newInput.getName())+"-"+coveringP.get(newInput.getName())+" nivel:"+this.level.get(newInput.getName())+" com filhos:");            
+                       +" com cobertura Atual: "+coveringP.get(newInput.getName())+"-"+coveringP.get(newInput.getName())+" nivel:"+this.level.get(newInput.getName())+" com filhos:");            
           for(NodeAig node:choices.get(selected))
               System.out.print(node.getName()+" ");
           System.out.print("\n");         
         }
         else //nodos com custo 1,1
+        {
+          System.out.println("CORTA SO ENTRE 1-1"); 
           copyAndCutTree(nodeAigActual,choices,selected,cost,solution);           
+        }
         cost.clear();
         choices.clear();
     }
@@ -171,7 +180,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                   NodeAig delet2 = (NodeAig)deleted.getVertex2();
                   System.out.println("Edge:"+ deleted.getId()+" entre "+delet1.getName()+" : "+delet2.getName()+deleted.isInverter());
                   tree.removeEdge(deleted.getId());
-                  if(delet2.getChildren().isEmpty())
+                  if(delet2.getAdjacencies().isEmpty())
                   {
                       System.out.println("deleto nodo: "+delet2.getName());
                       tree.removeVertex(delet2);
@@ -184,7 +193,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                }
                newTree.getTree().addAll(bfsCopy.getTree().getTree());
                newTree.addEdge(root, bfsCopy.getTree().getRoot(),inverterRoot);  
-               System.out.println("Nova Aresta de "+root.getName()+" para akiii :"+bfsCopy.getTree().getRoot().getName()+inverterRoot);
+               System.out.println("Nova Aresta de "+root.getName()+" para :"+bfsCopy.getTree().getRoot().getName()+inverterRoot);
              }
              this.newTrees.add(newTree);
              return inputFake;
@@ -193,9 +202,6 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
             {
                bfsTreeVisitorElisCopyAndCut bfsCopy =  new bfsTreeVisitorElisCopyAndCut();
                choices.get(selected).get(0).accept(bfsCopy);
-               coveringP.put(nodeAigActual.getName(),1);
-               coveringS.put(nodeAigActual.getName(),1);
-               level.put(nodeAigActual.getName(),getBiggerLevel(nodeAigActual));
                this.newTrees.add(bfsCopy.getTree());
                bfsCopy.getDeletedEdges().add(Algorithms.getEdge(nodeAigActual,choices.get(selected).get(0)));
                for(EdgeAig deleted: bfsCopy.getDeletedEdges())
@@ -204,7 +210,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                   NodeAig delet2 = (NodeAig)deleted.getVertex2();
                   System.out.println("Edge:"+ deleted.getId()+" entre "+delet1.getName()+" : "+delet2.getName()+deleted.isInverter());                  
                   tree.removeEdge(deleted.getId());
-                  if(delet2.getChildren().isEmpty())
+                  if(delet2.getAdjacencies().isEmpty())
                   {
                       System.out.println("deleto nodo: "+delet2.getName());
                       tree.removeVertex(delet2);
@@ -236,25 +242,31 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                Tree newTree     = new Tree(newRoot);
                for(NodeAig fatherDeleted: choices.get(selected))
                {
-                   boolean inverter = Algorithms.isInverter(nodeAigActual, fatherDeleted);
+                   EdgeAig edge = Algorithms.getEdge(nodeAigActual, fatherDeleted);
+                   boolean inverter = edge.isInverter();
+                   tree.removeEdge(edge.getId());
+                   //if(fatherDeleted.getChildren().isEmpty())
                    tree.removeVertex(fatherDeleted);
                    newTree.addEdge(newRoot, fatherDeleted,inverter);
-                   System.out.print("Nova Aresta de "+newRoot.getName()+" para :"+fatherDeleted.getName()+inverter);
+                   System.out.println("Nova Aresta de "+newRoot.getName()+" para :"+fatherDeleted.getName()+inverter);
                    newTree.add(newRoot);
                }    
                coveringS.put(newInput.getName(),1);
                coveringP.put(newInput.getName(),1); 
                level.put(newInput.getName(),2);
                newFathersInput.add(newInput);                   
-               System.out.println("Novo corte na árvore novo NodoInput:"+newInput.getName());
+               System.out.print("Novo corte na árvore novo NodoInput: "+newInput.getName()+" custo: 1-1 e filhos");
                newNodesCut--;
-               if(newNodesCut > 0)
+               for(NodeAig node:newTree.getRoot().getParents())
+                     System.out.print(node.getName()+" ");
+               System.out.print("\n");         
+               this.newTrees.add(newTree);
+               if((newNodesCut > 0))
                {
                 cost.clear();
                 choices.clear();
                 selected = choiceDinamic(nodeAigActual,choices,cost);
                }
-               this.newTrees.add(newTree);
             }
             for(NodeAig nodesFake: newFathersInput)
               tree.addEdge(nodeAigActual, nodesFake, false);

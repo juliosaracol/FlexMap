@@ -36,7 +36,7 @@ public class Elis
               deleted.add(root);  
         }
         for(Tree tree: deleted)
-            trees.get
+            trees.getRoots().remove(tree);
         System.out.println("**************Equivalence************");
         for(Tree root: this.trees.getRoots())
            equivalenceNodes(root,root.getRoot());
