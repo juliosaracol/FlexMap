@@ -141,6 +141,8 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
         {
           System.out.println("CORTA SO ENTRE 1-1"); 
           System.out.println("NODO:"+nodeAigActual.getName());
+          if(nodeAigActual.getName().equals("52"))
+            System.out.print("AKII");
           System.out.print("FILHOS:");
           for(NodeAig node:nodeAigActual.getParents())
             System.out.print(node.getName()+" ");
@@ -263,7 +265,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                     tree.removeVertex(fatherDeleted);
                    System.out.println("Nova Aresta de "+newRoot.getName()+" para :"+newNode.getName()+inverter);
                    newTree.addEdge(newRoot, newNode,inverter);                  
-               }    
+                }    
                coveringS.put(newInput.getName(),1);
                coveringP.put(newInput.getName(),1); 
                level.put(newInput.getName(),2);
@@ -286,8 +288,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
               tree.add(nodesFake);  
               tree.addEdge(nodeAigActual, nodesFake, false);
             }
-            tree.show();
-            if(nodeAigActual.getParents().size() >= index ) //caso nao necessite cortar mais as entradas
+            if(nodeAigActual.getParents().size() <= index ) //caso nao necessite cortar mais as entradas
               solution = false; 
           }
           return null;
@@ -311,11 +312,13 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
             
         for(int i=1;i<=combination;i++)
         {
-          //gera todas as combinações dos filhos
-          ArrayList<ArrayList<Integer>> indexCombinations  = 
-                  CombinationGenerator.getCombinations((nodeAigActual.getAdjacencies().size()-nodeAigActual.getChildren().size()),i);
-          for(int j=0;j<indexCombinations.size();j++) 
+          if((nodeAigActual.getParents().size())>=i) 
           {
+            //gera todas as combinações dos filhos
+            ArrayList<ArrayList<Integer>> indexCombinations  = 
+                  CombinationGenerator.getCombinations((nodeAigActual.getAdjacencies().size()-nodeAigActual.getChildren().size()),i); //(n,r)
+            for(int j=0;j<indexCombinations.size();j++)  
+            {
               choices.add(new ArrayList<NodeAig>()); //separa combinacao
               cost.add(new ArrayList<Integer>());    //calcula o custo da combinacao
               costS =0;
@@ -364,7 +367,8 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                             if(levelCombination.get(levelCombination.size()-1) <= levelCombination.get(indexBest))
                              indexBest = cost.size()-1;
               }
-           } 
+            } 
+          }
         }
         return indexBest;
     }

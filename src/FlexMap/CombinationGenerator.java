@@ -20,6 +20,7 @@ public class CombinationGenerator
 
     public CombinationGenerator(int n, int r) {
         if (r > n) {
+            System.out.println("tentando fazer combinação de n>p "+n+":"+r);
             throw new IllegalArgumentException();
         }
         if (n < 1) {
