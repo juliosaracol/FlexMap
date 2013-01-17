@@ -32,7 +32,9 @@ public class bfsTreeVisitorToEqn extends bfsNodeAigVisitor
        }
        Set<NodeAig> eqnNodes = new HashSet<NodeAig>();
        for(NodeAig father: nodeAigActual.getParents())
+       {
           eqnNodes.add(father);
+       }
        this.eqn.put(nodeAigActual, eqnNodes);
     }
     

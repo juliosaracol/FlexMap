@@ -16,12 +16,14 @@ public class bfsTreeVisitorElisCopyAndCut extends bfsNodeAigVisitor
     protected Tree tree;
     protected TreeMap<String,NodeAig> nodesNames;
     protected ArrayList<EdgeAig> deletedEdges;
+    protected Tree treeOld;
     
-    public bfsTreeVisitorElisCopyAndCut() 
+    public bfsTreeVisitorElisCopyAndCut(Tree treeOld) 
     {
         super();
-        nodesNames          = new TreeMap<String, NodeAig>();
+        this.nodesNames          = new TreeMap<String, NodeAig>();
         this.deletedEdges   = new ArrayList<EdgeAig>(); 
+        this.treeOld             = treeOld;
     }
 
     
@@ -45,11 +47,11 @@ public class bfsTreeVisitorElisCopyAndCut extends bfsNodeAigVisitor
            if(!this.nodesNames.containsKey(father.getName()))
            {
                if(father.isInput())
-                   newNode = new NodeAigInput(father.getId(), father.getName());
+                   newNode = new NodeAigInput(tree.getVerticesCount(), father.getName());
                if(father.isOR())
-                   newNode = new NodeAigGateOr(father.getId(), father.getName());
+                   newNode = new NodeAigGateOr(tree.getVerticesCount(), father.getName());
                if(father.isAnd()||father.isOutput())
-                   newNode = new NodeAigGate(father.getId(), father.getName());
+                   newNode = new NodeAigGate(tree.getVerticesCount(), father.getName());
                NodeAig child = this.nodesNames.get(nodeAigActual.getName());
                tree.addEdge(child,newNode, Algorithms.isInverter(nodeAigActual,father));
                this.deletedEdges.add(Algorithms.getEdge(nodeAigActual, father));

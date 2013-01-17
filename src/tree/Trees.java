@@ -17,7 +17,6 @@ public abstract class Trees
     
     public Trees(Aig aig) 
     {
-        Set<Tree>           rootsSubTree = new HashSet<Tree>(); //para subarvores de inversor e saida
         this.aig = aig;
         for(NodeAig node :aig.getAllNodesAig())
         {
@@ -35,19 +34,6 @@ public abstract class Trees
                             Tree newTree = new Tree(newNode);
                             this.roots.add(newTree);
                      } 
-                     else //arvore so com 2 nodos
-                     {//aki o problema
-                        if((!node.getParents().get(0).isInput()))
-                        {
-                         System.out.println("INSTANCIANDO ARVORE "+node.getName());
-                         NodeAig newNode = new NodeAigOutput(node.getId(),node.getName());
-                         Tree newTree    = new Tree(newNode);
-                         NodeAig input   = new NodeAigInput(node.getParents().get(0).getId(),node.getParents().get(0).getName());
-                         newTree.addEdge(newNode,input, true);
-                         newTree.add(input);
-                         rootsSubTree.add(newTree);
-                        }
-                     }                         
                   }
                   else
                   {
@@ -66,7 +52,6 @@ public abstract class Trees
              bfsTreeVisitorCopy bfs = new bfsTreeVisitorCopy(treeNodes,tree);
              aig.getVertexName(tree.getRoot().getName()).accept(bfs);
         }
-        this.roots.addAll(rootsSubTree);
     }
 
     public void show() {

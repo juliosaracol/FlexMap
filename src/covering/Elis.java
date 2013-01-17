@@ -20,7 +20,6 @@ public class Elis
         this.s = s;
         this.p = p;
         this.trees  = trees;
-        Algorithms.deletedTreeInverter(this.trees);
         Set<Tree> roots = trees.getRoots();
         for(Tree root : roots)
         {
@@ -28,13 +27,17 @@ public class Elis
             root.getRoot().accept(dfsOrGate);
         }
         for(Tree root: this.trees.getRoots())
-        {
-            System.out.println("**************TREE root:"+root.getRoot().getName());
-            deMorgan(root,root.getRoot(),false);
-        }
+            if(root.getTree().size()>2)
+            {
+                System.out.println("**************TREE root:"+root.getRoot().getName());
+                deMorgan(root,root.getRoot(),false);
+            }
         System.out.println("**************Equivalence************");
         for(Tree root: this.trees.getRoots())
-           equivalenceNodes(root,root.getRoot());
+        {
+           if(root.getTree().size()>2)
+               equivalenceNodes(root,root.getRoot());
+        }
         mapping(); 
     }
     /**Método que aplica deMorgan em cada árvore até as entradas
@@ -52,7 +55,6 @@ public class Elis
         {
            if(root.getParents().get(0).getChildren().size()==1)
            {
-            System.out.println("NOVO NODO RAIZ CRIADO NO LUGAR DO NOME"+root.getName());
             NodeAig newRoot = createGate(tree,root.getParents().get(0));
             tree.removeEdge(Algorithms.getEdge(root, root.getParents().get(0)).getId());
             tree.removeVertex(root);
@@ -124,6 +126,7 @@ public class Elis
     {
         ArrayList<NodeAig> fathers          = root.getParents();
         ArrayList<NodeAig> fathersEquals    = new ArrayList<NodeAig>();
+        boolean status = false;
         for(NodeAig father: fathers)
         {
            if((!father.isInput())&&
@@ -134,10 +137,16 @@ public class Elis
         { 
             System.out.println("UNION em: "+root.getName()+" e "+fatherEqual.getName());  
             unionGates(tree,root,fatherEqual);//deleta filho e instancia um só nodo
+            status = true;
         }
-        fathers = root.getParents();
-        for(NodeAig father: fathers)
-            equivalenceNodes(tree, father);        
+        if(status==true)
+            equivalenceNodes(tree, root);
+        else
+        {
+            fathers = root.getParents();
+            for(NodeAig father: fathers)
+                equivalenceNodes(tree, father);        
+        }
     }
     
     /**Método que instância um nodo cópia trocando a operação lógica do nodo and->or || or->and invertendo as arestas dos pais e mantendo a aresta do filho */
