@@ -59,8 +59,6 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
     * @return true (cost OK) false (cost > sp)*/
     private boolean sumBestCost(NodeAig nodeAigActual) 
     {
-       if(coveringP.containsKey(nodeAigActual.getName())&&coveringS.containsKey(nodeAigActual.getName()))
-           return true;
        int costS=0,costP=0;
        if(nodeAigActual.isOR()) //caso OR
        {
@@ -114,6 +112,8 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
               int newLevel = getBiggerLevel(choices.get(selected)); 
               newInput = copyAndCutTree(nodeAigActual, choices, selected, cost, solution);
               tree.addEdge(nodeAigActual, newInput,false);
+              tree.add(newInput);
+              tree.dec_verticesCount();
               System.out.println("Nova Aresta de "+nodeAigActual.getName()+" para :"+newInput.getName()+false);
               coveringS.put(newInput.getName(),1);
               coveringP.put(newInput.getName(),1);
@@ -126,6 +126,8 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
             newInput = new NodeAigInput(tree.getVerticesCount(),choices.get(selected).get(0).getName());
             copyAndCutTree(nodeAigActual, choices, selected, cost, solution);
             tree.addEdge(nodeAigActual, newInput,inverter);
+            tree.add(newInput);
+            tree.dec_verticesCount();
             coveringP.put(newInput.getName(),1);
             coveringS.put(newInput.getName(),1);
             level.put(newInput.getName(),newLevel);         
@@ -145,7 +147,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
           for(NodeAig node:nodeAigActual.getParents())
             System.out.print(node.getName()+" ");
           System.out.print("\n");         
-          copyAndCutTree(nodeAigActual,choices,selected,cost,solution);  
+          copyAndCutTree(nodeAigActual,choices,selected,cost,solution);
         }
         cost.clear();
         choices.clear();
@@ -173,7 +175,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                 root    = new NodeAigGate(newTree.getVerticesCount(),createName(nodeAigActual.getName(),"X")); 
               newTree.add(root);
               newTree.setRoot(root);
-              inputFake  = new NodeAigInput(tree.getVerticesCount(),root.getName());   
+              inputFake  = new NodeAigInput(tree.getVerticesCount(),root.getName()); 
               for(NodeAig node: choices.get(selected))
               {
                    boolean inverterRoot = Algorithms.isInverter(nodeAigActual, node);  
@@ -240,12 +242,15 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
               index = s;             
           while(solution != false)
           {              
-            int lastFather  = (nodeAigActual.getAdjacencies().size()-nodeAigActual.getChildren().size());  
-            int newNodesCut = (nodeAigActual.getAdjacencies().size()-nodeAigActual.getChildren().size())/index; //quantidade de vezes que vai aplica o corte de entradas 1,1 
+            int lastFather  = (nodeAigActual.getAdjacencies().size()-nodeAigActual.getChildren().size()); 
+            int newNodesCut = lastFather/index; //quantidade de vezes que vai aplica o corte de entradas 1,1 
+            if((newNodesCut==1)&&(lastFather%index==0))
+                newNodesCut=0;
             while(newNodesCut > 0)
             {
                NodeAig newRoot  = null;
                Tree newTree = new Tree();
+               tree.inc_verticesCount();
                NodeAig newInput = new NodeAigInput(tree.getVerticesCount(),createName(nodeAigActual.getName(),"X"));
                if(nodeAigActual.isOR())
                    newRoot  = new NodeAigGateOr(newTree.getVerticesCount(),newInput.getName());               
@@ -264,7 +269,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                     tree.removeVertex(fatherDeleted);
                    System.out.println("Nova Aresta de "+newRoot.getName()+" para :"+newNode.getName()+inverter);
                    newTree.addEdge(newRoot, newNode,inverter);                  
-                }    
+               }    
                coveringS.put(newInput.getName(),1);
                coveringP.put(newInput.getName(),1); 
                level.put(newInput.getName(),2);
