@@ -33,7 +33,8 @@ public abstract class Trees
                             newNode = new NodeAigOutput(node.getId(),node.getName());
                             Tree newTree = new Tree(newNode);
                             this.roots.add(newTree);
-                     } 
+                     }
+                     
                   }
                   else
                   {

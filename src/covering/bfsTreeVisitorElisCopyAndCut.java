@@ -24,9 +24,7 @@ public class bfsTreeVisitorElisCopyAndCut extends bfsNodeAigVisitor
         this.nodesNames          = new TreeMap<String, NodeAig>();
         this.deletedEdges   = new ArrayList<EdgeAig>(); 
         this.treeOld             = treeOld;
-    }
-
-    
+    }   
     @Override
     public void function(NodeAig nodeAigActual) 
     {
@@ -78,8 +76,5 @@ public class bfsTreeVisitorElisCopyAndCut extends bfsNodeAigVisitor
 
     public ArrayList<EdgeAig> getDeletedEdges() {
         return deletedEdges;
-    }
-    
-    
-    
+    }   
 }

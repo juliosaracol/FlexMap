@@ -27,17 +27,16 @@ public class Elis
             root.getRoot().accept(dfsOrGate);
         }
         for(Tree root: this.trees.getRoots())
-            if(root.getTree().size()>2)
-            {
-                System.out.println("**************TREE root:"+root.getRoot().getName());
-                deMorgan(root,root.getRoot(),false);
-            }
-        System.out.println("**************Equivalence************");
-        for(Tree root: this.trees.getRoots())
         {
            if(root.getTree().size()>2)
-               equivalenceNodes(root,root.getRoot());
+           {
+             System.out.println("**************TREE root:"+root.getRoot().getName());
+             deMorgan(root,root.getRoot(),false);
+           }
         }
+        System.out.println("**************Equivalence************");
+        for(Tree root: this.trees.getRoots())
+           equivalenceNodes(root,root.getRoot());
         mapping(); 
     }
     /**Método que aplica deMorgan em cada árvore até as entradas
@@ -59,7 +58,7 @@ public class Elis
             tree.removeEdge(Algorithms.getEdge(root, root.getParents().get(0)).getId());
             tree.removeVertex(root);
             tree.add(newRoot);
-            tree.setRoot(newRoot);            
+            tree.setRoot(newRoot);
            }
            ArrayList<NodeAig> fathers = tree.getRoot().getParents();
            for(NodeAig father: fathers)

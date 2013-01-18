@@ -21,7 +21,6 @@ public class TreesElis extends Trees{
        String outString1="";
        for(Tree tree: getRoots())
        {
-           tree.show();
            if((!tree.getRoot().getName().contains("X"))&&((Integer.parseInt(tree.getRoot().getName())%2) != 0))
            {
                 bfsTreeVisitorToEqn bfsEqn = new bfsTreeVisitorToEqn();
