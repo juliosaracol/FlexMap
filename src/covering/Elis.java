@@ -33,6 +33,8 @@ public class Elis
              System.out.println("**************TREE root:"+root.getRoot().getName());
              deMorgan(root,root.getRoot(),false);
            }
+           else
+           System.out.println("2#####nodos na arvore :"+root.getRoot().getName());
         }
         System.out.println("**************Equivalence************");
         for(Tree root: this.trees.getRoots())

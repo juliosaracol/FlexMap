@@ -199,9 +199,12 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                           tree.removeVertex(delet1);
                       }
                }
-               newTree.getTree().addAll(bfsCopy.getTree().getTree());
-               newTree.addEdge(root, bfsCopy.getTree().getRoot(),inverterRoot);  
-               System.out.println("Nova Aresta de "+root.getName()+" para :"+bfsCopy.getTree().getRoot().getName()+inverterRoot);
+               newTree.addEdge(root, bfsCopy.getTree().getRoot(),inverterRoot); 
+               System.out.println("Nova Aresta de raiz "+root.getName()+" para :"+bfsCopy.getTree().getRoot().getName()+inverterRoot);
+               Set<NodeAig> treeNew = bfsCopy.getTree().getTree();
+               for(NodeAig nodeNewId: treeNew)
+                   nodeNewId.setId(newTree.getVerticesCount()+nodeNewId.getId());
+               newTree.getTree().addAll(treeNew);
               }
               this.newTrees.add(newTree);
               return inputFake;

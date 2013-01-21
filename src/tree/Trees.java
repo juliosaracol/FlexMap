@@ -34,7 +34,21 @@ public abstract class Trees
                             Tree newTree = new Tree(newNode);
                             this.roots.add(newTree);
                      }
-                     
+                     else
+                     {
+                        NodeAig newNode   = null;
+                        NodeAig newFather = null;
+                        this.treeNodes.add(node.getName());
+                        newNode = new NodeAigOutput(node.getId(),node.getName());
+                        Tree newTree = new Tree(newNode);
+                        this.roots.add(newTree);
+                        if(node.getParents().get(0).isOR())
+                            newFather = new NodeAigGateOr(node.getParents().get(0).getId(),node.getParents().get(0).getName());
+                        else
+                            newFather = new NodeAigGate(node.getParents().get(0).getId(),node.getParents().get(0).getName());
+                        newTree.add(newFather);
+                        newTree.addEdge(newTree.getRoot(),newFather, true);
+                     }
                   }
                   else
                   {

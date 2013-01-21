@@ -182,4 +182,10 @@ public class Tree extends Graph
             System.out.print(e.toString());
         }
     }
+
+    public void setVerticesCount(int verticesCount) {
+        this.verticesCount = verticesCount;
+    }
+    
+    
 }

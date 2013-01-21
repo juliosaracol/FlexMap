@@ -38,7 +38,7 @@ public class bfsTreeVisitorElisCopyAndCut extends bfsNodeAigVisitor
            if(nodeAigActual.isAnd()||nodeAigActual.isOutput())
                newNode = new NodeAigGate(nodeAigActual.getId(), nodeAigActual.getName());
            this.nodesNames.put(newNode.getName(), newNode);
-           this.tree = new Tree(newNode);           
+           this.tree = new Tree(newNode);
         }
         for(NodeAig father: nodeAigActual.getParents())
         {
