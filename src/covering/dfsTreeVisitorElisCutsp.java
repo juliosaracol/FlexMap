@@ -113,7 +113,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
               newInput = copyAndCutTree(nodeAigActual, choices, selected, cost, solution);
               tree.addEdge(nodeAigActual, newInput,false);
               tree.add(newInput);
-              tree.dec_verticesCount();
+              //tree.dec_verticesCount();
               System.out.println("Nova Aresta de "+nodeAigActual.getName()+" para :"+newInput.getName()+false);
               coveringS.put(newInput.getName(),1);
               coveringP.put(newInput.getName(),1);
@@ -127,7 +127,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
             copyAndCutTree(nodeAigActual, choices, selected, cost, solution);
             tree.addEdge(nodeAigActual, newInput,inverter);
             tree.add(newInput);
-            tree.dec_verticesCount();
+            //tree.dec_verticesCount();
             coveringP.put(newInput.getName(),1);
             coveringS.put(newInput.getName(),1);
             level.put(newInput.getName(),newLevel);         
@@ -141,6 +141,8 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
         }
         else //nodos com custo 1,1
         {
+          System.out.println("CORTA SO ENTRE 1-1"); 
+          if(nodeAigActual.getName().equals("50"))
           System.out.println("CORTA SO ENTRE 1-1"); 
           System.out.println("NODO:"+nodeAigActual.getName());
           System.out.print("FILHOS:");
@@ -170,12 +172,13 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
             {
              Tree newTree = new Tree();
              if(nodeAigActual.isOR())
-                root    = new NodeAigGateOr(newTree.getVerticesCount(),createName(nodeAigActual.getName(),"X")); 
+                root    = new NodeAigGateOr(newTree.getVerticesCount(),createName(nodeAigActual.getName(),"0")); 
              else
-                root    = new NodeAigGate(newTree.getVerticesCount(),createName(nodeAigActual.getName(),"X")); 
+                root    = new NodeAigGate(newTree.getVerticesCount(),createName(nodeAigActual.getName(),"0")); 
               newTree.add(root);
               newTree.setRoot(root);
-              inputFake  = new NodeAigInput(tree.getVerticesCount(),root.getName()); 
+              inputFake  = new NodeAigInput(tree.getVerticesCount(),root.getName());
+              tree.inc_verticesCount();
               for(NodeAig node: choices.get(selected))
               {
                    boolean inverterRoot = Algorithms.isInverter(nodeAigActual, node);  
@@ -198,7 +201,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
                           System.out.println("deleto nodo: "+delet1.getName());
                           tree.removeVertex(delet1);
                       }
-               }
+                    }
                newTree.addEdge(root, bfsCopy.getTree().getRoot(),inverterRoot); 
                System.out.println("Nova Aresta de raiz "+root.getName()+" para :"+bfsCopy.getTree().getRoot().getName()+inverterRoot);
                Set<NodeAig> treeNew = bfsCopy.getTree().getTree();
@@ -245,6 +248,7 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
               index = s;             
           while(solution != false)
           {              
+            int idVertex = this.tree.getVerticesCount()+1; 
             int lastFather  = (nodeAigActual.getAdjacencies().size()-nodeAigActual.getChildren().size()); 
             int newNodesCut = lastFather/index; //quantidade de vezes que vai aplica o corte de entradas 1,1 
             if((newNodesCut==1)&&(lastFather%index==0))
@@ -253,12 +257,12 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
             {
                NodeAig newRoot  = null;
                Tree newTree = new Tree();
-               tree.inc_verticesCount();
-               NodeAig newInput = new NodeAigInput(tree.getVerticesCount(),createName(nodeAigActual.getName(),"X"));
+               NodeAig newInput = new NodeAigInput(idVertex,createName(nodeAigActual.getName(),"0"));
                if(nodeAigActual.isOR())
                    newRoot  = new NodeAigGateOr(newTree.getVerticesCount(),newInput.getName());               
                else
                    newRoot  = new NodeAigGate(newTree.getVerticesCount(),newInput.getName());               
+               idVertex++;
                newTree.add(newRoot);
                newTree.setRoot(newRoot);
                for(NodeAig fatherDeleted: choices.get(selected))
@@ -294,7 +298,9 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
             {
               tree.add(nodesFake);  
               tree.addEdge(nodeAigActual, nodesFake, false);
+              //tree.dec_verticesCount();
             }
+            //tree.inc_verticesCount();
             if(nodeAigActual.getParents().size() <= index ) //caso nao necessite cortar mais as entradas
               solution = false; 
             else
@@ -396,14 +402,22 @@ public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
     private String createName(String nodeCurrentName, String type)
     {
         String name="";
-        name = nodeCurrentName+type;
+        name = nodeCurrentName+"-"+type;
         for(NodeAig node: this.tree.getTree())
             if(node.getName().equals(name))
-              name = createName(name, type);
+            {
+              int typeNum = Integer.parseInt(type);
+              typeNum+=1;
+              name = createName(nodeCurrentName,String.valueOf(typeNum));
+            }
         for(Tree newT : this.newTrees)
             for(NodeAig node: newT.getTree())
                 if(node.getName().equals(name))
-                  name = createName(name, type);
+            {
+              int typeNum = Integer.parseInt(type);
+              typeNum+=1;
+              name = createName(nodeCurrentName,String.valueOf(typeNum));
+            }
         return name;
     }
 
