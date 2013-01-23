@@ -4,6 +4,7 @@ import io.*;
 import kcutter.*;
 import covering.*;
 import tree.*;
+import java.io.*;
 
 /**
  * Classe principal ferramenta FlexMap
@@ -12,9 +13,6 @@ import tree.*;
  * @version 1.0
  * @author Julio Saraçol
  * */
-
-import java.io.*;
-
 public class Main 
 {
     public static void main(String[] args) throws FileNotFoundException, IOException, Exception 

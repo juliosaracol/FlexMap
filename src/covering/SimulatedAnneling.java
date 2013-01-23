@@ -1,15 +1,13 @@
 package covering;
 
-/**
- * Classe aplica SimulatedAnneling 
- * @author Julio Saraçol
- */
-
 import FlexMap.CostFunction;
 import aig.*;
 import java.util.*;
 
-
+/**
+ * Classe aplica SimulatedAnneling 
+ * @author Julio Saraçol
+ */
 public class SimulatedAnneling
 {
 

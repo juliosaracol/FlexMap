@@ -1,15 +1,14 @@
 package covering;
-
-/**
- * Método que aplica a restrição s p através do caminhamento dfs na árvore em questão
- * @author Julio Saraçol
- */
-
 import FlexMap.*;
 import aig.*;
 import tree.*;
 import java.util.*;
 
+
+/**
+ * Método que aplica a restrição s p através do caminhamento dfs na árvore em questão
+ * @author Julio Saraçol
+ */
 public class dfsTreeVisitorElisCutsp extends dfsNodeAigVisitor
 {
     protected int s;

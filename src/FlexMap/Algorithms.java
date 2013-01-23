@@ -7,7 +7,6 @@ import tree.*;
  * Classe que concentra diversos algoritmos utilizados nas diversas estruturas
  * @author Julio Saraçol
  */
-
 public class Algorithms 
 {      
   

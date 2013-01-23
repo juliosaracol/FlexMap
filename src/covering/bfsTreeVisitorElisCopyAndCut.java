@@ -1,15 +1,14 @@
 package covering;
 
-/**
- * Classe que aplica o caminhamento da subarvore a partir do nodo "cortado" na Elis
- * @author Julio Saraçol
- */
-
 import FlexMap.Algorithms;
 import aig.*;
 import tree.*;
 import java.util.*;
 
+/**
+ * Classe que aplica o caminhamento da subarvore a partir do nodo "cortado" na Elis
+ * @author Julio Saraçol
+ */
 public class bfsTreeVisitorElisCopyAndCut extends bfsNodeAigVisitor
 {
 

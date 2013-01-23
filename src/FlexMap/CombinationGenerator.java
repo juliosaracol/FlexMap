@@ -1,14 +1,14 @@
-/**
- * Classe que produz combinações n por p gerando todas as possibilidades de casamento no caso de um array
- * @author Vinicius Possani
- * obs: Retorna indices a serem acessados dos ArrayList
- */
+
 
 package FlexMap;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-
+/**
+ * Classe que produz combinações n por p gerando todas as possibilidades de casamento no caso de um array
+ * @author Vinicius Possani
+ * obs: Retorna indices a serem acessados dos ArrayList
+ */
 public class CombinationGenerator 
 {
 
