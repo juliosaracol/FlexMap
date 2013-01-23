@@ -14,7 +14,6 @@ import tree.*;
  * */
 
 import java.io.*;
-import tree.Trees;
 
 public class Main 
 {
@@ -146,9 +145,28 @@ public class Main
              Aig myAig              = new Aig(args[0]);
              int sizeCut            = Integer.valueOf(args[2]);
              CutterKCuts    kcuts   = new CutterKCuts(myAig, sizeCut);
-             float   custFunction   = Float.valueOf(args[3]); //TORNAR CONFIGURAVEL
-             AreaFlow area          = new AreaFlow(myAig,sizeCut,kcuts,custFunction);
+             int areaCut            = Integer.parseInt(args[3]);
+             FunctionAreaFlow   function= new FunctionAreaFlow(0,0,0,1,1,areaCut);
+             AreaFlow area              = new AreaFlow(myAig,sizeCut,kcuts,function);
              area.showCovering();
+             if((args.length > 4)&&(args[4].contains(".eqn"))) 
+             { //caso arquivo de log
+               Logs.LogsWriteEqn(area.getEqn(),args[4]);  
+             }
+             return;
+        }
+        //----------------------------------------------------------------------        
+        //--------------------MAP AREA FLOW SIMULATED ANNELING------------------
+        if(args[1].equals("-ASA")&&(args.length >= 4))
+        {
+             Aig myAig                          = new Aig(args[0]);
+             int sizeCut                        = Integer.valueOf(args[2]);
+             CutterKCutsTreeNodes kcuts         = new CutterKCutsTreeNodes(myAig, sizeCut);
+             FunctionAreaFlow   function        = new FunctionAreaFlow(0,0,0,1,1,1);
+             AreaFlow area                      = new AreaFlow(myAig,sizeCut,kcuts,function);
+             CoveringAreaFlow initialCovering   = area.getCovering();
+             area.showCovering();
+             SimulatedAnneling SA               = new SimulatedAnneling(myAig,initialCovering, function,1000,100);
              if((args.length > 4)&&(args[4].contains(".eqn"))) 
              { //caso arquivo de log
                Logs.LogsWriteEqn(area.getEqn(),args[4]);  

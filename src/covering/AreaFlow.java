@@ -1,5 +1,7 @@
 package covering;
 
+import FlexMap.CostFunction;
+import FlexMap.FunctionAreaFlow;
 import aig.*;
 import io.*;
 import java.io.FileNotFoundException;
@@ -16,18 +18,18 @@ public class AreaFlow
     protected Aig                   myAig;
     protected Integer               sizeCut;
     protected CutterK               kcuts;
-    protected Float                 CostCut;
+    protected FunctionAreaFlow      function;
     protected Map<NodeAig, AigCut>  covering;
     protected Map<NodeAig, AigCut>  bestCut;
     protected Map<NodeAig,Float>    tableArea;
     protected Map<NodeAig,Integer>  levelNode;
 
-    public AreaFlow(Aig myAig, int size, CutterK cutterK, Float Cost) 
+    public AreaFlow(Aig myAig, int size, CutterK cutterK,FunctionAreaFlow function) 
     {
         this.myAig      = myAig;
         this.sizeCut    = size;
         this.kcuts      = cutterK;
-        this.CostCut    = Cost;
+        this.function   = function;
         this.covering   = new HashMap<NodeAig, AigCut>();
         this.bestCut    = new HashMap<NodeAig, AigCut>();
         this.tableArea  = new HashMap<NodeAig, Float>();
@@ -86,29 +88,29 @@ public class AreaFlow
     //**Método contabiliza a área do Cut
     private float sumCost(AigCut cut, NodeAig nodeActual) 
     {
-        float Cost=0;
-        int outEdge=0;
+        float input     =0;
+        int output      =0;
         if(nodeActual.getChildren().isEmpty())
-            outEdge =1;//fanouts
+            output =1;//fanouts
         else
-            outEdge = nodeActual.getChildren().size(); //fanouts
+            output = nodeActual.getChildren().size(); //fanouts
         if(cut.size()==1) //corte unitário sempre 1+entradas
         {
           for(NodeAig node: nodeActual.getParents())
           {
             if(!tableArea.containsKey(node))
                 getBestArea(node);
-            Cost+=tableArea.get(node);
+            input+=tableArea.get(node);
           }
-          return (this.CostCut+Cost)/outEdge; 
+          return this.function.eval(0,0,0,input, output, 1); 
         }
         for(NodeAig node:cut)
         {
             if(!tableArea.containsKey(node))
                 getBestArea(node);
-            Cost+=tableArea.get(node);
+            input+=tableArea.get(node);
         }
-        return (Cost+this.CostCut)/outEdge;
+        return this.function.eval(0,0,0,input, output, 1);
     }
     //**Método faz a melhor escolha entre os cortes do Nodo
     private void choiceBestArea(NodeAig nodeActual, Map<AigCut, Float> tableCost) 
@@ -185,11 +187,20 @@ public class AreaFlow
         System.out.println("############################################################");
     }
     
-    //** Método de acesso a cobetura gerada
-    public Map<NodeAig, AigCut> getCovering() {
-        return covering;
+    //** Método de acesso a cobetura gerada no formato do objeto Covering
+    public CoveringAreaFlow getCovering() {
+        Map<NodeAig,Set<NodeAig>> finalCov = new HashMap<NodeAig, Set<NodeAig>>();
+        for(Map.Entry<NodeAig,AigCut> cut : this.covering.entrySet())
+            finalCov.put(cut.getKey(), cut.getValue().getCut());
+        CoveringAreaFlow finalCovering = new CoveringAreaFlow(finalCov);
+        return finalCovering;
     }
 
+    //** Método de acesso aos cortes da cobetura gerada
+    public Map<NodeAig, AigCut> getCoveringCuts() {
+        return covering;
+    }
+    
     //**Método que seleciona o menor custo possivel melhor Cut*/
     private AigCut bestCost(Map<AigCut, Float> tableCost) 
     {
@@ -207,7 +218,7 @@ public class AreaFlow
     
     public String getEqn() throws FileNotFoundException
     {
-       String eqn = Logs.coveringToEqn(myAig, getCovering());
+       String eqn = Logs.coveringToEqn(myAig, getCoveringCuts());
        return eqn;
     }
 }
