@@ -98,8 +98,7 @@ public class SimulatedAnneling
     }
 
     private Covering perturbation(Covering state)
-    {
-        
+    {        
         Covering newCovering = applyNewCovering(state);
         //seleciona um treenode 
         //pega um novo matching
@@ -127,7 +126,37 @@ public class SimulatedAnneling
                System.out.print(" ("+function.eval(0, 0, 0, inputs,output,1)+") custo\n");
            }
         }
+        covering();       
         return null;
     }
     
+    //**Método que aplica a cobertura baseado em bfs utilizando as areas calculadas
+    protected void covering()
+    {
+        bfsAigVisitorAreaCovering bfs = new bfsAigVisitorAreaCovering(this);
+        for(NodeAig nodeActual: myAig.getNodeOutputsAig())
+        {
+            System.out.println("saida: "+nodeActual.getName());
+            if(!this.covering.containsKey(nodeActual))
+            {
+                this.covering.put(nodeActual, this.bestCut.get(nodeActual));
+                nodeActual.accept(bfs);     
+            }
+        }
+        boolean signalOk = true;
+        while(signalOk == true)
+        {
+          Map<NodeAig,AigCut> list = new HashMap<NodeAig, AigCut>();
+          signalOk = false;  
+          for(Map.Entry<NodeAig,AigCut> element: this.covering.entrySet())
+              for(NodeAig node: element.getValue().getCut())
+                if((!node.isInput())&&(!this.covering.containsKey(node)))
+                {
+                    list.put(node, this.bestCut.get(node));
+                    signalOk = true;
+                }
+          this.covering.putAll(list);
+        }
+    }
+
 }

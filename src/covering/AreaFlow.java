@@ -74,8 +74,7 @@ public class AreaFlow
            {
               float cost  = sumCost(cut,nodeActual);
               tableCost.put(cut, (Float)cost);              
-           }
-           
+           }           
         }while(iterator.hasNext()); //contabiliza areas
         if(!nodeActual.isInput())
             choiceBestArea(nodeActual,tableCost);
