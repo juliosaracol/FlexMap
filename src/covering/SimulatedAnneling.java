@@ -3,6 +3,7 @@ package covering;
 import FlexMap.CostFunction;
 import aig.*;
 import java.util.*;
+import kcutter.CutterK;
 
 /**
  * Classe aplica SimulatedAnneling 
@@ -14,16 +15,22 @@ public class SimulatedAnneling
     protected int initialTemp;
     protected int finalTemp;
     protected Aig myAig;
-    protected Covering initialCovering;
-    protected Covering actualState;
+    protected CutterK   kcuts;
+    protected Covering  initialCovering;
+    protected Covering  actualState;
     protected CostFunction function;
+    protected ArrayList<NodeAig> treeNodes;
     
-    public SimulatedAnneling(Aig myAig, Covering initial, CostFunction function, int tempInitial, int tempFinal)
+    
+    public SimulatedAnneling(Aig myAig,CutterK kcuts, Covering initial, CostFunction function, int tempInitial, int tempFinal)
     {
+        this.initialTemp        = tempInitial;
+        this.finalTemp          = tempFinal;
         this.myAig              = myAig;  
+        this.kcuts              = kcuts;
         this.initialCovering    = initial;
         this.function           = function;
-        ArrayList<NodeAig> treeNodes = new ArrayList<NodeAig>();
+        this.treeNodes = new ArrayList<NodeAig>();
         for(Map.Entry<NodeAig,Set<NodeAig>> covering : this.initialCovering.getCovering().entrySet())
         {
             if((covering.getKey().getChildren().size() > 1)&&(!covering.getKey().isInput()))
@@ -31,17 +38,8 @@ public class SimulatedAnneling
                 System.out.println("Node TreeNode"+covering.getKey().getName());
                 treeNodes.add(covering.getKey());
             }
-            if(covering.getValue().size() > 1)
-            {
-                for(NodeAig node: covering.getValue())
-                    if((node.getChildren().size() > 1)&&(!node.isInput()))
-                    {
-                        System.out.println("Node TreeNode"+node.getName());
-                        treeNodes.add(node);
-                    }
-            }
-            this.actualState = run();
          }
+         this.actualState = run();
      }
         
      //**Motor da engine simullatedAnelling*/
@@ -53,8 +51,7 @@ public class SimulatedAnneling
             double factor;
             double prob;
             double t = getInitialTemp();
-            stateOriginal.evaluation(function);
-            float energy        = stateOriginal.getCost();
+            float energy        = stateOriginal.getCost(function);
             float energyBest    = energy;
             float energyNew;
             float delta;
@@ -66,9 +63,9 @@ public class SimulatedAnneling
                 t *= factor;                 
 
                 stateNew    = perturbation(stateOriginal);
-                stateNew.evaluation(function);
-                energyNew   = stateNew.getCost();
-                energy      = stateOriginal.getCost();
+                break;
+                energyNew   = stateNew.getCost(function);
+                energy      = stateOriginal.getCost(function);
                 delta = energyNew - energy;
                 prob = Math.pow(Math.E,(-delta/t));
 
@@ -102,11 +99,35 @@ public class SimulatedAnneling
 
     private Covering perturbation(Covering state)
     {
+        
+        Covering newCovering = applyNewCovering(state);
         //seleciona um treenode 
         //pega um novo matching
         //gera nova cobertra 
         //retorna
-        throw new UnsupportedOperationException("Not yet implemented");
+        return newCovering;
+    }
+
+    private Covering applyNewCovering(Covering state) 
+    {
+        for(NodeAig nodeT: treeNodes)
+        {
+           System.out.println("TREENODE:"+ nodeT.getName());
+           for(Set<NodeAig> set:this.kcuts.getCuts().get(nodeT))
+           {
+               float output =1;
+               if(nodeT.getChildren().size()>1)
+                   output = nodeT.getChildren().size();
+               float inputs=0;
+               for(NodeAig node: set)
+               {
+                  inputs += state.getCosts().get(node);
+                  System.out.print(node.getName()+"-");
+               }
+               System.out.print(" ("+function.eval(0, 0, 0, inputs,output,1)+") custo\n");
+           }
+        }
+        return null;
     }
     
 }

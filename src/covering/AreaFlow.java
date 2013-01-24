@@ -1,7 +1,7 @@
 package covering;
 
 import FlexMap.CostFunction;
-import FlexMap.FunctionAreaFlow;
+import FlexMap.CostAreaFlow;
 import aig.*;
 import io.*;
 import java.io.FileNotFoundException;
@@ -18,13 +18,13 @@ public class AreaFlow
     protected Aig                   myAig;
     protected Integer               sizeCut;
     protected CutterK               kcuts;
-    protected FunctionAreaFlow      function;
+    protected CostAreaFlow          function;
     protected Map<NodeAig, AigCut>  covering;
     protected Map<NodeAig, AigCut>  bestCut;
     protected Map<NodeAig,Float>    tableArea;
     protected Map<NodeAig,Integer>  levelNode;
 
-    public AreaFlow(Aig myAig, int size, CutterK cutterK,FunctionAreaFlow function) 
+    public AreaFlow(Aig myAig, int size, CutterK cutterK,CostAreaFlow function) 
     {
         this.myAig      = myAig;
         this.sizeCut    = size;
@@ -187,12 +187,12 @@ public class AreaFlow
         System.out.println("############################################################");
     }
     
-    //** Método de acesso a cobetura gerada no formato do objeto Covering
+    //** Método de acesso a cobetura gerada no formato do objeto Covering*/
     public CoveringAreaFlow getCovering() {
         Map<NodeAig,Set<NodeAig>> finalCov = new HashMap<NodeAig, Set<NodeAig>>();
         for(Map.Entry<NodeAig,AigCut> cut : this.covering.entrySet())
             finalCov.put(cut.getKey(), cut.getValue().getCut());
-        CoveringAreaFlow finalCovering = new CoveringAreaFlow(finalCov);
+        CoveringAreaFlow finalCovering = new CoveringAreaFlow(finalCov,tableArea);
         return finalCovering;
     }
 

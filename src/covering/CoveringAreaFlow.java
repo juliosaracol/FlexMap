@@ -10,21 +10,28 @@ import java.util.*;
  */
 public class CoveringAreaFlow extends Covering
 {
-    public CoveringAreaFlow(Map<NodeAig, Set<NodeAig>> covering) 
+
+    public CoveringAreaFlow(Map<NodeAig, Set<NodeAig>> covering,Map<NodeAig,Float> costs)
     {
-        super(covering);
+        super(covering,costs);
     }
     
     @Override
-    /**Método que aplica avaliação dos custos da cobertura*/
+    /**Método que aplica avaliação dos custos da cobertura é acessado pelo getCost()*/
       public void evaluation(CostFunction function)
     {
-        this.cost = 0;
+        float cost = 0;
+        output=0;
+        input=0;
         for(Map.Entry<NodeAig,Set<NodeAig>> set : this.covering.entrySet())
         {
             output  = set.getKey().getChildren().size();
-            input   = set.getValue().size();          
-            this.cost+=function.eval(area, delay, consumption, input, output, other);
+            if(set.getKey().getChildren().isEmpty())
+                output =1;//fanouts
+            for(NodeAig node: set.getValue())
+               input+=costs.get(node);
+          cost+=function.eval(area, delay, consumption, input, output,1);
         }
+        this.cost = cost;
     }
 } 

@@ -11,17 +11,16 @@ import java.util.*;
 public abstract class Covering
 {
     protected Map<NodeAig,Set<NodeAig>> covering;
-    protected float cost=0;
+    protected Map<NodeAig,Float>        costs;
+    protected float                     cost=0;
     protected float area=0, delay=0, consumption=0, input=0, output=0, other=0;
 
-    public Covering(Map<NodeAig, Set<NodeAig>> covering) 
+    public Covering(Map<NodeAig, Set<NodeAig>> covering,Map<NodeAig,Float> costs) 
     {
-        this.covering  = covering;
+        this.covering   = covering;
+        this.costs      = costs;
     }
     
-    /**Método que aplica avaliação dos custos da cobertura  e atualiza o getCost() de acordo com a função cost passada como parametro*/
-    public abstract void evaluation(CostFunction function);
-
     public float getArea() {
         return area;
     }
@@ -78,10 +77,19 @@ public abstract class Covering
         this.output = output;
     }
 
-    public float getCost() 
-    {
-        return cost;
+    public Map<NodeAig, Float> getCosts() {
+        return costs;
     }
-
     
+    
+
+    /**Método que aplica avaliação dos custos da cobertura  e atualiza o getCost() de acordo com a função cost passada como parametro*/
+    public abstract void evaluation(CostFunction function);
+    
+    public float getCost(CostFunction function)
+    {
+        evaluation(function);
+        return this.cost;
+    }
+   
 }

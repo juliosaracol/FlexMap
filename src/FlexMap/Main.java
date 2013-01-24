@@ -144,7 +144,7 @@ public class Main
              int sizeCut            = Integer.valueOf(args[2]);
              CutterKCuts    kcuts   = new CutterKCuts(myAig, sizeCut);
              int areaCut            = Integer.parseInt(args[3]);
-             FunctionAreaFlow   function= new FunctionAreaFlow(0,0,0,1,1,areaCut);
+             CostAreaFlow   function= new CostAreaFlow(0,0,0,1,1,areaCut);
              AreaFlow area              = new AreaFlow(myAig,sizeCut,kcuts,function);
              area.showCovering();
              if((args.length > 4)&&(args[4].contains(".eqn"))) 
@@ -160,11 +160,11 @@ public class Main
              Aig myAig                          = new Aig(args[0]);
              int sizeCut                        = Integer.valueOf(args[2]);
              CutterKCutsTreeNodes kcuts         = new CutterKCutsTreeNodes(myAig, sizeCut);
-             FunctionAreaFlow   function        = new FunctionAreaFlow(0,0,0,1,1,1);
+             CostAreaFlow   function            = new CostAreaFlow(0,0,0,1,1,1);
              AreaFlow area                      = new AreaFlow(myAig,sizeCut,kcuts,function);
              CoveringAreaFlow initialCovering   = area.getCovering();
              area.showCovering();
-             SimulatedAnneling SA               = new SimulatedAnneling(myAig,initialCovering, function,1000,100);
+             SimulatedAnneling SA               = new SimulatedAnneling(myAig,kcuts,initialCovering,function,1000,100);
              if((args.length > 4)&&(args[4].contains(".eqn"))) 
              { //caso arquivo de log
                Logs.LogsWriteEqn(area.getEqn(),args[4]);  
@@ -298,6 +298,8 @@ public class Main
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -A TamanhoDoCorte Custo-Cut [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW COM BIBLIOTECA--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AL TamanhoDoCorte arquivoBiblioteca [arquivoSaida.eqn (opcional)]");
+      System.out.println("--MAPEAMENTO COM AREAFLOW E SIMULATED ANNELING--");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -ASA TamanhoDoCorte [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM ELIS--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -E s p [arquivoSaida.eqn (opcional)]");
       System.out.println("--SWITCHING--");
