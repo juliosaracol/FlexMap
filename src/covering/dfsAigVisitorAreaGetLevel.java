@@ -1,6 +1,7 @@
 package covering;
 
 import aig.*;
+import java.util.Map;
 
 /**
  * Classe que aplica caminhamento no Aig para AreaFlow
@@ -9,12 +10,12 @@ import aig.*;
 public class dfsAigVisitorAreaGetLevel extends dfsNodeAigVisitor
 {
 
-    protected AreaFlow myArea;
+    protected Map<NodeAig,Integer> levelNode;
     
-    public dfsAigVisitorAreaGetLevel(AreaFlow areaFlow)
+    public dfsAigVisitorAreaGetLevel(Map<NodeAig,Integer> levels)
     {
         super();
-        this.myArea  = areaFlow;
+        this.levelNode  = levels;
     }
 
     @Override
@@ -25,17 +26,17 @@ public class dfsAigVisitorAreaGetLevel extends dfsNodeAigVisitor
 
     protected void getLevel(NodeAig nodeAigActual) 
     {
-        if(myArea.levelNode.containsKey(nodeAigActual))
+        if(this.levelNode.containsKey(nodeAigActual))
             return;
         int levelMax = 1; 
         for(NodeAig father : nodeAigActual.getParents())
         {
-            if(!myArea.levelNode.containsKey(father))
+            if(!this.levelNode.containsKey(father))
               function(father);
-            if(levelMax < myArea.levelNode.get(father))
-                 levelMax = myArea.levelNode.get(father);
+            if(levelMax < this.levelNode.get(father))
+                 levelMax = this.levelNode.get(father);
         }
         levelMax++;
-        myArea.levelNode.put(nodeAigActual,levelMax);        
+        this.levelNode.put(nodeAigActual,levelMax);        
     }
 }

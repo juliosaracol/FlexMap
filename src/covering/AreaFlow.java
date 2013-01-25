@@ -40,7 +40,7 @@ public class AreaFlow
     //** Método que aplica a cobertura baseado no AreaFlow
     private void mapAreaFlow() 
     {
-        dfsAigVisitorAreaGetLevel dfs = new dfsAigVisitorAreaGetLevel(this);
+        dfsAigVisitorAreaGetLevel dfs = new dfsAigVisitorAreaGetLevel(this.levelNode);
         for(NodeAig node: myAig.getNodeInputsAig())
             this.levelNode.put(node,1);
         for(NodeAig node: myAig.getNodeOutputsAig())

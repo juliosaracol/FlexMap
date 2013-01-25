@@ -159,7 +159,7 @@ public class Main
         {
              Aig myAig                          = new Aig(args[0]);
              int sizeCut                        = Integer.valueOf(args[2]);
-             CutterKCutsTreeNodes kcuts         = new CutterKCutsTreeNodes(myAig, sizeCut);
+             CutterKCuts    kcuts               = new CutterKCuts(myAig, sizeCut);
              CostAreaFlow   function            = new CostAreaFlow(0,0,0,1,1,1);
              AreaFlow area                      = new AreaFlow(myAig,sizeCut,kcuts,function);
              CoveringAreaFlow initialCovering   = area.getCovering();
