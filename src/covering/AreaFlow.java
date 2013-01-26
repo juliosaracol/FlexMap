@@ -220,4 +220,18 @@ public class AreaFlow
        String eqn = Logs.coveringToEqn(myAig, getCoveringCuts());
        return eqn;
     }
+
+    //**Método que retorna os melhores cortes de cada nodo em formato baseado na classe cobertura*/
+    public Map<NodeAig, Set<NodeAig>> getBestCut()
+    {
+        Map<NodeAig, Set<NodeAig>> bestsCut = new HashMap<NodeAig, Set<NodeAig>>();
+        for(Map.Entry<NodeAig,AigCut> cuts : this.bestCut.entrySet())
+        {
+            Set<NodeAig> cut = new HashSet<NodeAig>();
+            cut.addAll(cuts.getValue().getCut());
+            bestsCut.put(cuts.getKey(),cut);
+        }
+        return bestsCut;
+    }
+    
 }
