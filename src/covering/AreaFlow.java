@@ -78,11 +78,11 @@ public class AreaFlow
         }while(iterator.hasNext()); //contabiliza areas
         if(!nodeActual.isInput())
             choiceBestArea(nodeActual,tableCost);
-        System.out.print(" BestArea Nodo: "+nodeActual.getName()+
-         " Custo: "+tableArea.get(nodeActual)+
-         " Profundidade: "+levelNode.get(nodeActual)+
-         " Corte:");
-        bestCut.get(nodeActual).showCut();
+//        System.out.print(" BestArea Nodo: "+nodeActual.getName()+
+//         " Custo: "+tableArea.get(nodeActual)+
+//         " Profundidade: "+levelNode.get(nodeActual)+
+//         " Corte:");
+//        bestCut.get(nodeActual).showCut();
     }
     //**Método contabiliza a área do Cut
     private float sumCost(AigCut cut, NodeAig nodeActual) 
@@ -121,8 +121,8 @@ public class AreaFlow
         do
         {    
             cut = iterator.next();
-            System.out.println("trabalhando com o nodo :"+nodeActual.getName()+" e corte :");
-            cut.showCut();
+            //System.out.println("trabalhando com o nodo :"+nodeActual.getName()+" e corte :");
+            //cut.showCut();
             if(((tableCost.get(cut)) <= (tableCost.get(cutBest))))
               if(cut.size() >= cutBest.size())
                 if(sumLevel(cut,nodeActual) >= sumLevel(cutBest,nodeActual)) //compara a profundidade em relação ao circuito
@@ -147,7 +147,6 @@ public class AreaFlow
         bfsAigVisitorAreaCovering bfs = new bfsAigVisitorAreaCovering(this);
         for(NodeAig nodeActual: myAig.getNodeOutputsAig())
         {
-            System.out.println("saida: "+nodeActual.getName());
             if(!this.covering.containsKey(nodeActual))
             {
                 this.covering.put(nodeActual, this.bestCut.get(nodeActual));

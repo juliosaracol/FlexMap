@@ -164,11 +164,13 @@ public class Main
              AreaFlow area                      = new AreaFlow(myAig,sizeCut,kcuts,function);
              CoveringAreaFlow initialCovering   = area.getCovering();
              area.showCovering();
-             SimulatedAnneling SA               = new SimulatedAnneling(myAig,kcuts,area.getBestCut(),initialCovering,function,1000,100);
-             if((args.length > 4)&&(args[4].contains(".eqn"))) 
-             { //caso arquivo de log
-               Logs.LogsWriteEqn(area.getEqn(),args[4]);  
-             }
+             System.out.println(initialCovering.getCost(function));
+//             
+//             SimulatedAnneling SA               = new SimulatedAnneling(myAig,kcuts,area.getBestCut(),initialCovering,function,100,1000,50);
+//             if((args.length > 4)&&(args[4].contains(".eqn"))) 
+//             { //caso arquivo de log
+//               Logs.LogsWriteEqn(area.getEqn(),args[4]);  
+//             }
              return;
         }
         //----------------------------------------------------------------------

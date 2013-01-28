@@ -1,5 +1,6 @@
 package covering;
 
+import FlexMap.CostAreaFlow;
 import FlexMap.CostFunction;
 import aig.*;
 import java.util.*;
@@ -12,12 +13,14 @@ import kcutter.CutterK;
  */
 public class SimulatedAnneling
 {
-
+    protected int temp;
     protected int initialTemp;
     protected int finalTemp;
+    protected float step;
     protected Aig myAig;
     protected CutterK   kcuts;
     protected Map<NodeAig,Set<NodeAig>>  bestCut;
+    protected Map<NodeAig,Float>  bestCost;
     protected Covering  initialCovering;
     protected Covering  actualState;
     protected CostFunction function;
@@ -25,20 +28,23 @@ public class SimulatedAnneling
     protected Map<NodeAig,Integer> levelNode;
     
     
-    public SimulatedAnneling(Aig myAig,CutterK kcuts,Map<NodeAig,Set<NodeAig>> bestCut, Covering initial, CostFunction function, int tempInitial, int tempFinal)
+    public SimulatedAnneling(Aig myAig,CutterK kcuts,Map<NodeAig,Set<NodeAig>> bestCut, Covering initial, CostFunction function, int tempInitial, int tempFinal,int steps)
     {
+        this.step               = (initialTemp-finalTemp)/steps;
         this.initialTemp        = tempInitial;
         this.finalTemp          = tempFinal;
+        this.temp               = tempInitial;
         this.myAig              = myAig;  
         this.kcuts              = kcuts;
         this.initialCovering    = initial;
         this.function           = function;
         this.bestCut            = bestCut;
         
+        
         this.treeNodes = new ArrayList<NodeAig>();
         for(Map.Entry<NodeAig,Set<NodeAig>> covering : this.initialCovering.getCovering().entrySet())
         {
-            if((covering.getKey().getChildren().size() > 1)&&(!covering.getKey().isInput()))
+            if((covering.getKey().getChildren().size() > 1)&&(!covering.getKey().isInput())&&(!treeNodes.contains(covering.getKey())))
             {
                 System.out.println("Node TreeNode"+covering.getKey().getName());
                 treeNodes.add(covering.getKey());
@@ -57,7 +63,8 @@ public class SimulatedAnneling
                node.accept(dfs);
          }
          //*********************************************************************
-         this.actualState = run();
+         System.out.println("##############Solução Iinicial com custo:"+initialCovering.getCost(function));
+ //        this.actualState = run();
      }
         
      //**Motor da engine simullatedAnelling*/
@@ -92,29 +99,25 @@ public class SimulatedAnneling
 //
 //
 //        return candidateState;
-
+            
             Covering stateOriginal  = this.initialCovering; 
             Covering stateBest      = stateOriginal; 
             Covering stateNew; 
-            double factor;
             double prob;
-            double t = getInitialTemp();
+            double t = getTemp();
             float energy        = stateOriginal.getCost(function);
             float energyBest    = energy;
             float energyNew;
             float delta;
             int countIterations = 0;
 
-            while (t > 0)
+            while (t > this.finalTemp)
             {                       
-                factor = (4 + (Math.random() * 4))/10;
-                t *= factor;                 
-
                 stateNew    = perturbation(stateOriginal);
                 energyNew   = stateNew.getCost(function);
                 energy      = stateOriginal.getCost(function);
-                delta = energyNew - energy;
-                prob = Math.pow(Math.E,(-delta/t));
+                delta       = energyNew - energy;
+                prob        = Math.pow(Math.E,(-delta/t));
 
                 if ((delta <= 0) || (prob > randomize())) 
                 {
@@ -128,6 +131,7 @@ public class SimulatedAnneling
                     energyBest  = energyNew;
                 }
                 countIterations++;
+                t = getTemp();                 
             }
             return stateBest;     
     }
@@ -135,11 +139,12 @@ public class SimulatedAnneling
     //**Método que gera nova cobertura utilizando os Cuts dos teeeNodes*/
     private Covering applyNewCovering(Covering state,Map<NodeAig,ArrayList<Set<NodeAig>>> cuts) 
     {
+        Map<NodeAig,Float> cost = new HashMap<NodeAig, Float>();
         System.out.println("###########NEWCOVERING#########################");
         for(Map.Entry<NodeAig,Set<NodeAig>> set : this.bestCut.entrySet())
         {
            System.out.print("Nodo: "+ set.getKey().getName()+" [");            
-           if(treeNodes.contains(set.getKey()))
+           if(cuts.containsKey(set.getKey()))
            {
                int index = (int) Math.random() * (cuts.get(set.getKey()).size()-1);
                set.setValue(cuts.get(set.getKey()).get(index));
@@ -159,25 +164,35 @@ public class SimulatedAnneling
            bfsAigVisitorAreaSumLevel bfs = new bfsAigVisitorAreaSumLevel(levelNode,auxAigCut);
            set.getKey().accept(bfs);
            /***************************************************************/
-           System.out.print("] -("+function.eval(0, 0, 0, inputs,output,1)+") custo, level"+bfs.getLevel()+"\n");
+           if(set.getKey().isInput())
+               cost.put(set.getKey(),(float)0);
+           else
+               cost.put(set.getKey(),function.eval(0, 0, 0, inputs,output,1));
+           System.out.print("] -("+cost.get(set.getKey())+") custo, level"+bfs.getLevel()+"\n");
          }
-         System.out.println("#################################################");
-         return covering();
+         this.bestCost = cost;
+         Covering finalCovering = covering(cost);         
+         System.out.println("################################################# custo:");
+         finalCovering.getCost(function);
+         return finalCovering;
     }
     
     //**Método que aplica a cobertura baseado em bfs utilizando as areas calculadas
-    protected Covering covering()
-    { return null;}
-//        bfsAigVisitorAreaCovering bfs = new bfsAigVisitorAreaCovering(this);
-//        for(NodeAig nodeActual: myAig.getNodeOutputsAig())
-//        {
-//            System.out.println("saida: "+nodeActual.getName());
-//            if(!this.covering.containsKey(nodeActual))
-//            {
-//                this.covering.put(nodeActual, this.bestCut.get(nodeActual));
-//                nodeActual.accept(bfs);     
-//            }
-//        }
+    protected Covering covering(Map<NodeAig,Float> cost)
+    {
+        Map<NodeAig,Set<NodeAig>> selectedCuts = new HashMap<NodeAig, Set<NodeAig>>();
+        bfsAigVisitorSimulatedCovering bfs = new bfsAigVisitorSimulatedCovering(this,selectedCuts);
+        for(NodeAig nodeActual: myAig.getNodeOutputsAig())
+        {
+            if(!selectedCuts.containsKey(nodeActual))
+            {
+                selectedCuts.put(nodeActual, this.bestCut.get(nodeActual));
+                nodeActual.accept(bfs);     
+            }
+        }
+        Covering newState = new CoveringAreaFlow(selectedCuts,bestCost);
+        return newState;
+    }
 //        boolean signalOk = true;
 //        while(signalOk == true)
 //        {
@@ -195,9 +210,11 @@ public class SimulatedAnneling
  //   }
 
     /* Metodo responsavel por gerar o valor da temperatura inicial entre min e max */
-    private double getInitialTemp() 
+    private float getTemp() 
     {
-        return this.finalTemp + (Math.random() * this.initialTemp);
+        this.temp = (int) ((float)(Math.pow(temp, 2))-(temp*step));
+        System.out.println("TEMPERATURA: "+ temp);
+        return temp;
     }
     
     /* Metodo responsavel por gerar um numero aleatorio entre 0  e 1 */
@@ -214,24 +231,32 @@ public class SimulatedAnneling
         return newCovering;
     }
 
-    //**Método que seleciona os possiveis Cuts dos treeNodes*/
+    //**Método que seleciona os possiveis Cuts que referenciam treeNodes*/
     private Map<NodeAig, ArrayList<Set<NodeAig>>> getSetCutsTreeNodes(ArrayList<NodeAig> treeNodes) 
     {
          Map<NodeAig,ArrayList<Set<NodeAig>>> treeNodesCut = new HashMap<NodeAig, ArrayList<Set<NodeAig>>>();
-         for(NodeAig treeNode: treeNodes)
+         for(Map.Entry<NodeAig,Set<NodeAig>> set: this.bestCut.entrySet())
          {
-            ArrayList<Set<NodeAig>> sets = new ArrayList<Set<NodeAig>>();   
-            Set<AigCut>  cuts            = kcuts.getCuts().get(treeNode);
-            for(AigCut cut: cuts)
+           for(NodeAig nodeT: treeNodes)
+           {
+            if(set.getValue().contains(nodeT)) 
             {
+              System.out.println("NOVO CORTE PARA NODO:"+ set.getKey().getName());  
+              ArrayList<Set<NodeAig>> sets = new ArrayList<Set<NodeAig>>();   
+              Set<AigCut>  cuts            = kcuts.getCuts().get(set.getKey());
+              for(AigCut cut: cuts)
+              {
                 if(cut.size() > 1)
                 {
                  Set<NodeAig> setCuts  = new HashSet<NodeAig>();
                  setCuts.addAll(cut.getCut());
-                 sets.add(setCuts);
+                 if(!sets.contains(setCuts))
+                     sets.add(setCuts);
                 }
+              }
+              treeNodesCut.put(set.getKey(), sets);
             }
-            treeNodesCut.put(treeNode, sets);
+           }
          }
          return treeNodesCut;       
     }
