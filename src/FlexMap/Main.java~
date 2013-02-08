@@ -145,29 +145,8 @@ public class Main
              CutterKCuts    kcuts   = new CutterKCuts(myAig, sizeCut);
              int areaCut            = Integer.parseInt(args[3]);
              CostAreaFlow   function= new CostAreaFlow(0,0,0,1,1,areaCut);
-             AreaFlow area          = new AreaFlow(myAig,sizeCut,kcuts,function);
+             AreaFlow area              = new AreaFlow(myAig,sizeCut,kcuts,function);
              area.showCovering();
-             CoveringAreaFlow areaT = area.getCovering();
-             System.out.println("Valor final:"+areaT.getCost(function));          
-             if((args.length > 4)&&(args[4].contains(".eqn"))) 
-             { //caso arquivo de log
-               Logs.LogsWriteEqn(area.getEqn(),args[4]);  
-             }
-             return;
-        }
-        //----------------------------------------------------------------------        
-        //--------------------MAP AREA FLOW C/Kcuts Com LIMITES de TREENODES-------------------------------------
-        if(args[1].equals("-AT")&&(args.length >= 4))
-        {
-             Aig myAig              = new Aig(args[0]);
-             int sizeCut            = Integer.valueOf(args[2]);
-             CutterKCutsTreeNodes    kcuts   = new CutterKCutsTreeNodes(myAig, sizeCut);
-             int areaCut            = Integer.parseInt(args[3]);
-             CostAreaFlow   function= new CostAreaFlow(0,0,0,1,1,areaCut);
-             AreaFlow area          = new AreaFlow(myAig,sizeCut,kcuts,function);
-             area.showCovering();
-             CoveringAreaFlow areaT = area.getCovering();
-             System.out.println("Valor final:"+areaT.getCost(function));                       
              if((args.length > 4)&&(args[4].contains(".eqn"))) 
              { //caso arquivo de log
                Logs.LogsWriteEqn(area.getEqn(),args[4]);  
@@ -319,8 +298,6 @@ public class Main
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -KB TamanhoDoCorte Biblioteca.genlib [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -A TamanhoDoCorte Custo-Cut [arquivoSaida.eqn (opcional)]");
-      System.out.println("--MAPEAMENTO COM AREAFLOW C/TREENODES--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AT TamanhoDoCorte Custo-Cut [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW COM BIBLIOTECA--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AL TamanhoDoCorte arquivoBiblioteca [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW E SIMULATED ANNELING--");
