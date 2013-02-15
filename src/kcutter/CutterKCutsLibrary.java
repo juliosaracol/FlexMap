@@ -15,6 +15,7 @@ public final class CutterKCutsLibrary extends CutterKCuts
 
     protected LibraryReader library;
     protected Map<NodeAig,Set<AigCutBrc>>    cutsBrc;
+    /**Atributo que possui os cortes que foram encontrados Matchings*/
     protected Map<AigCutBrc,Set<FunctionData>> signature;
     public String logs="";
     
@@ -39,7 +40,7 @@ public final class CutterKCutsLibrary extends CutterKCuts
     {
         super(aig, limit);
         this.library    = new LibraryReader(libraryName,limit); 
-        if(library.equals(null))
+        if(library == null)
         {
             System.out.println("Impossivel carregar biblioteca.");
             System.exit(-1);
@@ -171,4 +172,9 @@ public final class CutterKCutsLibrary extends CutterKCuts
     public Map<NodeAig, Set<AigCutBrc>> getCutsBrc() {
         return cutsBrc;
     }
+    
+    public Map<AigCutBrc, Set<FunctionData>> getMatchings() {
+        return signature;
+    }
+    
 }

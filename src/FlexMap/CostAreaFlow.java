@@ -17,7 +17,7 @@ public class CostAreaFlow extends CostFunction
     public float eval(float area, float delay, float consumption, float input, float output, float other) 
     {
         float costFinal=0;
-        costFinal = ((input*pInput)+(other*pOther))/(output*pOutput);
+        costFinal = ((area*pArea)+(delay*pDelay)+(input*pInput)+(other*pOther))/(output*pOutput);
             return costFinal;
     }
     

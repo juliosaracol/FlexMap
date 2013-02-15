@@ -1,7 +1,6 @@
 package covering;
 
-import FlexMap.CostFunction;
-import FlexMap.CostAreaFlow;
+import FlexMap.*;
 import aig.*;
 import io.*;
 import java.io.FileNotFoundException;
@@ -38,7 +37,7 @@ public class AreaFlow
         covering();
     }
     //** Método que aplica a cobertura baseado no AreaFlow
-    private void mapAreaFlow() 
+    protected void mapAreaFlow() 
     {
         dfsAigVisitorAreaGetLevel dfs = new dfsAigVisitorAreaGetLevel(this.levelNode);
         for(NodeAig node: myAig.getNodeInputsAig())
@@ -85,7 +84,7 @@ public class AreaFlow
 //        bestCut.get(nodeActual).showCut();
     }
     //**Método contabiliza a área do Cut
-    private float sumCost(AigCut cut, NodeAig nodeActual) 
+    protected float sumCost(AigCut cut, NodeAig nodeActual) 
     {
         float input     =0;
         int output      =0;
@@ -101,7 +100,7 @@ public class AreaFlow
                 getBestArea(node);
             input+=tableArea.get(node);
           }
-          return this.function.eval(0,0,0,input, output, 1); 
+          return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1
         }
         for(NodeAig node:cut)
         {
@@ -109,10 +108,10 @@ public class AreaFlow
                 getBestArea(node);
             input+=tableArea.get(node);
         }
-        return this.function.eval(0,0,0,input, output, 1);
+        return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output, 0);
     }
     //**Método faz a melhor escolha entre os cortes do Nodo
-    private void choiceBestArea(NodeAig nodeActual, Map<AigCut, Float> tableCost) 
+    protected void choiceBestArea(NodeAig nodeActual, Map<AigCut, Float> tableCost) 
     {
         AigCut cut      = null;
         AigCut cutBest  = bestCost(tableCost);
@@ -133,7 +132,7 @@ public class AreaFlow
         tableArea.put(nodeActual, (tableCost.get(cutBest)));
     }
     //**Método contabiliza a profundidade utilizando bfs
-    private Integer sumLevel(AigCut cut, NodeAig nodeActual)
+    protected Integer sumLevel(AigCut cut, NodeAig nodeActual)
     {
         if((nodeActual.isOutput())&&(nodeActual.getParents().isEmpty())) //constant
             return 1;
@@ -200,7 +199,7 @@ public class AreaFlow
     }
     
     //**Método que seleciona o menor custo possivel melhor Cut*/
-    private AigCut bestCost(Map<AigCut, Float> tableCost) 
+    protected AigCut bestCost(Map<AigCut, Float> tableCost) 
     {
         AigCut best = null;
         for(Map.Entry<AigCut,Float> nodes: tableCost.entrySet())
