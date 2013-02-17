@@ -39,8 +39,8 @@ public final class CutterKCutsTreeNodes extends CutterK
     {
         
         if(this.cuts.containsKey(nodeCurrent))
-            return this.cuts.get(nodeCurrent); 
-        if(nodeCurrent.isInput())
+            return Collections.unmodifiableSet(this.cuts.get(nodeCurrent)); 
+        if((nodeCurrent.isInput())||((nodeCurrent.isOutput())&&(nodeCurrent.getParents().isEmpty()))) //constant
         {
             Set<AigCut> kcut = new HashSet<AigCut>();
             kcut.add(new AigCut(nodeCurrent));

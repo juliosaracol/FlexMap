@@ -38,7 +38,7 @@ public abstract class Covering
     }
 
     public Map<NodeAig, Set<NodeAig>> getCovering() {
-        return covering;
+        return Collections.unmodifiableMap(covering);
     }
 
     public void setCovering(Map<NodeAig, Set<NodeAig>> covering) {
@@ -78,7 +78,7 @@ public abstract class Covering
     }
 
     public Map<NodeAig, Float> getCosts() {
-        return costs;
+        return Collections.unmodifiableMap(costs);
     }
     
     

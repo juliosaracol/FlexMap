@@ -156,7 +156,7 @@ public class Main
              System.out.println("Valor final:"+areaT.getCost(function));          
              if((args.length > 9)&&(args[9].contains(".eqn"))) 
              { //caso arquivo de log
-               Logs.LogsWriteEqn(area.getEqn(),args[4]);  
+               Logs.LogsWriteEqn(area.getEqn(),args[9]);  
              }
              return;
         }

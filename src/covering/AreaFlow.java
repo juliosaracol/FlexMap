@@ -77,11 +77,11 @@ public class AreaFlow
         }while(iterator.hasNext()); //contabiliza areas
         if(!nodeActual.isInput())
             choiceBestArea(nodeActual,tableCost);
-//        System.out.print(" BestArea Nodo: "+nodeActual.getName()+
-//         " Custo: "+tableArea.get(nodeActual)+
-//         " Profundidade: "+levelNode.get(nodeActual)+
-//         " Corte:");
-//        bestCut.get(nodeActual).showCut();
+        System.out.print(" BestArea Nodo: "+nodeActual.getName()+
+         " Custo: "+tableArea.get(nodeActual)+
+         " Profundidade: "+levelNode.get(nodeActual)+
+         " Corte:");
+        bestCut.get(nodeActual).showCut();
     }
     //**Método contabiliza a área do Cut
     protected float sumCost(AigCut cut, NodeAig nodeActual) 
@@ -195,7 +195,7 @@ public class AreaFlow
 
     //** Método de acesso aos cortes da cobetura gerada
     public Map<NodeAig, AigCut> getCoveringCuts() {
-        return covering;
+        return Collections.unmodifiableMap(covering);
     }
     
     //**Método que seleciona o menor custo possivel melhor Cut*/
@@ -229,7 +229,7 @@ public class AreaFlow
             cut.addAll(cuts.getValue().getCut());
             bestsCut.put(cuts.getKey(),cut);
         }
-        return bestsCut;
+        return Collections.unmodifiableMap(bestsCut);
     }
     
 }

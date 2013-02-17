@@ -155,7 +155,7 @@ public class AigCut implements Set<NodeAig>
     }
 
     public Set<NodeAig> getCut() {
-        return cut;
+        return Collections.unmodifiableSet(cut);
     }
     
     

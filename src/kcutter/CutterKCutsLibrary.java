@@ -170,11 +170,11 @@ public final class CutterKCutsLibrary extends CutterKCuts
     }
     
     public Map<NodeAig, Set<AigCutBrc>> getCutsBrc() {
-        return cutsBrc;
+        return Collections.unmodifiableMap(cutsBrc);
     }
     
     public Map<AigCutBrc, Set<FunctionData>> getMatchings() {
-        return signature;
+        return Collections.unmodifiableMap(signature);
     }
     
 }
