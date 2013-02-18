@@ -10,6 +10,8 @@ parametros = [];
 for param in sys.argv :
     parametros.append(param);
 arquivoIn 	= parametros[1]; 		#------nome do arquivo de entradas
+if len(parametros) > 2:
+	arquivoOut = parametros[2];
 ##----------------------------------------------------------------------
 
 #-------------------conta entradas da linha-----------------------------
@@ -55,10 +57,13 @@ while True:
 			break;
 j=0;
 cost = [];
+contadorLuts = 0;
 while True:
 	entradas = 0;
 	if len(listaLinhas) > j:
 		costFinal = contaEntradas(listaLinhas[j]);
+		if costFinal !=0:
+			contadorLuts = contadorLuts+1;
 		cost.append(costFinal);
 		#print str(listaLinhas[j][1]) +"com o custo " + str(costFinal);
 		j = j+1;
@@ -75,3 +80,9 @@ while i < len(listaLinhas):
 	arquivoResult.write(str(listaLinhas[i][1].replace("\n",""))+str(cost[i])+';\n');
 	i=i+1;
 arquivoResult.close();
+#------------------------------------grava os resultadosGerais num arquivo xls
+if arquivoOut != "":
+	arquivoResultGeral = open('resultados/'+arquivoOut+'.xls','a');
+	#print arquivoIn+str(contadorLuts);
+	arquivoResultGeral.write(arquivoIn+';'+str(contadorLuts)+';\n');
+	arquivoResultGeral.close();
