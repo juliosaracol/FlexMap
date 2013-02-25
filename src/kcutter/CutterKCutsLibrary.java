@@ -144,8 +144,8 @@ public final class CutterKCutsLibrary extends CutterKCuts
              }
            }   
        }
-       logs += ("\n"+cuts.size()+" Cortes\n");
-       System.out.println(cuts.size()+" Cortes");
+       logs += ("\n"+signature.size()+" Cortes com Matching\n");
+       System.out.println(signature.size()+" Cortes com Matching");
        logs += ("########################################\n");
        System.out.println("########################################");
     }   

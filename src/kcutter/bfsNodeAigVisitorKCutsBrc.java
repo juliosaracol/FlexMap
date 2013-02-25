@@ -52,8 +52,10 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
                     father1 = BRCHandler.not(father1);
                 String father2Name = nodeAigActual.getParents().get(1).getName();
                 father2 = cut.getBrcVariables().get(father2Name);
-                if(Algorithms.isInverter(nodeAigActual, nodeAigActual.getParents().get(0)))
+                if(Algorithms.isInverter(nodeAigActual, nodeAigActual.getParents().get(1)))
                     father2 = BRCHandler.not(father2);
+//                if(nodeAigActual.getName().equals("42"))
+//                    System.out.println("aki");
                 BRC brcNode = BRCHandler.and(father1, father2);
                 TreeMap<String,BRC> newCutBrc = cut.getBrcVariables();
                 newCutBrc.put(nodeAigActual.getName(),brcNode);
