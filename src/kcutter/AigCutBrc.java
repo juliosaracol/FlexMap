@@ -91,7 +91,7 @@ public class AigCutBrc extends AigCut
            if(i < cut.size()-1)
                 System.out.print(node.getName()+",");
            else{
-               System.out.println(node.getName()+"]=>"+BRCHandler.toHexaString(getBrc(nodeCurrent)));
+               System.out.println(node.getName()+"]=>"+BRCHandler.toIntegerString(getBrc(nodeCurrent)));
            }
            i++;
        }
@@ -108,7 +108,7 @@ public class AigCutBrc extends AigCut
            if(i < this.cut.size()-1)
                cutString +=node.getName()+",";
            else
-               cutString +=node.getName()+"]=>"+BRCHandler.toHexaString(getBrc(node))+"\n";
+               cutString +=node.getName()+"]=>"+BRCHandler.toIntegerString(getBrc(node))+"\n";
            i++;
        }
        return cutString;
@@ -140,9 +140,7 @@ public class AigCutBrc extends AigCut
     {
         ArrayList<String> names = new ArrayList<String>();
         for(NodeAig nodeCurrent: this.cut)
-        {
             names.add(nodeCurrent.getName());
-        }
         return names;
     }
 

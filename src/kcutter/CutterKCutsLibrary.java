@@ -17,6 +17,7 @@ public final class CutterKCutsLibrary extends CutterKCuts
     protected Map<NodeAig,Set<AigCutBrc>>    cutsBrc;
     /**Atributo que possui os cortes que foram encontrados Matchings*/
     protected Map<AigCutBrc,Set<FunctionData>> signature;
+    protected Map<NodeAig,Set<AigCutBrc>>      cutsBrcMatchings;
     public String logs="";
     
     public CutterKCutsLibrary(Aig aig, int limit, String libraryName) throws Exception
@@ -30,6 +31,7 @@ public final class CutterKCutsLibrary extends CutterKCuts
         }            
         System.out.println("Biblioteca carregada com sucesso");
         this.signature  = new HashMap<AigCutBrc, Set<FunctionData>>();
+        this.cutsBrcMatchings =  new HashMap<NodeAig, Set<AigCutBrc>>();
         for(NodeAig node : aig.getAllNodesAig())
         {
             computeAllCuts(node);
@@ -46,7 +48,8 @@ public final class CutterKCutsLibrary extends CutterKCuts
             System.exit(-1);
         }
         System.out.println("##Biblioteca carregada com sucesso");
-        this.signature  = new HashMap<AigCutBrc, Set<FunctionData>>();
+        this.signature         = new HashMap<AigCutBrc, Set<FunctionData>>();
+        this.cutsBrcMatchings  =  new HashMap<NodeAig, Set<AigCutBrc>>();
         if(nodeCurrent == null){
             System.out.println("NODO NÃO EXISTE NO CIRCUITO");
             System.exit(-1);
@@ -72,6 +75,7 @@ public final class CutterKCutsLibrary extends CutterKCuts
             {
                 AigCutBrc cutBrc  = new AigCutBrc(this.limit);
                 cutBrc.addCuts(nodesCut);
+                cutBrc.getBrc();
                 setBrcs.add(cutBrc);
             }
             this.cutsBrc.put(node,setBrcs);
@@ -88,26 +92,34 @@ public final class CutterKCutsLibrary extends CutterKCuts
                BitRepresentation notBrcBit   = BitHandler.brcToBitRepresentation(BRCHandler.not(cut.getBrc()).getBRC());              
                BitRepresentation signP       = LowestFunctionFinder.run_P(brcBit, limit);
                BitRepresentation notSignP    = LowestFunctionFinder.run_P(notBrcBit, limit);
-               this.checkingSignP(cut, signP);
+               this.checkingSignP(cut, signP,nodeCurrent);
+               //System.out.print("assinatura HEXA->"+ signP.toHexaString()+" "); 
                System.out.print("Inversão de ");
-               this.checkingSignP(cut, notSignP);
+               //System.out.print("assinatura HEXA->"+ notSignP.toHexaString()+" "); 
+               this.checkingSignP(cut, notSignP,nodeCurrent);
                System.out.print("-----------------\n");
             }
     }
     
-    protected void checkingSignP(AigCutBrc cut, BitRepresentation sign)
+    protected void checkingSignP(AigCutBrc cut, BitRepresentation sign,NodeAig nodeCurrent)
     {
-         System.out.print("assinatura ->"+ sign.toHexaString()+" ");                         
+         System.out.print("assinatura HEXA->"+ sign.toHexaString()+" ");                         
          try{
               FunctionData dataFunc = library.getLib().getBySign(sign.toHexaString()); //consulta custo na biblioteca
-              System.out.println("Matching com a biblioteca célula: "+dataFunc.getGateName()+" função: "+dataFunc.getFunction()+" custo: "+dataFunc.getCost());
+              System.out.println("######Matching com a biblioteca célula: "+dataFunc.getGateName()+" função: "+dataFunc.getFunction()+" custo: "+dataFunc.getCost());
               if(this.signature.containsKey(cut))
+              {
                   this.signature.get(cut).add(dataFunc);
+                  this.cutsBrcMatchings.get(nodeCurrent).add(cut);                  
+              }
               else
               {
                   Set<FunctionData> sig = new HashSet<FunctionData>();
                   sig.add(dataFunc);
                   this.signature.put(cut,sig);
+                  Set<AigCutBrc> cuts = new HashSet<AigCutBrc>();
+                  cuts.add(cut);
+                  this.cutsBrcMatchings.put(nodeCurrent,cuts);                  
               }
          }catch(Exception e)
          {
@@ -168,13 +180,16 @@ public final class CutterKCutsLibrary extends CutterKCuts
        System.out.println(this.cuts.get(node).size()+" Cortes");
        System.out.println("########################################");
     }
-    
+
     public Map<NodeAig, Set<AigCutBrc>> getCutsBrc() {
-        return Collections.unmodifiableMap(cutsBrc);
+        return Collections.unmodifiableMap(cutsBrcMatchings);
     }
     
     public Map<AigCutBrc, Set<FunctionData>> getMatchings() {
         return Collections.unmodifiableMap(signature);
     }
+    
+    
+    
     
 }

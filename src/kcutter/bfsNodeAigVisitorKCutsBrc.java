@@ -22,10 +22,6 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
     public void function(NodeAig nodeAigActual) 
     {        
         BRC  father1,father2;
-        for(NodeAig father : this.cut.getCut()){
-            if(nodeAigActual.getChildren().contains(father))
-                return;
-        }
         if((nodeAigActual.isInput())||(this.cut.contains(nodeAigActual)))
             return;
         if((nodeAigActual.isOutput())&&(nodeAigActual.getParents().size()==1))
@@ -45,17 +41,15 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
                 if(!this.cut.contains(nodeAigActual.getParents().get(0)))
                     nodeAigActual.getParents().get(0).accept(this);
                 if(!this.cut.contains(nodeAigActual.getParents().get(1)))
-                    nodeAigActual.getParents().get(1).accept(this);
+                    nodeAigActual.getParents().get(1).accept(this);                
                 String father1Name = nodeAigActual.getParents().get(0).getName();
                 father1 = cut.getBrcVariables().get(father1Name);
                 if(Algorithms.isInverter(nodeAigActual, nodeAigActual.getParents().get(0)))
-                    father1 = BRCHandler.not(father1);
+                    father1 = BRCHandler.not(father1);                
                 String father2Name = nodeAigActual.getParents().get(1).getName();
-                father2 = cut.getBrcVariables().get(father2Name);
+                father2 = cut.getBrcVariables().get(father2Name);               
                 if(Algorithms.isInverter(nodeAigActual, nodeAigActual.getParents().get(1)))
-                    father2 = BRCHandler.not(father2);
-//                if(nodeAigActual.getName().equals("42"))
-//                    System.out.println("aki");
+                    father2 = BRCHandler.not(father2);                
                 BRC brcNode = BRCHandler.and(father1, father2);
                 TreeMap<String,BRC> newCutBrc = cut.getBrcVariables();
                 newCutBrc.put(nodeAigActual.getName(),brcNode);
