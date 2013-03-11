@@ -5,3 +5,4 @@ rm OUT-iscas_bench_aig_II/*
 rm saidaCecAbc 
 rm ../../OUT-aig_bench_iscas/*
 rm ../../OUT-iscas_bench_aig_II/*
+
