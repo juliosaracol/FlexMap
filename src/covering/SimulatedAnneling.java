@@ -40,16 +40,6 @@ public class SimulatedAnneling
         this.function           = function;
         this.bestCut            = bestCut;
         
-        
-        this.treeNodes = new ArrayList<NodeAig>();
-        for(Map.Entry<NodeAig,Set<NodeAig>> covering : this.initialCovering.getCovering().entrySet())
-        {
-            if((covering.getKey().getChildren().size() > 1)&&(!covering.getKey().isInput())&&(!treeNodes.contains(covering.getKey())))
-            {
-                System.out.println("Node TreeNode"+covering.getKey().getName());
-                treeNodes.add(covering.getKey());
-            }
-         }
          //**Profundidade de todos os nodos do grafo****************************
          levelNode = new HashMap<NodeAig, Integer>();
          dfsAigVisitorAreaGetLevel dfs = new dfsAigVisitorAreaGetLevel(this.levelNode);
@@ -63,43 +53,13 @@ public class SimulatedAnneling
                node.accept(dfs);
          }
          //*********************************************************************
-         System.out.println("##############Solução Iinicial com custo:"+initialCovering.getCost(function));
- //        this.actualState = run();
+         System.out.println("##############Solução Inicial com custo:"+initialCovering.getCost(function));
+        this.actualState = run();
      }
         
      //**Motor da engine simullatedAnelling*/
      public Covering run()
      {        
-//         
-//                 double temperature = temperatureInitial;
-//        Random random = new Random();
-//
-//        int deltaEnergy;
-//        double probability;
-//        Board newState;
-//
-//        do {
-//            newState = createNewState(candidateState);
-//            
-//            if (newState.getAttacksQueens() == 0)
-//                return newState;
-//
-//            deltaEnergy = newState.getAttacksQueens() - candidateState.getAttacksQueens();
-//
-//            probability = Math.pow(Math.E, -deltaEnergy/temperature);
-//
-//            if ( (deltaEnergy <= 0) || ( probability > ((double)(random.nextInt(10)/10.0)) ) ) {
-//                candidateState = newState.clone();
-//                path.add(candidateState);
-//            }
-//
-//            temperature = ( (6 + random.nextInt(10 - 6))/10.0 ) * temperature;
-//
-//        } while(candidateState.getAttacksQueens() != 0 && temperature >= 1 );
-//
-//
-//        return candidateState;
-            
             Covering stateOriginal  = this.initialCovering; 
             Covering stateBest      = stateOriginal; 
             Covering stateNew; 
@@ -209,7 +169,7 @@ public class SimulatedAnneling
 //        }
  //   }
 
-    /* Metodo responsavel por gerar o valor da temperatura inicial entre min e max */
+    /* Metodo responsável por gerar o valor da temperatura inicial entre min e max */
     private float getTemp() 
     {
         this.temp = (int) ((float)(Math.pow(temp, 2))-(temp*step));
@@ -226,37 +186,37 @@ public class SimulatedAnneling
     /**Método responsável por gerar uma nova cobertura alterando cortes de treenodes*/
     private Covering perturbation(Covering state)
     {        
-        Map<NodeAig,ArrayList<Set<NodeAig>>> cuts  = getSetCutsTreeNodes(treeNodes);
+        Map<NodeAig,ArrayList<Set<NodeAig>>> cuts  = getSetCutsTreeNodes();
         Covering newCovering = applyNewCovering(state,cuts);
         return newCovering;
     }
 
     //**Método que seleciona os possiveis Cuts que referenciam treeNodes*/
-    private Map<NodeAig, ArrayList<Set<NodeAig>>> getSetCutsTreeNodes(ArrayList<NodeAig> treeNodes) 
+    private Map<NodeAig, ArrayList<Set<NodeAig>>> getSetCutsTreeNodes() 
     {
          Map<NodeAig,ArrayList<Set<NodeAig>>> treeNodesCut = new HashMap<NodeAig, ArrayList<Set<NodeAig>>>();
          for(Map.Entry<NodeAig,Set<NodeAig>> set: this.bestCut.entrySet())
          {
-           for(NodeAig nodeT: treeNodes)
-           {
-            if(set.getValue().contains(nodeT)) 
-            {
-              System.out.println("NOVO CORTE PARA NODO:"+ set.getKey().getName());  
-              ArrayList<Set<NodeAig>> sets = new ArrayList<Set<NodeAig>>();   
-              Set<AigCut>  cuts            = kcuts.getCuts().get(set.getKey());
-              for(AigCut cut: cuts)
-              {
-                if(cut.size() > 1)
-                {
-                 Set<NodeAig> setCuts  = new HashSet<NodeAig>();
-                 setCuts.addAll(cut.getCut());
-                 if(!sets.contains(setCuts))
-                     sets.add(setCuts);
-                }
-              }
-              treeNodesCut.put(set.getKey(), sets);
-            }
-           }
+//           for(NodeAig nodeT: treeNodes)
+//           {
+//            if(set.getValue().contains(nodeT)) 
+//            {
+//              System.out.println("NOVO CORTE PARA NODO:"+ set.getKey().getName());  
+//              ArrayList<Set<NodeAig>> sets = new ArrayList<Set<NodeAig>>();   
+//              Set<AigCut>  cuts            = kcuts.getCuts().get(set.getKey());
+//              for(AigCut cut: cuts)
+//              {
+//                if(cut.size() > 1)
+//                {
+//                 Set<NodeAig> setCuts  = new HashSet<NodeAig>();
+//                 setCuts.addAll(cut.getCut());
+//                 if(!sets.contains(setCuts))
+//                     sets.add(setCuts);
+//                }
+//              }
+//              treeNodesCut.put(set.getKey(), sets);
+  //          }
+ //          }
          }
          return treeNodesCut;       
     }

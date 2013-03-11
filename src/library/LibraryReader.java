@@ -1,4 +1,5 @@
 package library;
+
 import java.util.*;
 
 //executa o parsing da lib e monta a lib na memoria
@@ -36,30 +37,28 @@ public class LibraryReader extends Loader{
             StringTokenizer lineParser = new StringTokenizer(line);
             String gateName;
             int cost;
-            try{
-                while (line != null){
-                    if (lineParser.nextToken().equals("GATE")){ //se nao for um comentario nem um pino
-                        gateName = lineParser.nextToken(" \t\n\r");  //pega o nome da porta logica
-                        cost = Integer.parseInt(lineParser.nextToken());    //pega o custo da celula
-                        String function = lineParser.nextToken(";");  //pega a função logica da porta
-                        function = function.substring(function.indexOf("=")+1);
-                        function = removeInvalidChars(function);
-                        //System.out.println(function);
+            while (line != null){
+                if (lineParser.nextToken().equals("GATE")){ //se nao for um comentario nem um pino
+                    gateName = lineParser.nextToken(" \t\n\r");  //pega o nome da porta logica
+                    cost = (int)Double.parseDouble(lineParser.nextToken());    //pega o custo da celula
+                    String function = lineParser.nextToken(";");  //pega a função logica da porta
+                    function = function.substring(function.indexOf("=")+1);
+                    function = removeInvalidChars(function);
+                    try{
+                        System.out.println(FunctionData.getSignature(function,nVars));
                         if (function.equals("CONST0")) lib.add(FunctionData.getSignature("0",nVars), new FunctionData(gateName, "0", cost, FunctionData.getSignature("0",nVars)));
                         else if (function.equals("CONST1")) lib.add(FunctionData.getSignature("1",nVars), new FunctionData(gateName, "1", cost, FunctionData.getSignature("1",nVars)));
                         else lib.add(FunctionData.getSignature(function,nVars), new FunctionData(gateName, function, cost, FunctionData.getSignature(function,nVars)));
                     }
-                    
-                    try{
-                        line = parser.nextToken("\r\n");
-                        lineParser = new StringTokenizer(line);
-                    }
-                    catch(Exception e){
-                        line = null;
-                    }
+                    catch(Exception e){System.out.println("Nao foi possivel gerar a assinatura de "+ function);}
                 }
-            }catch(Exception e){
-                System.out.println("aaaaaaaaaaaaaaa"+e.toString());
+                try{
+                    line = parser.nextToken("\r\n");
+                    lineParser = new StringTokenizer(line);
+                }
+                catch(Exception e){
+                    line = null;
+                }
             }
 	}
 	

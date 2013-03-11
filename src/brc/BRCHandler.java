@@ -63,7 +63,8 @@ public class BRCHandler {
     public static BRC and(BRC obj1, BRC obj2) {
         int and;
         BRC brc = new BRC();
-
+        if((obj1 == null)||(obj2 == null))
+            System.out.println("OBJETO NULO NO BRC");
         for (int i = 0; i < obj1.sizeBRC(); i++) {
             and = (obj1.getBRC(i)) & (obj2.getBRC(i));
             brc.setBRC(i, and);
