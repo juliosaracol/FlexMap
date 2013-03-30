@@ -118,7 +118,7 @@ public class Tree extends Graph
     }
 
     public Set<NodeAig> getTree() {
-        return Collections.unmodifiableSet(tree);
+        return tree;
     }
     
     public NodeAig getRoot() {

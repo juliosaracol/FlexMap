@@ -391,25 +391,25 @@ public class Aig extends Graph
     }
     //Métodos que possibilitam acesso a referencias para os nodos do Aig---------------------
     public Set<NodeAig> getAllNodesAig() {
-        return Collections.unmodifiableSet(allNodesAig);
+        return allNodesAig;
     }
     public void setAllNodesAig(Set<NodeAig> allNodesAig) {
         this.allNodesAig = allNodesAig;
     }
     public Set<NodeAig> getNodeGatesAig() {
-        return Collections.unmodifiableSet(nodeGatesAig);
+        return nodeGatesAig;
     }
     public void setNodeGatesAig(Set<NodeAig> nodeGatesAig) {
         this.nodeGatesAig = nodeGatesAig;
     }
     public Set<NodeAig> getNodeInputsAig() {
-        return Collections.unmodifiableSet(nodeInputsAig);
+        return nodeInputsAig;
     }
     public void setNodeInputsAig(Set<NodeAig> nodeInputsAig) {
         this.nodeInputsAig = nodeInputsAig;
     }
     public Set<NodeAig> getNodeOutputsAig() {
-        return Collections.unmodifiableSet(nodeOutputsAig);
+        return nodeOutputsAig;
     }
     public void setNodeOutputsAig(Set<NodeAig> nodeOutputsAig) {
         this.nodeOutputsAig = nodeOutputsAig;
