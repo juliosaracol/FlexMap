@@ -14,5 +14,5 @@ public class dfsNodeAigVisitorBasic extends dfsNodeAigVisitor
     public void function(NodeAig nodeAigActual) {
         return;
     }
-      
 }
+

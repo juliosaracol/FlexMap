@@ -35,4 +35,10 @@ public interface AigNodeVisitor {
      * @param nodeAigLatch The Node
      */
     public void visit(NodeAigLatch nodeAigLatch);
+
+    /**
+     * Visitor for an AigNodeInverter
+     * @param nodeAigInverter The Node
+     */
+    public void visit(NodeAigInverter nodeAigInverter);
 }

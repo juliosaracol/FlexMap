@@ -27,6 +27,14 @@ public class Main
           warning();
           return;
         }  
+        //--------------------AIG_INVERTERS-----------------------------------------
+        if(args[1].equals("-AI"))
+        {
+             AigInverter myAig  = new AigInverter(args[0]);
+             return;
+        }   
+        //------------------------------------------------------------------
+
         //--------------------ÁRVORES-----------------------------------------
         if((args[1].equals("-T")||args[1].equals("-TM"))&&(args.length >= 2))
         {

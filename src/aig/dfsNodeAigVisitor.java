@@ -69,7 +69,7 @@ public abstract class dfsNodeAigVisitor implements AigNodeVisitor
 
     @Override
     public void visit(NodeAigLatch nodeAigLatch) {
-        return;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -113,6 +113,12 @@ public abstract class dfsNodeAigVisitor implements AigNodeVisitor
         }
         function(nodeAigOutput);
     }
+    
+    @Override
+    public void visit(NodeAigInverter nodeAigInverter) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 
     public ArrayList<NodeAig> getList() {
         return list;

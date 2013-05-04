@@ -25,6 +25,11 @@ public class Algorithms
        }
        return edge.isInverter();
    }
+  /**Método que retorna a aresta entre os nodos indicados nos parametros
+   * @param nodeCurrent
+   * @param father
+   * @return EdgeAig
+   */
   public static EdgeAig getEdge(NodeAig nodeCurrent,NodeAig father)
   {
        EdgeAig edge = null;

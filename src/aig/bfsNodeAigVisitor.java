@@ -66,7 +66,7 @@ public abstract class bfsNodeAigVisitor implements AigNodeVisitor
 
     @Override
     public void visit(NodeAigLatch nodeAigLatch) {
-        return;
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -108,6 +108,13 @@ public abstract class bfsNodeAigVisitor implements AigNodeVisitor
             temp.accept(this);
         }
     }
+    
+    @Override
+    public void visit(NodeAigInverter nodeAigInverter) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+            
 
    //--------------------GET & SET----------------------------------
     public ArrayList<NodeAig> getNodesBfs() {

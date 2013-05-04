@@ -6,6 +6,6 @@ import graph.*;
  */
 public enum TypeNode
 {
-     INPUT,OUTPUT,LATCH,AND,OR;
+     INPUT,OUTPUT,LATCH,AND,OR,INVERTER;
 }
   
