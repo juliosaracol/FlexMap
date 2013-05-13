@@ -27,14 +27,6 @@ public class Main
           warning();
           return;
         }  
-        //--------------------AIG_INVERTERS-----------------------------------------
-        if(args[1].equals("-AI"))
-        {
-             AigInverter myAig  = new AigInverter(args[0]);
-             return;
-        }   
-        //------------------------------------------------------------------
-
         //--------------------ÁRVORES-----------------------------------------
         if((args[1].equals("-T")||args[1].equals("-TM"))&&(args.length >= 2))
         {
@@ -145,6 +137,27 @@ public class Main
           }
         }
         //----------------------------------------------------------------------
+        //--------------------AIG_INVERTERS-------------------------------------
+        if(args[1].equals("-AI"))
+        {
+          AigInverter myAig             = new AigInverter(args[0]);  
+          int sizeCut                   = Integer.valueOf(args[2]);
+          CutterKCutsInverter    kcuts  = new CutterKCutsInverter(myAig, sizeCut);
+          float pArea            = Float.parseFloat(args[3]);
+          float pDelay           = Float.parseFloat(args[4]);
+          float pConsumption     = Float.parseFloat(args[5]);
+          float pInput           = Float.parseFloat(args[6]);
+          float pOutput          = Float.parseFloat(args[7]);
+          float pOther           = Float.parseFloat(args[8]);
+          CostAreaFlow   function= new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
+          AreaFlow area          = new AreaFlow(myAig,sizeCut,kcuts,function);
+          area.showCovering();
+          area.getEqn();
+          CoveringAreaFlow areaT = area.getCovering();
+          System.out.println("Valor final:"+areaT.getCost(function));          
+          return;
+        }   
+        //------------------------------------------------------------------
         //--------------------MAP AREA FLOW-------------------------------------
         if(args[1].equals("-A")&&(args.length >= 9))
         {
@@ -160,6 +173,7 @@ public class Main
              CostAreaFlow   function= new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
              AreaFlow area          = new AreaFlow(myAig,sizeCut,kcuts,function);
              area.showCovering();
+             area.getEqn();
              CoveringAreaFlow areaT = area.getCovering();
              System.out.println("Valor final:"+areaT.getCost(function));          
              if((args.length > 9)&&(args[9].contains(".eqn"))) 
@@ -262,7 +276,7 @@ public class Main
        //--------------------DFS------------------------------------------------
         if(args[1].equals("-DFS")&&(args.length >= 2))
         {
-              Aig myAig = new Aig(args[0]);
+              AigInverter myAig = new AigInverter(args[0]);
               dfsNodeAigVisitorBasic myDfs = new dfsNodeAigVisitorBasic();
               if(args.length == 3)
               {
@@ -323,6 +337,16 @@ public class Main
                   Logs.LogsWriteEqn(myEqn, args[2]);
               return;
          }
+         //--------------------EQN DESCRIÇÃO------------------------------------
+         if(args[1].equals("-EQNI")&&(args.length >= 2))
+         {
+              AigInverter myAig = new AigInverter(args[0]);
+              String myEqn = Logs.AigtoEqn(myAig);
+              System.out.println(myEqn);
+//              if(args.length > 2)
+//                  Logs.LogsWriteEqn(myEqn, args[2]);
+              return;
+         }
       }
       warning(); //caso de nenhuma opção erro
       return;
@@ -360,6 +384,8 @@ public class Main
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -DFS [Nodo (opcional)]");
       System.out.println("--EQN--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -EQN [arquivoSaida.eqn(opcional)]");
+      System.out.println("--AIG-INVERTER--");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AI");
       System.out.println("-------------------------------------------------------");
     }
 }

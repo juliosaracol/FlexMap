@@ -116,7 +116,23 @@ public abstract class dfsNodeAigVisitor implements AigNodeVisitor
     
     @Override
     public void visit(NodeAigInverter nodeAigInverter) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if((!nodesDfs.contains(nodeAigInverter)))
+        {
+            nodesDfs.add(nodeAigInverter);
+            if(!list.contains(nodeAigInverter.getParents().get(0))&&(!nodesDfs.contains(nodeAigInverter.getParents().get(0))))
+            {
+               list.add(nodeAigInverter.getParents().get(0));                    
+               this.states++;
+            }
+        }
+        if(list.size()>0)
+        {
+            int sizeList = list.size()-1;
+            NodeAig temp = list.get(sizeList);
+            list.remove(sizeList); 
+            temp.accept(this);
+        }
+        function(nodeAigInverter);
     }
 
 

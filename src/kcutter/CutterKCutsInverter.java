@@ -1,42 +1,23 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package kcutter;
+
 import aig.*;
 import java.util.*;
 
-
 /**
- * Classe que aplica os K-cuts classico
- * @author Julio Saraçol
+ *
+ * @author julio
  */
-public class CutterKCuts extends CutterK
-{    
-    public CutterKCuts(Aig aig, int k) 
-    {
-        super(aig,k);
-        computeAllCuts();
-    }
+public class CutterKCutsInverter extends CutterKCuts {
 
-    public CutterKCuts(Aig aig,NodeAig node, int k) 
-    {
-        super(aig,k);
-        if(node == null){
-            System.out.println("NODO NÃO EXISTE NO CIRCUITO");
-            System.exit(-1);
-        }
-        computeAllCuts(node);
+    public CutterKCutsInverter(Aig aig, int k) {
+        super(aig, k);
     }
-
+    
     @Override
-    protected void computeAllCuts() 
-    {
-        for(NodeAig node : aig.getAllNodesAig())
-           computeKcuts(node);
-    }
-
-    protected void computeAllCuts(NodeAig node) 
-    {
-        computeKcuts(node);
-    }
-
     protected Set<AigCut> computeKcuts(NodeAig nodeCurrent) 
     {
         
@@ -51,11 +32,14 @@ public class CutterKCuts extends CutterK
         }
         else
         {               
-            if((nodeCurrent.isOutput())&&(nodeCurrent.getParents().size() == 1)) //inverter
+            if(nodeCurrent.getParents().size() == 1) //inverter
             {
+                Set<AigCut> kcut = new HashSet<AigCut>();
+                kcut.add(new AigCut(nodeCurrent));
                 if(!this.cuts.containsKey(nodeCurrent.getParents().get(0)))
                    computeKcuts(nodeCurrent.getParents().get(0));
-                this.cuts.put(nodeCurrent,this.cuts.get(nodeCurrent.getParents().get(0)));
+                kcut.addAll(this.cuts.get(nodeCurrent.getParents().get(0)));                   
+                this.cuts.put(nodeCurrent,kcut);
             }
             else
             {

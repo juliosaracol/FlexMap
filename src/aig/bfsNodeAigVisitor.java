@@ -111,7 +111,22 @@ public abstract class bfsNodeAigVisitor implements AigNodeVisitor
     
     @Override
     public void visit(NodeAigInverter nodeAigInverter) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        if(!nodesBfs.contains(nodeAigInverter))            
+        {
+            nodesBfs.add(nodeAigInverter);
+            if(!list.contains(nodeAigInverter.getParents().get(0))&&(!nodesBfs.contains(nodeAigInverter.getParents().get(0))))
+            {
+                    list.add(nodeAigInverter.getParents().get(0));
+                    this.states++;
+            }
+            function(nodeAigInverter);
+        }
+        if(list.size() > 0)
+        {
+            NodeAig temp =  list.get(0);
+            list.remove(0);
+            temp.accept(this);
+        }    
     }
 
             
