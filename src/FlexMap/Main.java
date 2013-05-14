@@ -17,13 +17,14 @@ public class Main
 {
     public static void main(String[] args) throws FileNotFoundException, IOException, Exception 
     {
-      if(args.length < 2) 
+      if(args.length < 2)
       { //não foram inseridos todos os argumentos necessários
         warning();
       }
       else
       { 
-        if(!args[0].contains(".aag")){ // se nao conseguiu ler o arquivo
+        if(!args[0].contains(".aag"))
+        { // se nao conseguiu ler o arquivo
           warning();
           return;
         }  
@@ -35,15 +36,15 @@ public class Main
              if(args[1].equals("-TM"))
                      myTrees.getEqnTrees();
              myTrees.getEqn();
-             if((args.length > 2)&&(args[2].contains(".eqn"))) 
-             { //caso arquivo de log
+             if((args.length > 2)&&(args[2].contains(".eqn"))){ //caso arquivo de log
                Logs.LogsWriteEqn(myTrees.getEqn(),args[2]);  
              }
              return;
         }   
         //------------------------------------------------------------------
         //--------------------KCUTS---------------------------------------------
-        if(args[1].equals("-K")&&(args.length >= 3)){
+        if(args[1].equals("-K")&&(args.length >= 3))
+        {
           Aig myAig = new Aig(args[0]);
           //Algoritmo de kcuts 
           int sizeCut = Integer.valueOf(args[2]);
@@ -107,8 +108,7 @@ public class Main
           Aig myAig = new Aig(args[0]);
           //Algoritmo de kcuts 
           int sizeCut = Integer.valueOf(args[2]);
-          if(!args[3].contains(".genlib"))
-          {
+          if(!args[3].contains(".genlib")){
               System.out.print("BIBLIOTECA EM FORMATO INVALIDO");
               System.exit(-1);
           }
@@ -137,7 +137,7 @@ public class Main
           }
         }
         //----------------------------------------------------------------------
-        //--------------------AIG_INVERTERS-------------------------------------
+        //--------------------MAP AREA FLOW COM AIG_INVERTERS-------------------
         if(args[1].equals("-AI"))
         {
           AigInverter myAig             = new AigInverter(args[0]);  
@@ -155,6 +155,9 @@ public class Main
           area.getEqn();
           CoveringAreaFlow areaT = area.getCovering();
           System.out.println("Valor final:"+areaT.getCost(function));          
+          if((args.length > 9)&&(args[9].contains(".eqn"))){ //caso arquivo de log
+            Logs.LogsWriteEqn(area.getEqn(),args[9]);  
+          }
           return;
         }   
         //------------------------------------------------------------------
@@ -176,14 +179,13 @@ public class Main
              area.getEqn();
              CoveringAreaFlow areaT = area.getCovering();
              System.out.println("Valor final:"+areaT.getCost(function));          
-             if((args.length > 9)&&(args[9].contains(".eqn"))) 
-             { //caso arquivo de log
+             if((args.length > 9)&&(args[9].contains(".eqn"))){ //caso arquivo de log
                Logs.LogsWriteEqn(area.getEqn(),args[9]);  
              }
              return;
         }
         //----------------------------------------------------------------------        
-        //--------------------MAP AREA FLOW C/Kcuts Com LIMITES de TREENODES----
+        //--------------------MAP AREA FLOW C/Kcuts C/LIMITES de TREENODES----
         if(args[1].equals("-AT")&&(args.length >= 9))
         {
              Aig myAig                      = new Aig(args[0]);
@@ -200,15 +202,14 @@ public class Main
              area.showCovering();
              CoveringAreaFlow areaT         = area.getCovering();
              System.out.println("Valor final:"+areaT.getCost(function));                       
-             if((args.length > 9)&&(args[9].contains(".eqn"))) 
-             { //caso arquivo de log
+             if((args.length > 9)&&(args[9].contains(".eqn"))){ //caso arquivo de log
                Logs.LogsWriteEqn(area.getEqn(),args[9]);  
              }
              return;
         }
         //----------------------------------------------------------------------        
         //--------------------MAP AREA FLOW C/KcutsLIBRARY----------------------
-        if(args[1].equals("-AB")&&(args.length >= 10))
+        if(args[1].equals("-AL")&&(args.length >= 10))
         {
              Aig myAig                = new Aig(args[0]);
              int sizeCut              = Integer.valueOf(args[2]);
@@ -337,16 +338,6 @@ public class Main
                   Logs.LogsWriteEqn(myEqn, args[2]);
               return;
          }
-         //--------------------EQN DESCRIÇÃO------------------------------------
-         if(args[1].equals("-EQNI")&&(args.length >= 2))
-         {
-              AigInverter myAig = new AigInverter(args[0]);
-              String myEqn = Logs.AigtoEqn(myAig);
-              System.out.println(myEqn);
-//              if(args.length > 2)
-//                  Logs.LogsWriteEqn(myEqn, args[2]);
-              return;
-         }
       }
       warning(); //caso de nenhuma opção erro
       return;
@@ -367,9 +358,11 @@ public class Main
       System.out.println("--KCUTS C/LIMITE DE TREENODES--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -KT TamanhoDoCorte [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
       System.out.println("--KCUTS C/BIBLIOTECA--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -KB TamanhoDoCorte Biblioteca.genlib [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -KL TamanhoDoCorte Biblioteca.genlib [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -A TamanhoDoCorte Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--MAPEAMENTO COM AREAFLOW COM AIG_INVERTER--");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AI TamanhoDoCorte Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW COM BIBLIOTECA--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AB TamanhoDoCorte Biblioteca.genlib Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW C/TREENODES--");
@@ -384,8 +377,6 @@ public class Main
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -DFS [Nodo (opcional)]");
       System.out.println("--EQN--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -EQN [arquivoSaida.eqn(opcional)]");
-      System.out.println("--AIG-INVERTER--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AI");
       System.out.println("-------------------------------------------------------");
     }
 }

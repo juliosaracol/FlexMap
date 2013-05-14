@@ -1,15 +1,11 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package kcutter;
 
 import aig.*;
 import java.util.*;
 
 /**
- *
- * @author julio
+ * Classe que adapta os CutterKcuts para trabalhar com Aig-Inverter
+ * @author Julio Saraçol 
  */
 public class CutterKCutsInverter extends CutterKCuts {
 
