@@ -262,24 +262,21 @@ public class Logs
             {
                 if(!(((Integer.parseInt(cell.getKey().getName())%2) != 0)&&(cell.getValue().size()==1)))
                 {
-                  dfsNodeAigVisitorCutToEqn dfsEqn = new dfsNodeAigVisitorCutToEqn(cell.getValue());
-                  if((Integer.parseInt(cell.getKey().getName())%2) != 0)
+                   dfsNodeAigVisitorCutToEqn dfsEqn = new dfsNodeAigVisitorCutToEqn(cell.getValue());
+                   nodesPath.add(cell.getKey());
+                   cell.getKey().accept(dfsEqn);
+                   outString1 += "["+cell.getKey().getName()+"]="+dfsEqn.getEqnDescription(cell.getKey())+";\n";
+                }
+                else{
+                  if(((Integer.parseInt(cell.getKey().getName())%2) != 0)&&(!nodesPath.contains(cell.getKey())))
                   {
+                      dfsNodeAigVisitorCutToEqn dfsEqn = new dfsNodeAigVisitorCutToEqn(cell.getValue());
                       if(!nodesPath.contains(cell.getKey().getParents().get(0)))
                       {
                         nodesPath.add(cell.getKey().getParents().get(0));
                         cell.getKey().getParents().get(0).accept(dfsEqn);
-                        outString1 += "["+(String.valueOf(Integer.parseInt(cell.getKey().getName())-1))+"]="+dfsEqn.getEqnDescription(cell.getKey().getParents().get(0))+";\n";
                       }
-                  }
-                  else
-                  {
-                      if(!nodesPath.contains(cell.getKey()))
-                      {
-                        nodesPath.add(cell.getKey());
-                        cell.getKey().accept(dfsEqn);
-                        outString1 += "["+cell.getKey().getName()+"]="+dfsEqn.getEqnDescription(cell.getKey())+";\n";
-                      }
+                      outString1 += "["+cell.getKey().getName()+"]=!"+dfsEqn.getEqnDescription(cell.getKey().getParents().get(0))+";\n";
                   }
                 }
             }
