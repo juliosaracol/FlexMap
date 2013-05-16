@@ -37,11 +37,13 @@ public class dfsAigToAigInverter extends dfsNodeAigVisitor
                    this.myaig.getAllNodesAig().add(newInverterNode);
                    this.myaig.getVertices().put(newInverterNode.getId(), newInverterNode);
                    this.myaig.inc_verticesCount();
+                   this.myaig.addEdge(newInverterNode.getName(),father.getName(),false);
+                   this.myaig.addEdge(nodeAigActual.getName(),newInverterNode.getName(),false);
                 }
-                else
+                else{
                    newInverterNode = this.myaig.getVertexName(name);
-                this.myaig.addEdge(newInverterNode.getName(),father.getName(),false);
-                this.myaig.addEdge(nodeAigActual.getName(),newInverterNode.getName(),false);
+                   this.myaig.addEdge(nodeAigActual.getName(),newInverterNode.getName(),false);
+                }
             }               
          } 
     }

@@ -253,7 +253,7 @@ public class Logs
    /**Método que gera descrição eqn a partir da cobertura em Kcuts*/
    public static String coveringToEqn(Aig myAig, Map<NodeAig,AigCut> covering) throws FileNotFoundException 
    {
-  String outString = createEqn(myAig); 
+        String outString = createEqn(myAig); 
         ArrayList<NodeAig> nodesPath = new ArrayList<NodeAig>();
         String outString1="";
         for(Map.Entry<NodeAig,AigCut> cell: covering.entrySet())
@@ -286,8 +286,46 @@ public class Logs
         }
         outString+=outString1;
         System.out.println(outString);
+        return outString;        
+  }    
+   /**Método que gera descrição eqn a partir da cobertura em KcutsInverters*/
+   public static String coveringToEqn(AigInverter myAigInverter, Map<NodeAig,AigCut> covering) throws FileNotFoundException 
+   {
+        String outString = createEqn(myAigInverter); 
+        ArrayList<NodeAig> nodesPath = new ArrayList<NodeAig>();
+        String outString1="";
+        for(Map.Entry<NodeAig,AigCut> cell: covering.entrySet())
+        {
+            if((!cell.getKey().isInput())&&(!nodesPath.contains(cell.getKey())))
+            {
+                if(!(((Integer.parseInt(cell.getKey().getName())%2) != 0)&&(cell.getValue().size()==1)))
+                {
+                  dfsNodeAigVisitorCutInverterToEqn dfsEqn = new dfsNodeAigVisitorCutInverterToEqn(cell.getValue());
+                  if(((Integer.parseInt(cell.getKey().getName())%2) != 0)&&(cell.getKey().isOutput()))
+                  {
+                      if(!nodesPath.contains(cell.getKey().getParents().get(0))){
+                        nodesPath.add(cell.getKey().getParents().get(0));
+                        System.out.println("DFS do NODO1"+cell.getKey().getName());
+                        cell.getKey().getParents().get(0).accept(dfsEqn);
+                        outString1 += "["+(String.valueOf(Integer.parseInt(cell.getKey().getName())-1))+"]="+dfsEqn.getEqnDescription(cell.getKey().getParents().get(0))+";\n";
+                      }
+                  }
+                  else
+                  {
+                      if(!nodesPath.contains(cell.getKey())){
+                        nodesPath.add(cell.getKey());
+                        System.out.println("DFS do NODO2"+cell.getKey().getName());
+                        cell.getKey().accept(dfsEqn);
+                        outString1 += "["+cell.getKey().getName()+"]="+dfsEqn.getEqnDescription(cell.getKey())+";\n";
+                      }
+                  }
+                }
+            }
+        }
+        outString+=outString1;
+        System.out.println(outString);
         return outString;
-   }    
+  }    
   /**Método que escreve eqn para arquivo de saída*/
   public static void LogsWriteEqn(String eqn,String fileLog)throws FileNotFoundException, IOException
    {

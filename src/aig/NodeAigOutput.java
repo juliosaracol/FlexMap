@@ -60,6 +60,7 @@ public class NodeAigOutput extends NodeAig
     {
         return TypeNode.OUTPUT;    
     }
+    
 
     /* Patterns visitor*/
     @Override

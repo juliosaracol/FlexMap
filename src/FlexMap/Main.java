@@ -150,7 +150,7 @@ public class Main
           float pOutput          = Float.parseFloat(args[7]);
           float pOther           = Float.parseFloat(args[8]);
           CostAreaFlow   function= new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
-          AreaFlow area          = new AreaFlow(myAig,sizeCut,kcuts,function);
+          AreaFlowInverter area  = new AreaFlowInverter(myAig,sizeCut,kcuts,function);
           area.showCovering();
           area.getEqn();
           CoveringAreaFlow areaT = area.getCovering();
