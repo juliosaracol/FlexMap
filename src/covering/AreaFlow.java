@@ -71,8 +71,8 @@ public class AreaFlow
            }
            else
            {
-              float cost  = sumCost(cut,nodeActual);
-              tableCost.put(cut, (Float)cost);              
+                float cost  = sumCost(cut,nodeActual);
+                tableCost.put(cut, (float)cost);                                
            }           
         }while(iterator.hasNext()); //contabiliza areas
         if(!nodeActual.isInput())
@@ -113,15 +113,20 @@ public class AreaFlow
     //**Método faz a melhor escolha entre os cortes do Nodo
     protected void choiceBestArea(NodeAig nodeActual, Map<AigCut, Float> tableCost) 
     {
-        AigCut cut      = null;
-        AigCut cutBest  = bestCost(tableCost);
+        AigCut cut       = null;
+        AigCut cutBest   = bestCost(tableCost);
         Set<AigCut> cuts = kcuts.getCuts().get(nodeActual); 
         Iterator<AigCut> iterator = cuts.iterator();
         do
         {    
             cut = iterator.next();
-            //System.out.println("trabalhando com o nodo :"+nodeActual.getName()+" e corte :");
-            //cut.showCut();
+            if(nodeActual.getName().equals("2521")){
+                cutBest.showCut();
+                cut.showCut();
+                System.out.println("trabalhando com o nodo :"+nodeActual.getName()+" altura 1 e do pai : "
+                        +sumLevel(cut,nodeActual)+":"+tableCost.get(cut)+" "+" "
+                        +sumLevel(cutBest,nodeActual)+":"+(tableCost.get(cutBest)));
+            }
             if(((tableCost.get(cut)) <= (tableCost.get(cutBest))))
               if(cut.size() >= cutBest.size())
                 if(sumLevel(cut,nodeActual) >= sumLevel(cutBest,nodeActual)) //compara a profundidade em relação ao circuito
@@ -136,6 +141,8 @@ public class AreaFlow
     {
         if((nodeActual.isOutput())&&(nodeActual.getParents().isEmpty())) //constant
             return 1;
+        if((cut.getCut().size()==1) && (cut.getCut().contains(nodeActual)))
+                return 1;
         bfsAigVisitorAreaSumLevel bfs = new bfsAigVisitorAreaSumLevel(levelNode, cut);
         nodeActual.accept(bfs);
         return bfs.getLevel();
@@ -198,7 +205,7 @@ public class AreaFlow
         return Collections.unmodifiableMap(covering);
     }
     
-    //**Método que seleciona o menor custo possivel melhor Cut*/
+    //**Método que seleciona o menor custo possivel = melhor Cut*/
     protected AigCut bestCost(Map<AigCut, Float> tableCost) 
     {
         AigCut best = null;

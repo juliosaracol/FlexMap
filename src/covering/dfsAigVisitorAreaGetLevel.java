@@ -6,6 +6,7 @@ import java.util.Map;
 /**
  * Classe que aplica caminhamento no Aig para AreaFlow
  * @author Julio Saraçol
+ * obs: a profundidade se da das entradas para as saidas(saidas possuem a profundidade maior)
  */
 public class dfsAigVisitorAreaGetLevel extends dfsNodeAigVisitor
 {

@@ -303,25 +303,48 @@ public class Logs
                   dfsNodeAigVisitorCutInverterToEqn dfsEqn = new dfsNodeAigVisitorCutInverterToEqn(cell.getValue());
                   if(((Integer.parseInt(cell.getKey().getName())%2) != 0)&&(cell.getKey().isOutput()))
                   {
-                      if(!nodesPath.contains(cell.getKey().getParents().get(0))){
+                      if((!nodesPath.contains(cell.getKey().getParents().get(0)))
+                             &&(!covering.containsKey(cell.getKey().getParents().get(0))))
+                      {
+                        nodesPath.add(cell.getKey());
                         nodesPath.add(cell.getKey().getParents().get(0));
-                        System.out.println("DFS do NODO1"+cell.getKey().getName());
+                        //System.out.println("DFS do NODO1"+cell.getKey().getName());
+                        //System.out.println(dfsEqn.getEqnDescription(cell.getKey().getParents().get(0)));
                         cell.getKey().getParents().get(0).accept(dfsEqn);
                         outString1 += "["+(String.valueOf(Integer.parseInt(cell.getKey().getName())-1))+"]="+dfsEqn.getEqnDescription(cell.getKey().getParents().get(0))+";\n";
+                        //if(!cell.getKey().getChildren().isEmpty())
+                        outString1 += "["+cell.getKey().getName()+"]=!(["+cell.getKey().getParents().get(0).getName()+"]);\n";
                       }
+//                      else{
+//                        nodesPath.add(cell.getKey());
+//                        nodesPath.add(cell.getKey().getParents().get(0));
+//                        System.out.println("DFS do NODO2"+cell.getKey().getName());
+//                        //System.out.println(dfsEqn.getEqnDescription(cell.getKey().getParents().get(0)));
+//                        cell.getKey().getParents().get(0).accept(dfsEqn);
+//                        outString1 += "["+(String.valueOf(Integer.parseInt(cell.getKey().getName())-1))+"]="+dfsEqn.getEqnDescription(cell.getKey().getParents().get(0))+";\n";
+//                      }
                   }
                   else
                   {
                       if(!nodesPath.contains(cell.getKey())){
                         nodesPath.add(cell.getKey());
-                        System.out.println("DFS do NODO2"+cell.getKey().getName());
+                        //System.out.println("DFS do NODO3"+cell.getKey().getName());
                         cell.getKey().accept(dfsEqn);
                         outString1 += "["+cell.getKey().getName()+"]="+dfsEqn.getEqnDescription(cell.getKey())+";\n";
                       }
                   }
                 }
+                else{
+                        if(!nodesPath.contains(cell.getKey())){
+                         nodesPath.add(cell.getKey());
+                         //System.out.println("DFS do NODO que faltava com corte"+cell.getKey().getName());
+                         //cell.getValue().showCut();
+                         outString1 += "["+cell.getKey().getName()+"]=!["+cell.getKey().getParents().get(0).getName()+"];\n";
+                        }
+                    }
             }
         }
+            
         outString+=outString1;
         System.out.println(outString);
         return outString;
