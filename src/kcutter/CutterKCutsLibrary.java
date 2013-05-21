@@ -10,7 +10,7 @@ import java.util.*;
  * Classe que aplica os K-cuts com Matching em Biblioteca de Células ".genlib"
  * @author Julio Saraçol
  */
-public final class CutterKCutsLibrary extends CutterKCuts
+public class CutterKCutsLibrary extends CutterKCuts
 {
 
     protected LibraryReader library;
@@ -62,9 +62,9 @@ public final class CutterKCutsLibrary extends CutterKCuts
     {
         computeKcuts(node);
         createBrc();
-        Matching(node);
+        //Matching(node);
     }
-
+    /**Método que inicializa os AigCutBrc de todos os cortes dos nodos do AIG*/
     private void createBrc() {
         this.cutsBrc  = new HashMap<NodeAig, Set<AigCutBrc>>();
         for(NodeAig node : aig.getAllNodesAig())
@@ -75,7 +75,7 @@ public final class CutterKCutsLibrary extends CutterKCuts
             {
                 AigCutBrc cutBrc  = new AigCutBrc(this.limit);
                 cutBrc.addCuts(nodesCut);
-                cutBrc.getBrc();
+                cutBrc.getBrc(node);
                 setBrcs.add(cutBrc);
             }
             this.cutsBrc.put(node,setBrcs);

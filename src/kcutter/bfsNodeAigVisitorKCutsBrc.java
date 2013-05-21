@@ -20,9 +20,9 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
     
     @Override
     public void function(NodeAig nodeAigActual) 
-    {        
+    {      
         BRC  father1,father2;
-        if((nodeAigActual.isInput())||(this.cut.contains(nodeAigActual)))
+        if((nodeAigActual.isInput())||((this.cut.contains(nodeAigActual))&&(!nodeAigActual.isInverter())))
             return;
         if((nodeAigActual.isOutput())&&(nodeAigActual.getParents().size()==1))
         {
@@ -33,11 +33,40 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
                 TreeMap<String,BRC> newCutBrc = cut.getBrcVariables();
                 newCutBrc.put(nodeAigActual.getName(),brcNode);
                 cut.setBrcVariables(newCutBrc);
+                return;
         }           
         else
         {
-            if(cut.size() > 1)
+            if((cut.size() > 1))
             {
+               if(nodeAigActual.isInverter()){
+                   if(this.cut.contains(nodeAigActual)){
+                    father1 = cut.getBrcVariables().get(nodeAigActual.getName());
+                    BRC brcNode = BRCHandler.not(father1);
+                    TreeMap<String,BRC> newCutBrc = cut.getBrcVariables();
+                    newCutBrc.put(nodeAigActual.getName(),brcNode);
+                    cut.setBrcVariables(newCutBrc);
+                    return;
+                   }
+                   else{                       
+                    String father1Name = nodeAigActual.getParents().get(0).getName();
+                    if((!this.cut.contains(nodeAigActual.getParents().get(0))||(cut.getBrcVariables().get(father1Name)==null))){
+                       System.out.println(nodeAigActual.getParents().get(0).getParents().size()+" "+this.nodesBfs.contains(nodeAigActual.getParents().get(0)));
+                       nodeAigActual.getParents().get(0).accept(this);
+                   }
+                    father1 = cut.getBrcVariables().get(father1Name);
+                    int a;
+                    if(father1 == null){
+                        cut.showCut();
+                    }
+                    father1 = BRCHandler.not(father1);                
+                    TreeMap<String,BRC> newCutBrc = cut.getBrcVariables();
+                    newCutBrc.put(nodeAigActual.getName(),father1);
+                    cut.setBrcVariables(newCutBrc);
+                    return;                                           
+                   }
+               } 
+               if(nodeAigActual.getParents().size() > 1){            
                 if(!this.cut.contains(nodeAigActual.getParents().get(0)))
                     nodeAigActual.getParents().get(0).accept(this);
                 if(!this.cut.contains(nodeAigActual.getParents().get(1)))
@@ -54,16 +83,17 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
                 TreeMap<String,BRC> newCutBrc = cut.getBrcVariables();
                 newCutBrc.put(nodeAigActual.getName(),brcNode);
                 cut.setBrcVariables(newCutBrc);
+                return;
+              }
             }
-       }
+        }                   
     }
     
     /** Override pois precisa abandonar a busca caso encontre entrada do corte*/
     @Override
     public void visit(NodeAigGate nodeAigGate) 
     {
-        if(nodesBfs.contains(nodeAigGate))
-        {
+        if(nodesBfs.contains(nodeAigGate)){
             return;
         }
         else
@@ -75,6 +105,32 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
                 for(int i=0;i<nodeAigGate.getParents().size();i++)
                 {
                     list.add(nodeAigGate.getParents().get(i));
+                    this.states++;
+                }
+            }
+        }
+        if(list.size() > 0)
+        {
+            NodeAig temp =  list.get(0);
+            list.remove(0);        
+            temp.accept(this);
+        }
+    }
+    public void visit(NodeAigInverter nodeAigInverter) 
+    {
+        if(nodesBfs.contains(nodeAigInverter)){
+            return;
+        }
+        else
+        {
+            nodesBfs.add(nodeAigInverter);
+            System.out.println(nodeAigInverter.getName());
+            function(nodeAigInverter);
+            if(!this.cut.contains(nodeAigInverter))
+            {
+                for(int i=0;i<nodeAigInverter.getParents().size();i++)
+                {
+                    list.add(nodeAigInverter.getParents().get(i));
                     this.states++;
                 }
             }

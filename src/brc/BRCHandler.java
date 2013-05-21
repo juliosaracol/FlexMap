@@ -29,7 +29,7 @@ public class BRCHandler {
                         basicRepresentationCodes.put(literal, invCode);
                     }
                     else {
-                        System.out.println("Error, any BRC was not found in the TrreMap!");
+                        System.out.println("Error, any BRC was not found in the TreeMap!");
                     }
                 }
                 

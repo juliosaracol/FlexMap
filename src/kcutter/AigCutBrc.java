@@ -129,7 +129,7 @@ public class AigCutBrc extends AigCut
     {   //aplica os brc nos cut 
         this.flagBrc            = true;
         this.brc                = new BRC();
-        ArrayList<String> var   = getVariables();
+        ArrayList<String> var   = getVariables(); //lista as variaveis de entrada do corte
         this.brcVariables       = BRCBuilder.getBasicRepresentationCodes(k,var);
         bfsNodeAigVisitorKCutsBrc createBrc = new bfsNodeAigVisitorKCutsBrc(this);
         root.accept(createBrc);

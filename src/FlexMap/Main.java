@@ -101,9 +101,38 @@ public class Main
                return;
           }
         }
+        //----------------------------------------------------------------------        
+        //--------------------KCUTS_INVERTERS-----------------------------------
+        if(args[1].equals("-KI")&&(args.length >= 3))
+        {
+          AigInverter myAig = new AigInverter(args[0]);
+          //Algoritmo de kcuts 
+          int sizeCut = Integer.valueOf(args[2]);
+          if(args.length > 3){
+            if(!args[3].contains(".txt")){
+                NodeAig nodeSelect = myAig.getVertexName(args[3]);
+                CutterKCutsInverter KcutsI  = new CutterKCutsInverter(myAig, nodeSelect, sizeCut);
+                KcutsI.showAllcuts(nodeSelect);
+                if((args.length > 4)&&(args[4].contains(".txt")))
+                    Logs.LogsAigKcuts(args[4],KcutsI,nodeSelect);
+                return;
+            }
+            else{
+                CutterKCutsInverter KcutsI  = new CutterKCutsInverter(myAig, sizeCut);
+                if(args[3].contains(".txt"))
+                    Logs.LogsAigKcuts(args[3],KcutsI);
+                return;                
+            }
+          }
+          if((args.length == 3)){
+               CutterKCutsInverter KcutsI  = new CutterKCutsInverter(myAig, sizeCut); 
+               KcutsI.showAllcuts();
+               return;
+          }
+        }
         //--------------------------------------------------------------------        
         //--------------------KCUTS C/BIBLIOTECA--------------------------
-        if(args[1].equals("-KB")&&(args.length >= 4))
+        if(args[1].equals("-KL")&&(args.length >= 4))
         {
           Aig myAig = new Aig(args[0]);
           //Algoritmo de kcuts 
@@ -132,6 +161,41 @@ public class Main
           }
           if((args.length == 4)){
                CutterKCutsLibrary KcutsLibrary = new CutterKCutsLibrary(myAig, sizeCut, library); 
+               KcutsLibrary.showAllcutsLibrary();
+               return;
+          }
+        }
+        //----------------------------------------------------------------------
+        //--------------------KCUTS_INVERTER C/BIBLIOTECA--------------------------
+        if(args[1].equals("-KIL")&&(args.length >= 4))
+        {
+          AigInverter myAig = new AigInverter(args[0]);
+          //Algoritmo de kcuts 
+          int sizeCut = Integer.valueOf(args[2]);
+          if(!args[3].contains(".genlib")){
+              System.out.print("BIBLIOTECA EM FORMATO INVALIDO");
+              System.exit(-1);
+          }
+          String library =  args[3];
+          if(args.length > 4){
+            if(!args[4].contains(".txt")){
+                NodeAig nodeSelect = myAig.getVertexName(args[4]);
+                CutterKCutsInverterLibrary KcutsLibrary  = new CutterKCutsInverterLibrary(myAig, nodeSelect, sizeCut,library);
+                KcutsLibrary.showAllcutsLibrary(nodeSelect);
+                if((args.length > 5)&&(args[5].contains(".txt")))
+                    Logs.LogsAigKcuts(args[5],KcutsLibrary, nodeSelect);
+                return;
+            }
+            else{
+                CutterKCutsInverterLibrary KcutsLibrary = new CutterKCutsInverterLibrary(myAig, sizeCut, library); 
+                KcutsLibrary.showAllcutsLibrary();
+                if(args[4].contains(".txt"))
+                    Logs.LogsAigKcuts(args[4],KcutsLibrary);
+                return;                
+            }
+          }
+          if((args.length == 4)){
+               CutterKCutsInverterLibrary KcutsLibrary = new CutterKCutsInverterLibrary(myAig, sizeCut, library); 
                KcutsLibrary.showAllcutsLibrary();
                return;
           }
@@ -357,8 +421,12 @@ public class Main
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -K TamanhoDoCorte [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
       System.out.println("--KCUTS C/LIMITE DE TREENODES--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -KT TamanhoDoCorte [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
+      System.out.println("--KCUTS_INVERTERS--");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -KI TamanhoDoCorte [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
       System.out.println("--KCUTS C/BIBLIOTECA--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -KL TamanhoDoCorte Biblioteca.genlib [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
+      System.out.println("--KCUTS_INVERTER C/BIBLIOTECA--");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -KIL TamanhoDoCorte Biblioteca.genlib [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -A TamanhoDoCorte Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW COM AIG_INVERTER--");

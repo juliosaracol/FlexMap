@@ -1,20 +1,24 @@
 package kcutter;
 
 import aig.*;
-import java.util.*;
+import brc.*;
+import functionsClasses.*;
+import library.*;
+import java.util.*; 
 
 /**
- * Classe que adapta os CutterKcuts para trabalhar com Aig-Inverter
- * @author Julio Saraçol 
+ * Classe que aplica os K-cutsInverter com Matching em Biblioteca de Células ".genlib"
+ * @author Julio Saraçol
  */
-public class CutterKCutsInverter extends CutterKCuts {
+public class CutterKCutsInverterLibrary extends CutterKCutsLibrary 
+{
 
-    public CutterKCutsInverter(Aig aig, int k) {
-        super(aig, k);
+    public CutterKCutsInverterLibrary(Aig aig, int limit, String libraryName) throws Exception {
+        super(aig, limit, libraryName);
     }
 
-    public CutterKCutsInverter(Aig aig, NodeAig node, int k) {
-        super(aig, node, k);
+    public CutterKCutsInverterLibrary(Aig aig, NodeAig nodeCurrent, int limit, String libraryName) throws Exception {
+        super(aig, nodeCurrent, limit, libraryName);
     }
     
     @Override
@@ -43,7 +47,7 @@ public class CutterKCutsInverter extends CutterKCuts {
             }
             else
             {
-              if(nodeCurrent.getParents().size()>0)
+              if(nodeCurrent.getParents().size()>1)
               {
                if(!this.cuts.containsKey(nodeCurrent.getParents().get(0)))
                   computeKcuts(nodeCurrent.getParents().get(0));
@@ -62,4 +66,5 @@ public class CutterKCutsInverter extends CutterKCuts {
             return null;
         }
     }
+    
 }
