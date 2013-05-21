@@ -82,9 +82,10 @@ public class AigCutBrc extends AigCut
     } 
 
     public void showCutBrc(NodeAig nodeCurrent) {
-       if(cut.size() == 0)
+       if(cut.size() == 0){
+           System.out.print("VAZIO");          
            return;
-       System.out.print("[");
+    }System.out.print("[");
        int i=0;
        for(NodeAig node: cut)
        {
@@ -131,7 +132,9 @@ public class AigCutBrc extends AigCut
         this.brc                = new BRC();
         ArrayList<String> var   = getVariables(); //lista as variaveis de entrada do corte
         this.brcVariables       = BRCBuilder.getBasicRepresentationCodes(k,var);
-        bfsNodeAigVisitorKCutsBrc createBrc = new bfsNodeAigVisitorKCutsBrc(this);
+        System.out.println("raiz: "+root.getName());
+        showCut();
+        bfsNodeAigVisitorKCutsBrc createBrc = new bfsNodeAigVisitorKCutsBrc(this);       
         root.accept(createBrc);
         this.brc = this.getBrcVariables().get(root.getName());
     }

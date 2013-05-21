@@ -62,7 +62,7 @@ public class CutterKCutsLibrary extends CutterKCuts
     {
         computeKcuts(node);
         createBrc();
-        //Matching(node);
+        Matching(node);
     }
     /**Método que inicializa os AigCutBrc de todos os cortes dos nodos do AIG*/
     private void createBrc() {
