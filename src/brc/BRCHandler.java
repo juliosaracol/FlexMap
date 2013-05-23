@@ -6,65 +6,47 @@ import java.util.TreeMap;
 public class BRCHandler {
 
     public BRCHandler() {
-    
     }
-    
+
     /* Constroi o BRC da funcao */
     public static BRC builFunctionRepresentationCode(ArrayList<ArrayList<String>> cubes, TreeMap<String, BRC> basicRepresentationCodes) {
-       
+
         BRC first_code;
         BRC second_code;
-        BRC directCode;
-        BRC invCode;
         ArrayList<BRC> cubesCode = new ArrayList<BRC>();
-        
+
         // Cria o BRC de cada cubo
-        for(ArrayList<String> cube: cubes) {
-            for(String literal: cube) {
-                if(!basicRepresentationCodes.containsKey(literal)) {
-                    if(literal.charAt(0) == '!') {
-                        directCode = basicRepresentationCodes.get(literal.substring(1));
-                        directCode = directCode.clone();
-                        invCode = BRCHandler.not(directCode);
-                        basicRepresentationCodes.put(literal, invCode);
-                    }
-                    else {
-                        System.out.println("Error, any BRC was not found in the TreeMap!");
-                    }
-                }
-                
-            }
+        for (ArrayList<String> cube : cubes) {
             cubesCode.add(buildCubesRepresentationCode(cube, basicRepresentationCodes));
         }
-        
+
         // Calcula o BRC da funcao
         first_code = cubesCode.get(0);
-        for(int i=0; i< cubesCode.size(); i++) {
+        for (int i = 0; i < cubesCode.size(); i++) {
             second_code = cubesCode.get(i);
-            first_code = BRCHandler.or(first_code, second_code);   
+            first_code = BRCHandler.or(first_code, second_code);
         }
-        
+
         return first_code;
     }
 
     /* Cria o BRC de cada cubo */
     public static BRC buildCubesRepresentationCode(ArrayList<String> cube, TreeMap<String, BRC> basicRepresentationCodes) {
-        
+
         BRC first_code = basicRepresentationCodes.get(cube.get(0));
         BRC second_code;
-        for(int i=1; i < cube.size(); i++) {
+        for (int i = 1; i < cube.size(); i++) {
             second_code = basicRepresentationCodes.get(cube.get(i));
-            first_code = BRCHandler.and(first_code, second_code);   
+            first_code = BRCHandler.and(first_code, second_code);
         }
-        
+
         return first_code;
     }
-    
+
     public static BRC and(BRC obj1, BRC obj2) {
-        int and;
-        BRC brc = new BRC();
-        if((obj1 == null)||(obj2 == null))
-            System.out.println("OBJETO NULO NO BRC");
+        long and;
+        BRC brc = new BRC(obj1.getNumberBits());
+
         for (int i = 0; i < obj1.sizeBRC(); i++) {
             and = (obj1.getBRC(i)) & (obj2.getBRC(i));
             brc.setBRC(i, and);
@@ -74,8 +56,8 @@ public class BRCHandler {
     }
 
     public static BRC or(BRC obj1, BRC obj2) {
-        int or;
-        BRC brc = new BRC();
+        long or;
+        BRC brc = new BRC(obj1.getNumberBits());
 
         for (int i = 0; i < obj1.sizeBRC(); i++) {
             or = (obj1.getBRC(i)) | (obj2.getBRC(i));
@@ -86,18 +68,39 @@ public class BRCHandler {
     }
 
     public static BRC not(BRC obj) {
-        int inverter;
-        BRC brc = new BRC();
+        long inverter;
+        BRC brc = new BRC(obj.getNumberBits());
 
         for (int i = 0; i < obj.sizeBRC(); i++) {
             inverter = ~(obj.getBRC(i));
-            brc.setBRC(i, inverter);
-        }
 
-        return brc;
-    }
+            switch (obj.getNumberBits()) {
+                case 2 :
+                    inverter = inverter & 3L;
+                    break;
+                case 4:
+                    inverter = inverter & 15L;
+                    break;
+                case 8:
+                    inverter = inverter & 255L;
+                    break;
+                case 16:
+                    inverter = inverter & 65535L;
+                    break;
+                case 32:
+                    inverter = inverter & 4294967295L;
+                    break;
+                default:
+                    break;
+			}
+            
+			brc.setBRC(i, inverter);
+		}
+    
+		return brc ;
+	}
 
-    public static boolean equal(BRC obj1, BRC obj2) {
+	public static boolean equal(BRC obj1, BRC obj2) {
 
         for (int i = 0; i < obj1.sizeBRC(); i++) {
             if (obj1.getBRC(i) != obj2.getBRC(i)) {
@@ -113,7 +116,7 @@ public class BRCHandler {
         String hexa = "";
         
         for(int i = 0; i < brc.sizeBRC(); i++) {
-            hexa += Integer.toHexString(brc.getBRC(i));
+            hexa += Long.toHexString(brc.getBRC(i));
         }
         
         return hexa;
@@ -132,6 +135,30 @@ public class BRCHandler {
         
     }
     
+    public static String toBinaryString(BRC brc) {
+        
+        long value;
+        String binary = "";
+         
+        for(int i=0; i < brc.sizeBRC(); i++) {
+            
+            value = brc.getBRC(i);
+
+            /*cria um valor inteiro com 1 no bit mais a esquerda e 0s em outros locais*/
+            long displayMask = 1L << 63;
+
+            /*para cada bit exibe 0 ou 1*/
+            for (int bit = 1; bit <= 64; bit++) {
+                /*utiliza displayMask para isolar o bit*/
+                binary += ((value & displayMask) == 0 ? '0' : '1');
+               
+                value <<= 1L; //desloca o valor uma posição para a esquerda
+            }
+        }
+        
+        return binary;
+    }
+    
     public static void displayInteger(BRC brc) {
         
         for(int i=0; i < brc.sizeBRC(); i++) {
@@ -141,31 +168,9 @@ public class BRCHandler {
         System.out.println();        
     }
     
-    public static void displayBinary(BRC brc) {
-
-        int value;
-        
-        for(int i=0; i < brc.sizeBRC(); i++) {
-            
-            value = brc.getBRC(i);
-
-            /*cria um valor inteiro com 1 no bit mais a esquerda e 0s em outros locais*/
-            int displayMask = 1 << 31;
-
-            /*para cada bit exibe 0 ou 1*/
-            for (int bit = 1; bit <= 32; bit++) {
-                /*utiliza displayMask para isolar o bit*/
-                System.out.print((value & displayMask) == 0 ? '0' : '1');
-
-                value <<= 1; //desloca o valor uma posição para a esquerda
-
-                if (bit % 8 == 0) {
-                    System.out.print(' ');//espaço a cada 8 bits
-                }
-            }
-        }
-        
-        System.out.println();
+    public static void displayBinary(BRC brc) {  
+                  
+        System.out.println(toBinaryString(brc));
     }
     
 }

@@ -86,6 +86,6 @@ public class FunctionData{
             if (f.equals("0")) return "0";
             if (f.equals("1")) return "255";
             BitRepresentation br = LowestFunctionFinder.run_P(ExpanderExpression.runExpanderExpression(f),nvars);
-            return Integer.toString(br.toInteger().get(0));
+            return Long.toString(br.toLong().get(0));
 	}
 }

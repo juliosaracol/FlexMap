@@ -1,5 +1,7 @@
 package functionsClasses;
 
+import brc.BRC;
+import brc.BRCHandler;
 import java.util.ArrayList;
 
 public class BitHandler {
@@ -90,70 +92,26 @@ public class BitHandler {
     /*
      * Converte um BRC para um BitRepresentation
      */
-    public static BitRepresentation brcToBitRepresentation(ArrayList<Integer> brc) {
-
-        int nBits = brc.size() * 32;
-        int nVariables = getVariablesNumber(nBits);
-
-        String bitArray = getBitArray(brc);
-
+    public static BitRepresentation brcToBitRepresentation(BRC cutBRC, int nVariables) {
+        
+        int nBits = (int) Math.pow(2, nVariables);
+        
+        // Converte o BRC para String Binaria
+        String BinaryString = BRCHandler.toBinaryString(cutBRC);
+        
         BitRepresentation function = new BitRepresentation(nBits, nVariables);
-
-        for (int i = 0; i < bitArray.length(); i++) {
-            if (bitArray.charAt(i) == '1') {
-                function.flip(i);
+        int index = 0;
+        
+        for (int i = (BinaryString.length()-nBits); i < BinaryString.length(); i++) {
+            if (BinaryString.charAt(i) == '1') {
+                function.flip(index);
             }
+            index++;
         }
 
         return function;
     }
 
-    /*
-     * Encontra o numero de variaveis da funcao atraves do numero de bits
-     */
-    private static int getVariablesNumber(int nBits) {
-
-        int count = 1;
-
-        while (nBits != 2) {
-            nBits = nBits / 2;
-            count++;
-        }
-
-        return count;
-    }
-
-    /*
-     * Para cada Integer do ArrayList do BRC Gera uma String de 32 Bits e as
-     * concatena
-     */
-    private static String getBitArray(ArrayList<Integer> brc) {
-
-        String bitArray;
-        String leftZeros;
-        String function = "";
-        String reverse;
-        int length;
-
-        for (int i = brc.size() - 1; i >= 0; i--) {
-
-            leftZeros = "";
-
-            bitArray = Integer.toBinaryString(brc.get(i));
-            length = 32 - bitArray.length();
-
-            for (int j = 0; j < length; j++) {
-                leftZeros += "0";
-            }
-
-            reverse = new StringBuffer(bitArray).reverse().toString();
-
-            function += reverse + leftZeros;
-
-        }
-
-        return function;
-    }
 
     public static BitRepresentation setBitRepresentation(BitRepresentation bitRepresentation, int nVariable) {
         
@@ -184,8 +142,8 @@ public class BitHandler {
     /*
      * Mostra a assimatura em numero(s)inteiro(s)
      */
-    public static void displayIntegers(BitRepresentation a) {
-        for (Integer i : a.toInteger()) {
+    public static void displayLongs(BitRepresentation a) {
+        for (Long i : a.toLong()) {
             System.out.print(i + " ");
         }
         System.out.println();
@@ -205,7 +163,7 @@ public class BitHandler {
      * Mostra a assimatura em binario
      */
     public static void displayBinary(BitRepresentation a) {
-        for (int i = a.bitLength() - 1; i >= 0; i--) {
+        for (int i = 0; i < a.bitLength(); i++) {
             if (a.get(i)) {
                 System.out.print("1");
             } else {
@@ -214,4 +172,5 @@ public class BitHandler {
         }
         System.out.println();
     }
+    
 }

@@ -48,9 +48,9 @@ public class Builder {
     /*
      * Constroi uma assinatura para cada linha da tabela verdade
      */
-    public static int[] buildEntrys(ArrayList<BitRepresentation> signatures, int nVariables, int nBits) {
+    public static long[] buildEntrys(ArrayList<BitRepresentation> signatures, int nVariables, int nBits) {
 
-        int rows[] = new int[nBits];
+        long rows[] = new long[nBits];
         BitRepresentation row;
 
         // 2^n linhas
@@ -63,19 +63,20 @@ public class Builder {
                 }
             }
 
-            rows[i] = row.toInteger().get(0);
+            rows[i] = row.toLong().get(0);
         }
 
         return rows;
     }
 
-    public static TreeMap<Integer, Boolean> buildTruthTable(BitRepresentation function, int nVariables) {
+    public static TreeMap<Long, Boolean> buildTruthTable(BitRepresentation function, int nVariables) {
 
         int nBits = (int) Math.pow(2, nVariables);
-        TreeMap<Integer, Boolean> truthTable = new TreeMap<Integer, Boolean>();
-
-        for (int i = 0; i < nBits; i++) {
-            truthTable.put(i, function.get(i));
+        TreeMap<Long, Boolean> truthTable = new TreeMap<Long, Boolean>();
+        long index = 0;
+        for (int i = nBits-1; i >= 0; i--) {
+            truthTable.put(index, function.get(i));
+            index++;
         }
 
         return truthTable;
@@ -84,16 +85,16 @@ public class Builder {
     /**
      * ********************** BUILD TRANSFORMATION TABLES *********************
      */
-    public static int[][] buildTransformationTable_NP(int nVariables, int tableSize) {
+    public static long[][] buildTransformationTable_NP(int nVariables, int tableSize) {
 
         int nBits = (int) Math.pow(2, nVariables);
-        int table[][] = new int[tableSize][nBits];
+        long table[][] = new long[tableSize][nBits];
 
         int p = 0; // Combinações p a p
         ArrayList<ArrayList<BitRepresentation>> permutations = new ArrayList<ArrayList<BitRepresentation>>();
         ArrayList<BitRepresentation> currentPermut;
         ArrayList<ArrayList<Integer>> combinations;
-        int element[];
+        long element[];
         int index = 0;
         Iterator permut = PermutationGenerator.getPermutations(buildBasicRepresentationCodes(nVariables));
 
@@ -131,14 +132,14 @@ public class Builder {
         return table;
     }
 
-    public static int[][] buildTransformationTable_P(int nVariables, int tableSize) {
+    public static long[][] buildTransformationTable_P(int nVariables, int tableSize) {
 
         int nBits = (int) Math.pow(2, nVariables);
-        int table[][] = new int[tableSize][nBits];
+        long table[][] = new long[tableSize][nBits];
 
         ArrayList<ArrayList<BitRepresentation>> permutations = new ArrayList<ArrayList<BitRepresentation>>();
         ArrayList<BitRepresentation> currentPermut;
-        int element[];
+        long element[];
         int index = 0;
         Iterator permut = PermutationGenerator.getPermutations(buildBasicRepresentationCodes(nVariables));
 

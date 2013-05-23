@@ -88,10 +88,17 @@ public class CutterKCutsLibrary extends CutterKCuts
             for(AigCutBrc cut: allCuts)
             {
                cut.showCut(nodeCurrent);
-               BitRepresentation brcBit      = BitHandler.brcToBitRepresentation(cut.getBrc().getBRC());              
-               BitRepresentation notBrcBit   = BitHandler.brcToBitRepresentation(BRCHandler.not(cut.getBrc()).getBRC());              
-               BitRepresentation signP       = LowestFunctionFinder.run_P(brcBit, limit);
-               BitRepresentation notSignP    = LowestFunctionFinder.run_P(notBrcBit, limit);
+               BRCHandler.displayBinary(cut.getBrc(nodeCurrent));
+               
+               BitRepresentation bitRep      = BitHandler.brcToBitRepresentation(cut.getBrc(nodeCurrent), this.limit);
+               BitRepresentation signP       = LowestFunctionFinder.run_P(bitRep, limit);
+               
+               // Clona e Nega o BRC
+               BRC cloneBRC = cut.getBrc(nodeCurrent).clone();
+               cloneBRC = BRCHandler.not(cloneBRC);
+               BitRepresentation notBitRep      = BitHandler.brcToBitRepresentation(cloneBRC, this.limit);
+               BitRepresentation notSignP    = LowestFunctionFinder.run_P(notBitRep, limit);
+               
                this.checkingSignP(cut, signP,nodeCurrent);
                //System.out.print("assinatura HEXA->"+ signP.toHexaString()+" "); 
                System.out.print("Inversão de ");

@@ -4,27 +4,37 @@ import java.util.ArrayList;
 
 public class BRC {
 
-    protected ArrayList<Integer> variable; //array para armazenar os inteiros que formarao o BRC
+    private ArrayList<Long> variable; //array para armazenar os inteiros que formarao o BRC
+    private int numberBits;
 
-    public BRC() {
-        this.variable = new ArrayList<Integer>();
+    public BRC(int numberBits) {
+        this.variable = new ArrayList<Long>();
+        this.numberBits = numberBits;
     }
    
-    public void addBRC(int value) {
+    public void addBRC(long value) {
         this.variable.add(value);
     }
     
-    public void setBRC(int pos, int value) {
+    public void setBRC(int pos, long value) {
         this.variable.add(pos, value);
     }
 
-    public int getBRC(int pos) {
+    public long getBRC(int pos) {
         return variable.get(pos);
     }
 
-    public ArrayList<Integer> getBRC() {
+    public ArrayList<Long> getBRC() {
         return variable;
     }
+
+    public int getNumberBits() {
+        return numberBits;
+    }
+
+    public void setNumberBits(int numberBits) {
+        this.numberBits = numberBits;
+    }        
     
     public int sizeBRC(){
         return variable.size();
@@ -33,7 +43,7 @@ public class BRC {
     @Override
     public BRC clone() {
         
-        BRC clone = new BRC();
+        BRC clone = new BRC(this.numberBits);
         
         for(int i=0; i < this.sizeBRC(); i++) {
             clone.setBRC(i, this.getBRC(i));
@@ -41,4 +51,5 @@ public class BRC {
         
         return clone;
     }
+    
 }

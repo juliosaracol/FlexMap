@@ -85,7 +85,8 @@ public class AigCutBrc extends AigCut
        if(cut.size() == 0){
            System.out.print("VAZIO");          
            return;
-    }System.out.print("[");
+       }
+       System.out.print("[");
        int i=0;
        for(NodeAig node: cut)
        {
@@ -124,16 +125,20 @@ public class AigCutBrc extends AigCut
             updateBrc(root);
         return this.brc;
     }
-   
+    
+    public BRC getBrc() {
+       throw new UnsupportedOperationException("Not supported yet.");
+    }
+  
     /**Cria o BRC referente ao corte atual*/ 
     public void updateBrc(NodeAig root)
     {   //aplica os brc nos cut 
         this.flagBrc            = true;
-        this.brc                = new BRC();
+        this.brc                = new BRC((int)Math.pow(2,this.k));
         ArrayList<String> var   = getVariables(); //lista as variaveis de entrada do corte
         this.brcVariables       = BRCBuilder.getBasicRepresentationCodes(k,var);
-        System.out.println("raiz: "+root.getName());
-        showCut();
+        //System.out.println("raiz: "+root.getName());
+        //showCut();
         bfsNodeAigVisitorKCutsBrc createBrc = new bfsNodeAigVisitorKCutsBrc(this);       
         root.accept(createBrc);
         this.brc = this.getBrcVariables().get(root.getName());
@@ -147,15 +152,13 @@ public class AigCutBrc extends AigCut
         return names;
     }
 
-    public BRC getBrc() {
-        return brc;
-    }
 
     public TreeMap<String, BRC> getBrcVariables() {
         return brcVariables;
     }
 
     public void setBrcVariables(TreeMap<String, BRC> brcVariables) {
+        this.flagBrc = false;
         this.brcVariables = brcVariables;
     }
 

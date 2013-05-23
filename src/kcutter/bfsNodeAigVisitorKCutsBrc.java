@@ -22,7 +22,7 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
     public void function(NodeAig nodeAigActual) 
     {      
         BRC  father1,father2;
-        if((nodeAigActual.isInput())||((this.cut.contains(nodeAigActual))&&(!nodeAigActual.isInverter())))
+        if((nodeAigActual.isInput())||((this.cut.contains(nodeAigActual))))
             return;
         if((nodeAigActual.isOutput())&&(nodeAigActual.getParents().size()==1))
         {
@@ -40,15 +40,15 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
             if((cut.size() > 1))
             {
                if(nodeAigActual.isInverter()){
-                   if(this.cut.contains(nodeAigActual)){
-                    father1 = cut.getBrcVariables().get(nodeAigActual.getName());
-                    BRC brcNode = BRCHandler.not(father1);
-                    TreeMap<String,BRC> newCutBrc = cut.getBrcVariables();
-                    newCutBrc.put(nodeAigActual.getName(),brcNode);
-                    cut.setBrcVariables(newCutBrc);
-                    return;
-                   }
-                   else{
+                   //if(this.cut.contains(nodeAigActual)){
+                    //father1 = cut.getBrcVariables().get(nodeAigActual.getName());
+                    //BRC brcNode = BRCHandler.not(father1);
+                    //TreeMap<String,BRC> newCutBrc = cut.getBrcVariables();
+                    //newCutBrc.put(nodeAigActual.getName(),brcNode);
+                    //cut.setBrcVariables(newCutBrc);
+                    //return;
+                   //}
+                   //else{
                     if(!this.cut.contains(nodeAigActual.getParents().get(0)))
                         nodeAigActual.getParents().get(0).accept(this);
                     String father1Name = nodeAigActual.getParents().get(0).getName();
@@ -58,7 +58,7 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
                     newCutBrc.put(nodeAigActual.getName(),father1);
                     cut.setBrcVariables(newCutBrc);
                     return;                                           
-                   }
+                   //}
                } 
                if(nodeAigActual.getParents().size() > 1){            
                 if(!this.cut.contains(nodeAigActual.getParents().get(0)))
@@ -81,9 +81,8 @@ public class bfsNodeAigVisitorKCutsBrc extends bfsNodeAigVisitor{
               }
             }
             else{
-              if((this.cut.size()==1)&&(this.cut.contains(nodeAigActual))){
-                return;   
-              }                  
+              if((this.cut.size()==1)&&(this.cut.contains(nodeAigActual)))
+                return;                                   
               if(!this.cut.contains(nodeAigActual.getParents().get(0)))
                  nodeAigActual.getParents().get(0).accept(this);
               String father1Name = nodeAigActual.getParents().get(0).getName();

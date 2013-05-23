@@ -29,39 +29,40 @@ public class BitRepresentation extends BitSet {
     }
 
     /*
-     * Converte o bitrepresentation para um arrayList de inteiros
+     * Converte o bitrepresentation para um arrayList de longs
      */
-    public ArrayList<Integer> toInteger() {
+    public ArrayList<Long> toLong() {
 
-        int nIntegers, temp, length = 32;
-        ArrayList<Integer> ingeregers = new ArrayList<Integer>();
+        int nLongs, length = 64;
+        long temp;
+        ArrayList<Long> longs = new ArrayList<Long>();
 
-        if (this.bitLength > 32) {
-            nIntegers = this.bitLength / 32;
-            for (int i = 0; i < nIntegers; i++) {
+        if (this.bitLength > 64) {
+            nLongs = this.bitLength / 64;
+            for (int i = 0; i < nLongs; i++) {
                 temp = convert(length, i);
-                ingeregers.add(temp);
-                length += 32;
+                longs.add(temp);
+                length += 64;
             }
         } else {
             temp = convert(this.bitLength, 0);
-            ingeregers.add(temp);
+            longs.add(temp);
         }
 
-        Collections.reverse(ingeregers);
+        Collections.reverse(longs);
 
-        return ingeregers;
+        return longs;
     }
 
     /*
-     * Coverte sequencias de 32 bits pra um inteiro
+     * Coverte sequencias de 64 bits pra um long
      */
     private int convert(int length, int index) {
 
         int exp = 0;
         double number = 0;
 
-        for (int i = index * 32; i < length; i++) {
+        for (int i = index * 64; i < length; i++) {
             if (this.get(i)) {
                 number += Math.pow(2, exp);
             }
@@ -78,11 +79,11 @@ public class BitRepresentation extends BitSet {
      */
     public ArrayList<String> toHexa() {
 
-        ArrayList<Integer> integers = this.toInteger();
+        ArrayList<Long> Longs = this.toLong();
         ArrayList<String> hexa = new ArrayList<String>();
 
-        for (Integer i : integers) {
-            hexa.add(Integer.toHexString(i));
+        for (Long i : Longs) {
+            hexa.add(Long.toHexString(i));
         }
 
         return hexa;
@@ -94,21 +95,37 @@ public class BitRepresentation extends BitSet {
      */
     public String toHexaString() {
 
-        ArrayList<Integer> integers = this.toInteger();
+        ArrayList<Long> longs = this.toLong();
         String hexa = "";
 
-        for (Integer i : integers) {
-            hexa += Integer.toHexString(i);
+        for (Long i : longs) {
+            hexa += Long.toHexString(i);
         }
 
         return hexa;
     }
 
+    public String toBinaryString() {
+        
+        String binary = "";
+        
+        for(int i= 0; i < this.bitLength(); i++) {
+            if(this.get(i)) {
+                binary += "1";
+            }
+            else {
+                binary += "0";
+            }
+        }
+        
+        return binary;
+    }
+    
     /*
      * Mostra a assimatura em numero(s)inteiro(s)
      */
-    public void displayIntegers() {
-        for (Integer i : this.toInteger()) {
+    public void displayLongs() {
+        for (Long i : this.toLong()) {
             System.out.print(i + " ");
         }
         System.out.println();

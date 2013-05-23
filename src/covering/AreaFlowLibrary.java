@@ -152,6 +152,7 @@ public class AreaFlowLibrary
     //**Método que aplica a cobertura baseado em bfs utilizando as areas calculadas
     protected void covering()
     {
+        /*obs: impolementar a cobertura de acordo com */
 //        bfsAigVisitorAreaCovering bfs = new bfsAigVisitorAreaCovering(this);
 //        for(NodeAig nodeActual: myAig.getNodeOutputsAig())
 //        {
@@ -176,7 +177,7 @@ public class AreaFlowLibrary
 //          this.covering.putAll(list);
 //        }
     }
-    //**Método para visualização da cobetura final
+    //**Método para visualização da cobetura final*/
     public void showCovering()
     {
         Iterator<Map.Entry<NodeAig,AigCutBrc>> iterator =  this.covering.entrySet().iterator();

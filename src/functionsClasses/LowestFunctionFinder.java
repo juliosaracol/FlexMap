@@ -12,11 +12,10 @@ public class LowestFunctionFinder {
     public static BitRepresentation run_NP(String expression, int nVariables) {
 
         expression = ExpanderExpression.runExpanderExpression(expression);
-        SetFunction setFunction = new SetFunction(expression, nVariables);
-        BitRepresentation function = setFunction.getFunctionSignature();
-
+        BitRepresentation function = SetFunction.builFunctionRepresentationCode(expression, nVariables);
+        
         int tableSize = (BitHandler.fact(nVariables) * (function.bitLength()));
-        int table[][] = Builder.buildTransformationTable_NP(nVariables, tableSize);
+        long table[][] = Builder.buildTransformationTable_NP(nVariables, tableSize);
 
         return getLowestFunction(table, tableSize, function, nVariables);
     }
@@ -28,7 +27,7 @@ public class LowestFunctionFinder {
     public static BitRepresentation run_NP(BitRepresentation function, int nVariables) {
 
         int tableSize = (BitHandler.fact(nVariables) * (function.bitLength()));
-        int table[][] = Builder.buildTransformationTable_NP(nVariables, tableSize);
+        long table[][] = Builder.buildTransformationTable_NP(nVariables, tableSize);
         BitRepresentation newFunction = BitHandler.setBitRepresentation(function, nVariables);
         
         return getLowestFunction(table, tableSize, newFunction, nVariables);
@@ -41,11 +40,10 @@ public class LowestFunctionFinder {
     public static BitRepresentation run_P(String expression, int nVariables) {
 
         expression = ExpanderExpression.runExpanderExpression(expression);
-        SetFunction setFunction = new SetFunction(expression, nVariables);
-        BitRepresentation function = setFunction.getFunctionSignature();
-
+        BitRepresentation function = SetFunction.builFunctionRepresentationCode(expression, nVariables);
+        
         int tableSize = (BitHandler.fact(nVariables));
-        int table[][] = Builder.buildTransformationTable_P(nVariables, tableSize);
+        long table[][] = Builder.buildTransformationTable_P(nVariables, tableSize);
 
         return getLowestFunction(table, tableSize, function, nVariables);
     }
@@ -57,7 +55,7 @@ public class LowestFunctionFinder {
     public static BitRepresentation run_P(BitRepresentation function, int nVariables) {
 
         int tableSize = (BitHandler.fact(nVariables));
-        int table[][] = Builder.buildTransformationTable_P(nVariables, tableSize);
+        long table[][] = Builder.buildTransformationTable_P(nVariables, tableSize);
         BitRepresentation newFunction = BitHandler.setBitRepresentation(function, nVariables);
         
         return getLowestFunction(table, tableSize, newFunction, nVariables);
@@ -68,14 +66,14 @@ public class LowestFunctionFinder {
      * transformacao NP ou P e retorna um BitRepresentation com a menor
      * representacao
      */
-    private static BitRepresentation getLowestFunction(int table[][], int tableSize, BitRepresentation function, int nVariables) {
+    private static BitRepresentation getLowestFunction(long table[][], int tableSize, BitRepresentation function, int nVariables) {
 
         int nBits = function.bitLength();
         int col, level;
 
         BitRepresentation lowest = new BitRepresentation(nBits, nVariables);
         BitRepresentation temp;
-        TreeMap<Integer, Boolean> truthTable = Builder.buildTruthTable(function, nVariables);
+        TreeMap<Long, Boolean> truthTable = Builder.buildTruthTable(function, nVariables);
 
         for (level = 0; level < nBits; level++) {
             if (truthTable.get(table[0][level])) {
