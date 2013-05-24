@@ -97,9 +97,24 @@ public class BitRepresentation extends BitSet {
 
         ArrayList<Long> longs = this.toLong();
         String hexa = "";
+        String temp;
+        String leftZeros;
+        int diff;
 
-        for (Long i : longs) {
-            hexa += Long.toHexString(i);
+        for (Long n : longs) {
+            
+            leftZeros = "";
+            temp = Long.toHexString(n);
+            
+            if(temp.length() < 16) {
+                
+                diff = 16 - temp.length();
+                for(int i=0; i < diff; i++) {
+                    leftZeros += "0";
+                }
+            }
+            
+            hexa += leftZeros + temp;
         }
 
         return hexa;

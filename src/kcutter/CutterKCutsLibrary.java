@@ -92,15 +92,14 @@ public class CutterKCutsLibrary extends CutterKCuts
                
                BitRepresentation bitRep      = BitHandler.brcToBitRepresentation(cut.getBrc(nodeCurrent), this.limit);
                BitRepresentation signP       = LowestFunctionFinder.run_P(bitRep, limit);
+               this.checkingSignP(cut, signP,nodeCurrent);
+               //System.out.print("assinatura HEXA->"+ signP.toHexaString()+" "); 
                
                // Clona e Nega o BRC
                BRC cloneBRC = cut.getBrc(nodeCurrent).clone();
                cloneBRC = BRCHandler.not(cloneBRC);
-               BitRepresentation notBitRep      = BitHandler.brcToBitRepresentation(cloneBRC, this.limit);
+               BitRepresentation notBitRep   = BitHandler.brcToBitRepresentation(cloneBRC, this.limit);
                BitRepresentation notSignP    = LowestFunctionFinder.run_P(notBitRep, limit);
-               
-               this.checkingSignP(cut, signP,nodeCurrent);
-               //System.out.print("assinatura HEXA->"+ signP.toHexaString()+" "); 
                System.out.print("Inversão de ");
                //System.out.print("assinatura HEXA->"+ notSignP.toHexaString()+" "); 
                this.checkingSignP(cut, notSignP,nodeCurrent);

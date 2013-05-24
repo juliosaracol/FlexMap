@@ -170,7 +170,6 @@ public class Main
         if(args[1].equals("-KIL")&&(args.length >= 4))
         {
           AigInverter myAig = new AigInverter(args[0]);
-          //Algoritmo de kcuts 
           int sizeCut = Integer.valueOf(args[2]);
           if(!args[3].contains(".genlib")){
               System.out.print("BIBLIOTECA EM FORMATO INVALIDO");
@@ -181,14 +180,14 @@ public class Main
             if(!args[4].contains(".txt")){
                 NodeAig nodeSelect = myAig.getVertexName(args[4]);
                 CutterKCutsInverterLibrary KcutsLibrary  = new CutterKCutsInverterLibrary(myAig, nodeSelect, sizeCut,library);
-                //KcutsLibrary.showAllcutsLibrary(nodeSelect);
+                KcutsLibrary.showAllcutsLibrary(nodeSelect);
                 if((args.length > 5)&&(args[5].contains(".txt")))
                     Logs.LogsAigKcuts(args[5],KcutsLibrary, nodeSelect);
                 return;
             }
             else{
                 CutterKCutsInverterLibrary KcutsLibrary = new CutterKCutsInverterLibrary(myAig, sizeCut, library); 
-                //KcutsLibrary.showAllcutsLibrary();
+                KcutsLibrary.showAllcutsLibrary();
                 if(args[4].contains(".txt"))
                     Logs.LogsAigKcuts(args[4],KcutsLibrary);
                 return;                
@@ -196,7 +195,7 @@ public class Main
           }
           if((args.length == 4)){
                CutterKCutsInverterLibrary KcutsLibrary = new CutterKCutsInverterLibrary(myAig, sizeCut, library); 
-               //KcutsLibrary.showAllcutsLibrary();
+               KcutsLibrary.showAllcutsLibrary();
                return;
           }
         }
@@ -275,28 +274,28 @@ public class Main
         //--------------------MAP AREA FLOW C/KcutsLIBRARY----------------------
         if(args[1].equals("-AL")&&(args.length >= 10))
         {
-//             Aig myAig                = new Aig(args[0]);
-//             int sizeCut              = Integer.valueOf(args[2]);
-//             CutterKCutsLibrary kcuts = new CutterKCutsLibrary(myAig, sizeCut, args[3]);
-//             float pArea              = Float.parseFloat(args[4]);
-//             float pDelay             = Float.parseFloat(args[5]);
-//             float pConsumption       = Float.parseFloat(args[6]);
-//             float pInput             = Float.parseFloat(args[7]);
-//             float pOutput            = Float.parseFloat(args[8]);
-//             float pOther             = Float.parseFloat(args[9]);
-//             CostAreaFlow   function  = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
-//             AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,function);
-////             area.showCovering();
-////             CoveringAreaFlow areaT = area.getCovering();
-////             System.out.println("Valor final:"+areaT.getCost(function));                       
-////             if((args.length > 10)&&(args[10].contains(".eqn"))) 
-////             {  //caso arquivo de log
-////                Logs.LogsWriteEqn(area.getEqn(),args[10]);  
-////             }
+             Aig myAig                = new Aig(args[0]);
+             int sizeCut              = Integer.valueOf(args[2]);
+             CutterKCutsLibrary kcuts = new CutterKCutsLibrary(myAig, sizeCut, args[3]);
+             float pArea              = Float.parseFloat(args[4]);
+             float pDelay             = Float.parseFloat(args[5]);
+             float pConsumption       = Float.parseFloat(args[6]);
+             float pInput             = Float.parseFloat(args[7]);
+             float pOutput            = Float.parseFloat(args[8]);
+             float pOther             = Float.parseFloat(args[9]);
+             CostAreaFlow   function  = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
+             AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,function);
+             area.showCovering();
+             CoveringAreaFlow areaT = area.getCovering();
+             System.out.println("Valor final:"+areaT.getCost(function));                       
+             if((args.length > 10)&&(args[10].contains(".eqn"))) 
+             {  //caso arquivo de log
+                //Logs.LogsWriteEqn(area.getEqn(),args[10]);  
+             }
              return;
         }
         //----------------------------------------------------------------------        
-        //--------------------MAP AREA FLOW C/KcutsLIBRARY----------------------
+        //--------------------MAP AREA FLOW C/KcutsINVERTER_LIBRARY----------------------
         if(args[1].equals("-AIL")&&(args.length >= 10))
         {
              AigInverter myAig        = new AigInverter(args[0]);

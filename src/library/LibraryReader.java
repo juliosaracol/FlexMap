@@ -15,8 +15,9 @@ public class LibraryReader extends Loader{
                     throw new Exception();
                 }
                 nVars = nvars;
-		lib = new Histogram();
-                lib.setNVars(nvars);
+//		lib = new Histogram();
+//                lib.setNVars(nvars);
+                lib = new Histogram(nvars);
 		load_to_lib();
 	}
         

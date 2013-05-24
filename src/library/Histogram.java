@@ -10,13 +10,14 @@ public class Histogram{
         protected int maj;
         protected int nVars;
 	
-	public Histogram(){
-            fmap = new TreeMap<String, FunctionData>();
-            cost = 0;
-            invs = 0;
-            maj = 0;
-            nVars = 3;
-	}
+//	public Histogram(){
+//            fmap = new TreeMap<String, FunctionData>();
+//            cost = 0;
+//            invs = 0;
+//            maj = 0;
+//            nVars = 3;
+//	}
+        //NAO TEM PQ ISSO
 	
         public Histogram(int nvars){
             fmap = new TreeMap<String, FunctionData>();

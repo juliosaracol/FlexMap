@@ -1,16 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package covering;
 
 import FlexMap.CostAreaFlow;
 import aig.Aig;
 import aig.NodeAig;
-import io.Logs;
-import java.io.FileNotFoundException;
 import kcutter.*;
-import library.*;
 import java.util.*;
 
 /**
@@ -19,7 +12,7 @@ import java.util.*;
  */
 public class AreaFlowLibrary
 {
-     protected Aig                   myAig;
+    protected Aig                   myAig;
     protected Integer               sizeCut;
     protected CutterKCutsLibrary     kcuts;
     protected CostAreaFlow          function;
@@ -55,7 +48,7 @@ public class AreaFlowLibrary
            else
                node.accept(dfs);
         }
-        for(NodeAig node: kcuts.getCutsBrc().keySet())
+        for(NodeAig node: kcuts.getCutsBrc().keySet()) //já acessa somente Cuts com matchings
         {
           System.out.println(node.getName());  
           getBestArea(node);
@@ -95,6 +88,7 @@ public class AreaFlowLibrary
     //**Método contabiliza a área do Cut
     protected float sumCost(AigCutBrc cut, NodeAig nodeActual) 
     {
+        float area = 1; //busca da biblioteca
         float input     =0;
         int output      =0;
         if(nodeActual.getChildren().isEmpty())
@@ -109,7 +103,7 @@ public class AreaFlowLibrary
                 getBestArea(node);
             input+=tableArea.get(node);
           }
-          return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1
+          return this.function.eval(area,this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1
         }
         for(NodeAig node:cut)
         {
@@ -117,7 +111,7 @@ public class AreaFlowLibrary
                 getBestArea(node);
             input+=tableArea.get(node);
         }
-        return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output, 0);
+        return this.function.eval(area,this.levelNode.get(nodeActual),0,input, output, 0);
     }
     //**Método faz a melhor escolha entre os cortes do Nodo
     protected void choiceBestArea(NodeAig nodeActual, Map<AigCutBrc, Float> tableCost) 
