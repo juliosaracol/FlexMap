@@ -455,7 +455,7 @@ public class Main
       System.out.println("--MAPEAMENTO COM AREAFLOW COM AIG_INVERTER--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AI TamanhoDoCorte Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW COM BIBLIOTECA--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AB TamanhoDoCorte Biblioteca.genlib Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AIL TamanhoDoCorte Biblioteca.genlib Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW C/TREENODES--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AT TamanhoDoCorte Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW E SIMULATED ANNELING--");

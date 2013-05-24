@@ -5,6 +5,7 @@ import aig.Aig;
 import aig.NodeAig;
 import kcutter.*;
 import java.util.*;
+import library.FunctionData;
 
 /**
  * Classe que estende ArreaFlow utilizando apenas K-cuts com Matching na biblioteca
@@ -12,14 +13,15 @@ import java.util.*;
  */
 public class AreaFlowLibrary
 {
-    protected Aig                   myAig;
-    protected Integer               sizeCut;
-    protected CutterKCutsLibrary     kcuts;
-    protected CostAreaFlow          function;
-    protected Map<NodeAig, AigCutBrc>  covering;
-    protected Map<NodeAig, AigCutBrc>  bestCut;
-    protected Map<NodeAig,Float>    tableArea;
-    protected Map<NodeAig,Integer>  levelNode;
+    protected Aig                       myAig;
+    protected Integer                   sizeCut;
+    protected CutterKCutsLibrary        kcuts;
+    protected CostAreaFlow              function;
+    protected Map<NodeAig, AigCutBrc>   covering;
+    protected Map<NodeAig, AigCutBrc>   bestCut;
+    protected Map<NodeAig,Float>        tableArea;
+    protected Map<NodeAig,Integer>      levelNode;
+    protected Map<AigCutBrc,FunctionData> bestCell;
 
     public AreaFlowLibrary(Aig myAig, int size, CutterKCutsLibrary cutterK,CostAreaFlow function) 
     {
@@ -31,6 +33,8 @@ public class AreaFlowLibrary
         this.bestCut    = new HashMap<NodeAig, AigCutBrc>();
         this.tableArea  = new HashMap<NodeAig, Float>();
         this.levelNode  = new HashMap<NodeAig, Integer>();
+        this.bestCell   = new HashMap<AigCutBrc, FunctionData>();
+        
         System.out.print("********* START AREAFLOW LIBRARY ******");
         mapAreaFlow();
         //covering();
@@ -54,7 +58,7 @@ public class AreaFlowLibrary
           getBestArea(node);
         }
     }
-    //**Método que dado um Nodo gera os cortes, calcula áreas e seleciona melhor área
+    //**Método que dado um Nodo gera custos dos cortes
     protected  void getBestArea(NodeAig nodeActual)
     {
         if(this.bestCut.containsKey(nodeActual))
@@ -73,9 +77,23 @@ public class AreaFlowLibrary
            }
            else
            {
-              float cost  = sumCost(cut,nodeActual);
-              tableCost.put(cut, (Float)cost);              
-           }           
+              float bestCost=-1, cost;
+              FunctionData bestMatching = null;
+              for(FunctionData matching : kcuts.getMatchings().get(cut)){//dada um corte e os matchings possiveis calcula todos os custos com todos os matchings seleciona o melhor 
+                  if(bestCost==-1){
+                    bestMatching = matching;  
+                    bestCost     = sumCost(cut,nodeActual, matching);
+                  }
+                  else{
+                       cost = sumCost(cut,nodeActual, matching);
+                       if(bestCost > cost){
+                           bestCost = cost;
+                           bestMatching = matching;
+                       }
+                    }
+              }
+              tableCost.put(cut, (Float)bestCost);              
+          }
         }while(iterator.hasNext()); //contabiliza areas
         if(!nodeActual.isInput())
             choiceBestArea(nodeActual,tableCost);
@@ -85,12 +103,11 @@ public class AreaFlowLibrary
          " Corte:");
         bestCut.get(nodeActual).showCut();
     }
-    //**Método contabiliza a área do Cut
-    protected float sumCost(AigCutBrc cut, NodeAig nodeActual) 
+    //**Método contabiliza a área do Cut com os matchings e retorna o custo
+    protected float sumCost(AigCutBrc cut, NodeAig nodeActual, FunctionData matching) 
     {
-        float area = 1; //busca da biblioteca
-        float input     =0;
-        int output      =0;
+        float input     = 0;
+        int   output    = 0;
         if(nodeActual.getChildren().isEmpty())
             output =1;//fanouts
         else
@@ -103,17 +120,18 @@ public class AreaFlowLibrary
                 getBestArea(node);
             input+=tableArea.get(node);
           }
-          return this.function.eval(area,this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1
+          return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1
         }
+        
         for(NodeAig node:cut)
         {
             if(!tableArea.containsKey(node))
                 getBestArea(node);
             input+=tableArea.get(node);
         }
-        return this.function.eval(area,this.levelNode.get(nodeActual),0,input, output, 0);
+        return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output, 0);
     }
-    //**Método faz a melhor escolha entre os cortes do Nodo
+    //**Método faz a melhor escolha entre os cortes do Nodo com os custos
     protected void choiceBestArea(NodeAig nodeActual, Map<AigCutBrc, Float> tableCost) 
     {
         AigCutBrc cut        = null;

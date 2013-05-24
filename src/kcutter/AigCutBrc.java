@@ -14,6 +14,7 @@ public class AigCutBrc extends AigCut
     protected Boolean flagBrc;
     protected BRC brc = null;
     protected TreeMap<String, BRC> brcVariables =null;
+    protected Boolean notMatching = false;
  
     /**
      * Construtor
@@ -22,6 +23,8 @@ public class AigCutBrc extends AigCut
         super();
         this.k = k;
         this.flagBrc = false;
+        //*adaptação para repreentar matchings invertidos
+        this.notMatching = false;
     }
 
     /**
@@ -168,5 +171,22 @@ public class AigCutBrc extends AigCut
     
     public void setK(int k) {
         this.k = k;
-    }    
+    }
+
+    /*métdodo para tratar matchings invertidos
+     * @param notMatching 
+     */
+    public void setNotMatching() {
+        if(this.notMatching == true)
+            this.notMatching = false;
+        else
+            this.notMatching = true;
+        this.notMatching = notMatching;
+    }
+
+    public Boolean getNotMatching() {
+        return notMatching;
+    }
+    
+    
 }
