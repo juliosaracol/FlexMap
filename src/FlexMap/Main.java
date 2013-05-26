@@ -285,9 +285,9 @@ public class Main
              float pOther             = Float.parseFloat(args[9]);
              CostAreaFlow   function  = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
              AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,function);
-             area.showCovering();
-             CoveringAreaFlow areaT = area.getCovering();
-             System.out.println("Valor final:"+areaT.getCost(function));                       
+             //area.showCovering();
+             //CoveringAreaFlow areaT = area.getCovering();
+             //System.out.println("Valor final:"+areaT.getCost(function));                       
              if((args.length > 10)&&(args[10].contains(".eqn"))) 
              {  //caso arquivo de log
                 //Logs.LogsWriteEqn(area.getEqn(),args[10]);  
@@ -309,7 +309,7 @@ public class Main
              float pOther             = Float.parseFloat(args[9]);
              CostAreaFlow   function  = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
              AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,function);
-             area.showCovering();
+             //area.showCovering();
              //CoveringAreaFlow areaT = area.getCovering();
              //System.out.println("Valor final:"+areaT.getCost(function));                       
              if((args.length > 10)&&(args[10].contains(".eqn"))) 

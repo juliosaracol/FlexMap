@@ -17,6 +17,7 @@ public class CutterKCutsLibrary extends CutterKCuts
     protected Map<NodeAig,Set<AigCutBrc>>    cutsBrc;
     /**Atributo que possui os cortes que foram encontrados Matchings*/
     protected Map<AigCutBrc,Set<FunctionData>> signature;
+    protected Map<Set<FunctionData>,String>    signatureToHexa;
     protected Map<NodeAig,Set<AigCutBrc>>      cutsBrcMatchings;
     public String logs="";
     
@@ -30,12 +31,14 @@ public class CutterKCutsLibrary extends CutterKCuts
             System.exit(-1);
         }            
         System.out.println("Biblioteca carregada com sucesso");
-        this.signature  = new HashMap<AigCutBrc, Set<FunctionData>>();
-        this.cutsBrcMatchings =  new HashMap<NodeAig, Set<AigCutBrc>>();
+        this.signature          = new HashMap<AigCutBrc, Set<FunctionData>>();
+        this.signatureToHexa    = new HashMap<Set<FunctionData>, String>();
+        this.cutsBrcMatchings   = new HashMap<NodeAig, Set<AigCutBrc>>();
         for(NodeAig node : aig.getAllNodesAig())
         {
             computeAllCuts(node);
         }
+        System.out.println("KcutsLibrary efetuado com sucesso!");
     }
     
     public CutterKCutsLibrary(Aig aig,NodeAig nodeCurrent, int limit, String libraryName) throws Exception
@@ -55,10 +58,11 @@ public class CutterKCutsLibrary extends CutterKCuts
             System.exit(-1);
         }
         this.computeAllCuts(nodeCurrent);
+        System.out.println("KcutsLibrary efetuado com sucesso!");
     }
 
     @Override
-    protected void computeAllCuts(NodeAig node) 
+    protected void computeAllCuts(NodeAig node) throws CloneNotSupportedException 
     {
         computeKcuts(node);
         createBrc();
@@ -83,15 +87,17 @@ public class CutterKCutsLibrary extends CutterKCuts
     }
     
     private void Matching(NodeAig nodeCurrent) {
-            System.out.println("Buscando Matching com nodo: "+nodeCurrent.getName());
+            //System.out.println("Buscando Matching com nodo: "+nodeCurrent.getName());
             Set<AigCutBrc> allCuts = this.cutsBrc.get(nodeCurrent);
             for(AigCutBrc cut: allCuts)
             {
-               cut.showCut(nodeCurrent);
-               BRCHandler.displayBinary(cut.getBrc(nodeCurrent));
+               //cut.showCut(nodeCurrent);
+               //BRCHandler.displayBinary(cut.getBrc(nodeCurrent));
                
                BitRepresentation bitRep      = BitHandler.brcToBitRepresentation(cut.getBrc(nodeCurrent), this.limit);
                BitRepresentation signP       = LowestFunctionFinder.run_P(bitRep, limit);
+               //cadastra a assinaturaP em HEXA do corte
+               cut.setSignaturePHexa(signP.toHexaString());
                this.checkingSignP(cut, signP,nodeCurrent);
                //System.out.print("assinatura HEXA->"+ signP.toHexaString()+" "); 
                
@@ -100,33 +106,33 @@ public class CutterKCutsLibrary extends CutterKCuts
                cloneBRC = BRCHandler.not(cloneBRC);
                BitRepresentation notBitRep   = BitHandler.brcToBitRepresentation(cloneBRC, this.limit);
                BitRepresentation notSignP    = LowestFunctionFinder.run_P(notBitRep, limit);
-               System.out.print("Inversão de ");
+               //System.out.print("Inversão de ");
                //System.out.print("assinatura HEXA->"+ notSignP.toHexaString()+" "); 
                this.checkingSignP(cut, notSignP,nodeCurrent);
-               System.out.print("-----------------\n");
+               //System.out.print("-----------------\n");
             }
     }
     
     protected void checkingSignP(AigCutBrc cut, BitRepresentation sign,NodeAig nodeCurrent)
     {
-         System.out.print("assinatura HEXA->"+ sign.toHexaString()+" ");                         
+        System.out.print("Nodo: "+nodeCurrent.getName()+"assinatura HEXA->"+ sign.toHexaString()+" ");                         
          try{
               FunctionData dataFunc = library.getLib().getBySign(sign.toHexaString()); //consulta custo na biblioteca
               System.out.println("######Matching com a biblioteca célula: "+dataFunc.getGateName()+" função: "+dataFunc.getFunction()+" custo: "+dataFunc.getCost());
               if(this.signature.containsKey(cut))
-              {
                   this.signature.get(cut).add(dataFunc);
-                  this.cutsBrcMatchings.get(nodeCurrent).add(cut);                  
-              }
-              else
-              {
+              else{
                   Set<FunctionData> sig = new HashSet<FunctionData>();
                   sig.add(dataFunc);
                   this.signature.put(cut,sig);
-                  Set<AigCutBrc> cuts = new HashSet<AigCutBrc>();
-                  cuts.add(cut);
-                  this.cutsBrcMatchings.put(nodeCurrent,cuts);                  
               }
+              if(!this.cutsBrcMatchings.containsKey(nodeCurrent)){
+                 Set<AigCutBrc> cuts = new HashSet<AigCutBrc>();
+                 cuts.add(cut);
+                 this.cutsBrcMatchings.put(nodeCurrent,cuts);
+              }
+              else
+                 this.cutsBrcMatchings.get(nodeCurrent).add(cut);                     
          }catch(Exception e)
          {
             System.out.println("%%%%SEM MATCHING: erro ao pesquisar função lógica na biblioteca ou assinatura%%%%");
@@ -187,13 +193,26 @@ public class CutterKCutsLibrary extends CutterKCuts
        System.out.println("########################################");
     }
 
+    /** Método de acesso aos Kcuts que estão com matching na biblioteca*/ 
     public Map<NodeAig, Set<AigCutBrc>> getCutsBrc() {
         return Collections.unmodifiableMap(cutsBrcMatchings);
     }
     
+    /** Método de acesso ao conjunto cort/matchings da biblioteca*/ 
     public Map<AigCutBrc, Set<FunctionData>> getMatchings() {
         return Collections.unmodifiableMap(signature);
     }
+
+    /** Método de acesso a biblioteca em que os Kcuts foram aplicados os matchings*/ 
+    public LibraryReader getLibrary() {
+        return library;
+    }
+
+    public void setLibrary(LibraryReader library) {
+        this.library = library;
+    }
+    
+    
     
     
     

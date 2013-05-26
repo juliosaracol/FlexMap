@@ -42,18 +42,47 @@ public abstract class Cutter
      * @param k2 Set of cuts to be combined
      * @return  A set of cuts, irredundant, and respecting size limit
      */
-    protected Set<AigCut> combineIrredundant(Set<AigCut> k1, Set<AigCut> k2)
+    protected Set<AigCut> combineIrredundant(NodeAig nodeActual, Set<AigCut> k1, Set<AigCut> k2)
     {
         //Combine all cuts
-        Set<AigCut> combinedCuts = combineCuts(k1, k2);
+        Set<AigCut> combinedCuts = combineCuts(nodeActual,k1, k2);
         //Remove reduntant cuts
         makeIrredundantCuts(combinedCuts);
         return combinedCuts;
     }
     /** Método que combina os dois sub-Cuts*/
-    protected Set<AigCut> combineCuts(Set<AigCut> k1, Set<AigCut> k2)
+    protected Set<AigCut> combineCuts(NodeAig nodeActual, Set<AigCut> k1,Set<AigCut> k2)
     {
+        
         Set<AigCut> combinedCuts = new HashSet<AigCut>();
+        if((!nodeActual.getParents().get(0).isInput())&&(!nodeActual.getParents().get(1).isInput())){
+            AigCut fathers = new AigCut();
+            fathers.add(nodeActual.getParents().get(0));
+            fathers.add(nodeActual.getParents().get(1));
+            if (fathers.size() <= this.limit)
+               combinedCuts.add(fathers);
+        }                    
+        if(!nodeActual.getParents().get(0).isInput()){
+            for (AigCut aigCut2 : k2) 
+            {
+                AigCut currentCut = new AigCut();
+                currentCut.add(nodeActual.getParents().get(0));
+                currentCut.addAll(aigCut2);
+                if (currentCut.size() <= this.limit)
+                    combinedCuts.add(currentCut);
+            }
+        }
+        if(!nodeActual.getParents().get(1).isInput()){
+            for (AigCut aigCut1 : k1) 
+            {
+                AigCut currentCut = new AigCut();
+                currentCut.add(nodeActual.getParents().get(1));
+                currentCut.addAll(aigCut1);
+                if (currentCut.size() <= this.limit)
+                    combinedCuts.add(currentCut);
+            }
+        }
+
         for (AigCut aigCut1 : k1) 
         {
             for (AigCut aigCut2 : k2) 

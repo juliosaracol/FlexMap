@@ -6,6 +6,7 @@ import aig.NodeAig;
 import kcutter.*;
 import java.util.*;
 import library.FunctionData;
+import sun.org.mozilla.javascript.ast.ThrowStatement;
 
 /**
  * Classe que estende ArreaFlow utilizando apenas K-cuts com Matching na biblioteca
@@ -34,8 +35,13 @@ public class AreaFlowLibrary
         this.tableArea  = new HashMap<NodeAig, Float>();
         this.levelNode  = new HashMap<NodeAig, Integer>();
         this.bestCell   = new HashMap<AigCutBrc, FunctionData>();
-        
-        System.out.print("********* START AREAFLOW LIBRARY ******");
+//        
+//        if(this.kcuts.getCutsBrc().size() < myAig.getAllNodesAig().size()){
+//            System.out.println("Não possível encontrar matchings para todos os nodos");
+//            System.exit(-1);
+//        }
+                      
+        System.out.println("********* START AREAFLOW LIBRARY ******");
         mapAreaFlow();
         //covering();
     }
@@ -53,10 +59,7 @@ public class AreaFlowLibrary
                node.accept(dfs);
         }
         for(NodeAig node: kcuts.getCutsBrc().keySet()) //já acessa somente Cuts com matchings
-        {
-          System.out.println(node.getName());  
           getBestArea(node);
-        }
     }
     //**Método que dado um Nodo gera custos dos cortes
     protected  void getBestArea(NodeAig nodeActual)
@@ -65,6 +68,8 @@ public class AreaFlowLibrary
           return;
         Map<AigCutBrc,Float> tableCost     = new HashMap<AigCutBrc, Float>();
         Set<AigCutBrc> cuts                = kcuts.getCutsBrc().get(nodeActual);
+        if(cuts == null)//CASO DE NÂO HOUVER MATCHING
+            return;
         Iterator<AigCutBrc> iterator       = cuts.iterator();
         do
         {          
@@ -77,9 +82,11 @@ public class AreaFlowLibrary
            }
            else
            {
+              if(!((cut.getCut().size()==1) && (cut.getCut().contains(nodeActual)))){
               float bestCost=-1, cost;
               FunctionData bestMatching = null;
-              for(FunctionData matching : kcuts.getMatchings().get(cut)){//dada um corte e os matchings possiveis calcula todos os custos com todos os matchings seleciona o melhor 
+              for(FunctionData matching : kcuts.getMatchings().get(cut)){
+                  //dado um corte e os matchings possiveis calcula todos os custos com todos os matchings seleciona o melhor 
                   if(bestCost==-1){
                     bestMatching = matching;  
                     bestCost     = sumCost(cut,nodeActual, matching);
@@ -91,8 +98,11 @@ public class AreaFlowLibrary
                            bestMatching = matching;
                        }
                     }
-              }
-              tableCost.put(cut, (Float)bestCost);              
+                }
+                if(!cut.getSignaturePHexa().equals(bestMatching.getSignature()))
+                    cut.setNotMatching();
+                tableCost.put(cut, (Float)bestCost);
+             }
           }
         }while(iterator.hasNext()); //contabiliza areas
         if(!nodeActual.isInput())
@@ -103,7 +113,7 @@ public class AreaFlowLibrary
          " Corte:");
         bestCut.get(nodeActual).showCut();
     }
-    //**Método contabiliza a área do Cut com os matchings e retorna o custo
+    //**Método contabiliza a área do Cut com seu matching e retorna o custo
     protected float sumCost(AigCutBrc cut, NodeAig nodeActual, FunctionData matching) 
     {
         float input     = 0;
@@ -118,20 +128,43 @@ public class AreaFlowLibrary
           {
             if(!tableArea.containsKey(node))
                 getBestArea(node);
-            input+=tableArea.get(node);
+            if(tableArea.get(node)==null){
+                System.out.println(node.getName());
+               input+=10;
+            }
+            else
+                input+=tableArea.get(node);
           }
-          return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1
+          //compara as assinaturas hexa pra ver se o matching eh negado
+          if(cut.getSignaturePHexa().equals(matching.getSignature())){
+              //pega o custo do inversor
+              float inverter = 1;//this.kcuts.getLibrary().getLib().getBySign("!").getCost();
+              return this.function.eval(matching.getCost()+inverter,this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1
+          }
+          else
+              return this.function.eval(matching.getCost(),this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1              
         }
         
         for(NodeAig node:cut)
         {
             if(!tableArea.containsKey(node))
                 getBestArea(node);
-            input+=tableArea.get(node);
+            if(tableArea.get(node)==null){
+                System.out.println(node.getName());
+                input+=0;
+            }else
+                input+=tableArea.get(node);
         }
-        return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output, 0);
+        //compara as assinaturas hexa pra ver se o matching eh negado
+        if(cut.getSignaturePHexa().equals(matching.getSignature())){
+            //pega o custo do inversor
+            float inverter = 1;//this.kcuts.getLibrary().getLib().getBySign("!").getCost();
+            return this.function.eval(matching.getCost()+inverter,this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1
+        }
+        else
+            return this.function.eval(matching.getCost(),this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1              
     }
-    //**Método faz a melhor escolha entre os cortes do Nodo com os custos
+    //**Método faz a melhor escolha entre os cortes/matching do Nodo com os custos
     protected void choiceBestArea(NodeAig nodeActual, Map<AigCutBrc, Float> tableCost) 
     {
         AigCutBrc cut        = null;

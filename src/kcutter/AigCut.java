@@ -157,6 +157,15 @@ public class AigCut implements Set<NodeAig>
     public Set<NodeAig> getCut() {
         return Collections.unmodifiableSet(cut);
     }
+
+    @Override
+    protected AigCut clone() throws CloneNotSupportedException {
+        AigCut copy = new AigCut();
+        copy.addAll(getCut());
+        return copy;
+    }
+    
+    
     
     
 }

@@ -13,8 +13,9 @@ public class AigCutBrc extends AigCut
     protected int k;
     protected Boolean flagBrc;
     protected BRC brc = null;
-    protected TreeMap<String, BRC> brcVariables =null;
-    protected Boolean notMatching = false;
+    protected TreeMap<String, BRC> brcVariables = null;
+    protected Boolean notMatching               = false;
+    protected String signaturePHexa             = ""; 
  
     /**
      * Construtor
@@ -173,7 +174,8 @@ public class AigCutBrc extends AigCut
         this.k = k;
     }
 
-    /*métdodo para tratar matchings invertidos
+    /* Métdodo para sinalizar matchings invertidos 
+     * @return set if(true?false:true)
      * @param notMatching 
      */
     public void setNotMatching() {
@@ -184,9 +186,21 @@ public class AigCutBrc extends AigCut
         this.notMatching = notMatching;
     }
 
+    /** Método que consulta se o matching selecionado eh invertido*/
     public Boolean getNotMatching() {
         return notMatching;
     }
+
+    /** Métdodo que consulta a assinaturaP hexadecimal do corte*/
+    public String getSignaturePHexa() {
+        return signaturePHexa;
+    }
+
+    /** Métdodo que cadastra a assinaturaP hexadecimal do corte*/
+    public void setSignaturePHexa(String signaturePHexa) {
+        this.signaturePHexa = signaturePHexa;
+    }
+    
     
     
 }

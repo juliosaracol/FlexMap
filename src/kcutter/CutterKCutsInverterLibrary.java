@@ -1,9 +1,6 @@
 package kcutter;
 
 import aig.*;
-import brc.*;
-import functionsClasses.*;
-import library.*;
 import java.util.*; 
 
 /**
@@ -17,12 +14,12 @@ public class CutterKCutsInverterLibrary extends CutterKCutsLibrary
         super(aig, limit, libraryName);
     }
 
-    public CutterKCutsInverterLibrary(Aig aig, NodeAig nodeCurrent, int limit, String libraryName) throws Exception {
+    public CutterKCutsInverterLibrary(Aig aig, NodeAig nodeCurrent, int limit, String libraryName) throws CloneNotSupportedException, Exception  {
         super(aig, nodeCurrent, limit, libraryName);
     }
     
     @Override
-    protected Set<AigCut> computeKcuts(NodeAig nodeCurrent) 
+    protected Set<AigCut> computeKcuts(NodeAig nodeCurrent) throws CloneNotSupportedException 
     {
         
         if(this.cuts.containsKey(nodeCurrent))
@@ -42,8 +39,11 @@ public class CutterKCutsInverterLibrary extends CutterKCutsLibrary
                 kcut.add(new AigCut(nodeCurrent));
                 if(!this.cuts.containsKey(nodeCurrent.getParents().get(0)))
                    computeKcuts(nodeCurrent.getParents().get(0));
-                kcut.addAll(this.cuts.get(nodeCurrent.getParents().get(0)));                   
-                this.cuts.put(nodeCurrent,kcut);
+                Set<AigCut> clone =  new HashSet<AigCut>();
+                for(AigCut father: this.cuts.get(nodeCurrent.getParents().get(0)))
+                    clone.add(father.clone());
+                this.cuts.put(nodeCurrent,clone);
+                this.cuts.get(nodeCurrent).add(new AigCut(nodeCurrent.getParents().get(0)));
             }
             else
             {
@@ -55,8 +55,8 @@ public class CutterKCutsInverterLibrary extends CutterKCutsLibrary
                if(!this.cuts.containsKey(nodeCurrent.getParents().get(1)))
                   computeKcuts(nodeCurrent.getParents().get(1));
                Set<AigCut> k2 = this.cuts.get(nodeCurrent.getParents().get(1));
-               Set<AigCut> combined = combineIrredundant(k1, k2);
-               combined.add(new AigCut(nodeCurrent));
+               Set<AigCut> combined = combineIrredundant(nodeCurrent,k1, k2);
+               //combined.add(new AigCut(nodeCurrent));
                if(this.cuts.containsKey(nodeCurrent))
                    this.cuts.get(nodeCurrent).addAll(combined);
                else
