@@ -20,7 +20,7 @@ public class AreaFlowInverter extends AreaFlow{
     @Override
     public String getEqn() throws FileNotFoundException
     {
-       String eqn = Logs.coveringToEqn((AigInverter)myAig, getCoveringCuts());
+       String eqn = LogsCoveringToEqn.coveringToEqn((AigInverter)myAig, getCoveringCuts());
        return eqn;
     }    
     

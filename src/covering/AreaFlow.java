@@ -222,7 +222,7 @@ public class AreaFlow
     
     public String getEqn() throws FileNotFoundException
     {
-       String eqn = Logs.coveringToEqn(myAig, getCoveringCuts());
+       String eqn = LogsCoveringToEqn.coveringToEqn(myAig, getCoveringCuts());
        return eqn;
     }
 

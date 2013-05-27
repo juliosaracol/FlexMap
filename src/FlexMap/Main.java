@@ -54,14 +54,14 @@ public class Main
                 CutterKCuts Kcuts  = new CutterKCuts(myAig, nodeSelect, sizeCut);
                 Kcuts.showAllcuts(nodeSelect);
                 if((args.length > 4)&&(args[4].contains(".txt")))
-                    Logs.LogsAigKcuts(args[4],Kcuts,nodeSelect);
+                    LogsKcuts.LogsAigKcuts(args[4],Kcuts,nodeSelect);
                 return;
             }
             else{
                 CutterKCuts Kcuts  = new CutterKCuts(myAig, sizeCut); 
                 Kcuts.showAllcuts();
                 if(args[3].contains(".txt"))
-                    Logs.LogsAigKcuts(args[3],Kcuts);
+                    LogsKcuts.LogsAigKcuts(args[3],Kcuts);
                 return;                
             }
           }
@@ -84,14 +84,14 @@ public class Main
                 CutterKCutsTreeNodes KcutsTN  = new CutterKCutsTreeNodes(myAig, nodeSelect, sizeCut);
                 KcutsTN.showAllcuts(nodeSelect);
                 if((args.length > 4)&&(args[4].contains(".txt")))
-                    Logs.LogsAigKcuts(args[4],KcutsTN,nodeSelect);
+                    LogsKcuts.LogsAigKcuts(args[4],KcutsTN,nodeSelect);
                 return;
             }
             else{
                 CutterKCutsTreeNodes KcutsTN  = new CutterKCutsTreeNodes(myAig, sizeCut); 
                 KcutsTN.showAllcuts();
                 if(args[3].contains(".txt"))
-                    Logs.LogsAigKcuts(args[3],KcutsTN);
+                    LogsKcuts.LogsAigKcuts(args[3],KcutsTN);
                 return;                
             }
           }
@@ -114,13 +114,13 @@ public class Main
                 CutterKCutsInverter KcutsI  = new CutterKCutsInverter(myAig, nodeSelect, sizeCut);
                 KcutsI.showAllcuts(nodeSelect);
                 if((args.length > 4)&&(args[4].contains(".txt")))
-                    Logs.LogsAigKcuts(args[4],KcutsI,nodeSelect);
+                    LogsKcuts.LogsAigKcuts(args[4],KcutsI,nodeSelect);
                 return;
             }
             else{
                 CutterKCutsInverter KcutsI  = new CutterKCutsInverter(myAig, sizeCut);
                 if(args[3].contains(".txt"))
-                    Logs.LogsAigKcuts(args[3],KcutsI);
+                    LogsKcuts.LogsAigKcuts(args[3],KcutsI);
                 return;                
             }
           }
@@ -148,14 +148,14 @@ public class Main
                 CutterKCutsLibrary KcutsLibrary  = new CutterKCutsLibrary(myAig, nodeSelect, sizeCut,library);
                 KcutsLibrary.showAllcutsLibrary(nodeSelect);
                 if((args.length > 5)&&(args[5].contains(".txt")))
-                    Logs.LogsAigKcuts(args[5],KcutsLibrary, nodeSelect);
+                    LogsKcuts.LogsAigKcuts(args[5],KcutsLibrary, nodeSelect);
                 return;
             }
             else{
                 CutterKCutsLibrary KcutsLibrary = new CutterKCutsLibrary(myAig, sizeCut, library); 
                 KcutsLibrary.showAllcutsLibrary();
                 if(args[4].contains(".txt"))
-                    Logs.LogsAigKcuts(args[4],KcutsLibrary);
+                    LogsKcuts.LogsAigKcuts(args[4],KcutsLibrary);
                 return;                
             }
           }
@@ -182,14 +182,14 @@ public class Main
                 CutterKCutsInverterLibrary KcutsLibrary  = new CutterKCutsInverterLibrary(myAig, nodeSelect, sizeCut,library);
                 KcutsLibrary.showAllcutsLibrary(nodeSelect);
                 if((args.length > 5)&&(args[5].contains(".txt")))
-                    Logs.LogsAigKcuts(args[5],KcutsLibrary, nodeSelect);
+                    LogsKcuts.LogsAigKcuts(args[5],KcutsLibrary, nodeSelect);
                 return;
             }
             else{
                 CutterKCutsInverterLibrary KcutsLibrary = new CutterKCutsInverterLibrary(myAig, sizeCut, library); 
                 KcutsLibrary.showAllcutsLibrary();
                 if(args[4].contains(".txt"))
-                    Logs.LogsAigKcuts(args[4],KcutsLibrary);
+                    LogsKcuts.LogsAigKcuts(args[4],KcutsLibrary);
                 return;                
             }
           }
@@ -263,6 +263,7 @@ public class Main
              CostAreaFlow   function        = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
              AreaFlow area                  = new AreaFlow(myAig,sizeCut,kcuts,function);
              area.showCovering();
+             area.getEqn();
              CoveringAreaFlow areaT         = area.getCovering();
              System.out.println("Valor final:"+areaT.getCost(function));                       
              if((args.length > 9)&&(args[9].contains(".eqn"))){ //caso arquivo de log
@@ -285,12 +286,13 @@ public class Main
              float pOther             = Float.parseFloat(args[9]);
              CostAreaFlow   function  = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
              AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,function);
-             //area.showCovering();
-             //CoveringAreaFlow areaT = area.getCovering();
-             //System.out.println("Valor final:"+areaT.getCost(function));                       
+             area.showCovering();
+             area.getEqn();
+             CoveringAreaFlow areaT = area.getCovering();
+             System.out.println("Valor final:"+areaT.getCost(function));                       
              if((args.length > 10)&&(args[10].contains(".eqn"))) 
              {  //caso arquivo de log
-                //Logs.LogsWriteEqn(area.getEqn(),args[10]);  
+                Logs.LogsWriteEqn(area.getEqn(),args[10]);  
              }
              return;
         }
@@ -303,18 +305,19 @@ public class Main
              CutterKCutsInverterLibrary kcuts = new CutterKCutsInverterLibrary(myAig, sizeCut, args[3]);
              float pArea              = Float.parseFloat(args[4]);
              float pDelay             = Float.parseFloat(args[5]);
-             float pConsumption       = Float.parseFloat(args[6]);
+             float pConsumption       =  Float.parseFloat(args[6]);
              float pInput             = Float.parseFloat(args[7]);
              float pOutput            = Float.parseFloat(args[8]);
              float pOther             = Float.parseFloat(args[9]);
              CostAreaFlow   function  = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
              AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,function);
-             //area.showCovering();
-             //CoveringAreaFlow areaT = area.getCovering();
-             //System.out.println("Valor final:"+areaT.getCost(function));                       
+             area.showCovering();
+             area.getEqn();
+             CoveringAreaFlow areaT = area.getCovering();
+             System.out.println("Valor final:"+areaT.getCost(function));                       
              if((args.length > 10)&&(args[10].contains(".eqn"))) 
              { //caso arquivo de log
-              //Logs.LogsWriteEqn(area.getEqn(),args[10]);  
+              Logs.LogsWriteEqn(area.getEqn(),args[10]);  
              }
              return;
         }
@@ -322,27 +325,27 @@ public class Main
         //--------------------MAP AREA FLOW SIMULATED ANNELING------------------
         if(args[1].equals("-ASA")&&(args.length >= 9))
         {
-             Aig myAig                          = new Aig(args[0]);
-             int sizeCut                        = Integer.valueOf(args[2]);
-             CutterKCuts kcuts                  = new CutterKCuts(myAig, sizeCut);
-             float pArea                        = Float.parseFloat(args[3]);
-             float pDelay                       = Float.parseFloat(args[4]);
-             float pConsumption                 = Float.parseFloat(args[5]);
-             float pInput                       = Float.parseFloat(args[6]);
-             float pOutput                      = Float.parseFloat(args[7]);
-             float pOther                       = Float.parseFloat(args[8]);
-             CostAreaFlow   function            = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
-             AreaFlow area                      = new AreaFlow(myAig,sizeCut,kcuts,function);
-             CoveringAreaFlow initialCovering   = area.getCovering();
-             area.showCovering();
-             System.out.println(initialCovering.getCost(function));
-             
-             SimulatedAnneling SA               = new SimulatedAnneling(myAig,kcuts,area.getBestCut(),initialCovering,function,100,1000,50);
-             if((args.length > 9)&&(args[9].contains(".eqn"))) 
-             { //caso arquivo de log
-               Logs.LogsWriteEqn(area.getEqn(),args[10]);  
-             }
-             return;
+//             Aig myAig                          = new Aig(args[0]);
+//             int sizeCut                        = Integer.valueOf(args[2]);
+//             CutterKCuts kcuts                  = new CutterKCuts(myAig, sizeCut);
+//             float pArea                        = Float.parseFloat(args[3]);
+//             float pDelay                       = Float.parseFloat(args[4]);
+//             float pConsumption                 = Float.parseFloat(args[5]);
+//             float pInput                       = Float.parseFloat(args[6]);
+//             float pOutput                      = Float.parseFloat(args[7]);
+//             float pOther                       = Float.parseFloat(args[8]);
+//             CostAreaFlow   function            = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
+//             AreaFlow area                      = new AreaFlow(myAig,sizeCut,kcuts,function);
+//             CoveringAreaFlow initialCovering   = area.getCovering();
+//             area.showCovering();
+//             System.out.println(initialCovering.getCost(function));
+//             
+//             SimulatedAnneling SA               = new SimulatedAnneling(myAig,kcuts,area.getBestCut(),initialCovering,function,100,1000,50);
+//             if((args.length > 9)&&(args[9].contains(".eqn"))) 
+//             { //caso arquivo de log
+//               Logs.LogsWriteEqn(area.getEqn(),args[10]);  
+//             }
+//             return;
         }
         //----------------------------------------------------------------------
         //--------------------ELIS----------------------------------------------

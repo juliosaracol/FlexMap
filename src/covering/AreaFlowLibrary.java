@@ -2,7 +2,11 @@ package covering;
 
 import FlexMap.CostAreaFlow;
 import aig.Aig;
+import aig.AigInverter;
 import aig.NodeAig;
+import io.Logs;
+import io.LogsCoveringToEqn;
+import java.io.FileNotFoundException;
 import kcutter.*;
 import java.util.*;
 import library.FunctionData;
@@ -43,7 +47,7 @@ public class AreaFlowLibrary
                       
         System.out.println("********* START AREAFLOW LIBRARY ******");
         mapAreaFlow();
-        //covering();
+        covering();
     }
     //** Método que aplica a cobertura baseado no AreaFlow
     protected void mapAreaFlow() 
@@ -61,13 +65,14 @@ public class AreaFlowLibrary
         for(NodeAig node: kcuts.getCutsBrc().keySet()) //já acessa somente Cuts com matchings
           getBestArea(node);
     }
-    //**Método que dado um Nodo gera custos dos cortes
+    //**Método que dado um Nodo gera custos dos cortes ja associa o melhor matching para o corte
     protected  void getBestArea(NodeAig nodeActual)
     {
         if(this.bestCut.containsKey(nodeActual))
           return;
-        Map<AigCutBrc,Float> tableCost     = new HashMap<AigCutBrc, Float>();
-        Set<AigCutBrc> cuts                = kcuts.getCutsBrc().get(nodeActual);
+        Map<AigCutBrc, FunctionData> tableMatching  = new HashMap<AigCutBrc, FunctionData>();
+        Map<AigCutBrc,Float> tableCost              = new HashMap<AigCutBrc, Float>();
+        Set<AigCutBrc> cuts                         = kcuts.getCutsBrc().get(nodeActual);
         if(cuts == null)//CASO DE NÂO HOUVER MATCHING
             return;
         Iterator<AigCutBrc> iterator       = cuts.iterator();
@@ -102,11 +107,12 @@ public class AreaFlowLibrary
                 if(!cut.getSignaturePHexa().equals(bestMatching.getSignature()))
                     cut.setNotMatching();
                 tableCost.put(cut, (Float)bestCost);
+                tableMatching.put(cut, bestMatching);
              }
           }
         }while(iterator.hasNext()); //contabiliza areas
         if(!nodeActual.isInput())
-            choiceBestArea(nodeActual,tableCost);
+            choiceBestArea(nodeActual,tableCost, tableMatching);
         System.out.print(" BestArea Nodo: "+nodeActual.getName()+
          " Custo: "+tableArea.get(nodeActual)+
          " Profundidade: "+levelNode.get(nodeActual)+
@@ -165,7 +171,7 @@ public class AreaFlowLibrary
             return this.function.eval(matching.getCost(),this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1              
     }
     //**Método faz a melhor escolha entre os cortes/matching do Nodo com os custos
-    protected void choiceBestArea(NodeAig nodeActual, Map<AigCutBrc, Float> tableCost) 
+    protected void choiceBestArea(NodeAig nodeActual, Map<AigCutBrc, Float> tableCost,Map<AigCutBrc, FunctionData> tableMatching) 
     {
         AigCutBrc cut        = null;
         AigCutBrc cutBest    = bestCost(tableCost);
@@ -182,8 +188,9 @@ public class AreaFlowLibrary
                   cutBest = cut; 
                 
         }while(iterator.hasNext());
-        bestCut.put(nodeActual,cutBest);      
-        tableArea.put(nodeActual, (tableCost.get(cutBest)));
+        this.bestCell.put(cut, tableMatching.get(cut));
+        this.bestCut.put(nodeActual,cutBest);      
+        this.tableArea.put(nodeActual, (tableCost.get(cutBest)));
     }
     //**Método contabiliza a profundidade utilizando bfs
     protected Integer sumLevel(AigCutBrc cut, NodeAig nodeActual)
@@ -198,29 +205,36 @@ public class AreaFlowLibrary
     protected void covering()
     {
         /*obs: impolementar a cobertura de acordo com */
-//        bfsAigVisitorAreaCovering bfs = new bfsAigVisitorAreaCovering(this);
-//        for(NodeAig nodeActual: myAig.getNodeOutputsAig())
-//        {
-//            if(!this.covering.containsKey(nodeActual))
-//            {
-//                this.covering.put(nodeActual, this.bestCut.get(nodeActual));
-//                nodeActual.accept(bfs);     
-//            }
-//        }
-//        boolean signalOk = true;
-//        while(signalOk == true)
-//        {
-//          Map<NodeAig,AigCutBrc> list = new HashMap<NodeAig, AigCutBrc>();
-//          signalOk = false;  
-//          for(Map.Entry<NodeAig,AigCutBrc> element: this.covering.entrySet())
-//              for(NodeAig node: element.getValue().getCut())
-//                if((!node.isInput())&&(!this.covering.containsKey(node)))
-//                {
-//                    list.put(node, this.bestCut.get(node));
-//                    signalOk = true;
-//                }
-//          this.covering.putAll(list);
-//        }
+        bfsAigVisitorAreaLibraryCovering bfs = new bfsAigVisitorAreaLibraryCovering(this);
+        for(NodeAig nodeActual: myAig.getNodeOutputsAig())
+        {
+            if(!this.covering.containsKey(nodeActual))
+            {
+                this.covering.put(nodeActual, this.bestCut.get(nodeActual));
+                try {
+                       nodeActual.accept(bfs);                         
+                } catch (Exception e) 
+                { 
+                    System.out.println("Não foi possível mapear o circuito com a biblioteca especificada");
+                    System.exit(sizeCut);
+                }
+
+            }
+        }
+        boolean signalOk = true;
+        while(signalOk == true)
+        {
+          Map<NodeAig,AigCutBrc> list = new HashMap<NodeAig, AigCutBrc>();
+          signalOk = false;  
+          for(Map.Entry<NodeAig,AigCutBrc> element: this.covering.entrySet())
+              for(NodeAig node: element.getValue().getCut())
+                if((!node.isInput())&&(!this.covering.containsKey(node)))
+                {
+                    list.put(node, this.bestCut.get(node));
+                    signalOk = true;
+                }
+          this.covering.putAll(list);
+        }
     }
     //**Método para visualização da cobetura final*/
     public void showCovering()
@@ -268,11 +282,11 @@ public class AreaFlowLibrary
         return best;            
     }
     
-//    public String getEqn() throws FileNotFoundException
-//    {
-//       String eqn = Logs.coveringToEqn(myAig, getCoveringCuts());
-//       return eqn;
-//    }
+    public String getEqn() throws FileNotFoundException
+    {
+       String eqn = LogsCoveringToEqn.coveringToEqn(myAig, getCoveringCuts(),this.bestCell);
+       return eqn;
+    }
 
     //**Método que retorna os melhores cortes de cada nodo em formato baseado na classe cobertura*/
     public Map<NodeAig, Set<NodeAig>> getBestCut()
