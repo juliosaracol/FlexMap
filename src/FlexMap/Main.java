@@ -201,151 +201,112 @@ public class Main
         }
         //----------------------------------------------------------------------
         //--------------------MAP AREA FLOW-------------------------------------
-        if(args[1].equals("-A")&&(args.length >= 9))
+        if((args[1].equals("-A"))&&(args.length >= 4))
         {
              Aig myAig              = new Aig(args[0]);
              int sizeCut            = Integer.valueOf(args[2]);
              CutterKCuts    kcuts   = new CutterKCuts(myAig, sizeCut);
-             float pArea            = Float.parseFloat(args[3]);
-             float pDelay           = Float.parseFloat(args[4]);
-             float pConsumption     = Float.parseFloat(args[5]);
-             float pInput           = Float.parseFloat(args[6]);
-             float pOutput          = Float.parseFloat(args[7]);
-             float pOther           = Float.parseFloat(args[8]);
-             CostAreaFlow   function= new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
-             AreaFlow area          = new AreaFlow(myAig,sizeCut,kcuts,function);
+             String function        = args[3];
+             CostAreaFlow   costFunction    = new CostAreaFlow(function);
+             AreaFlow area                  = new AreaFlow(myAig,sizeCut,kcuts,costFunction);
              area.showCovering();
              area.getEqn();
              CoveringAreaFlow areaT = area.getCovering();
-             System.out.println("Valor final:"+areaT.getCost(function));          
-             if((args.length > 9)&&(args[9].contains(".eqn"))){ //caso arquivo de log
-               Logs.LogsWriteEqn(area.getEqn(),args[9]);  
+             System.out.println("Valor final:"+areaT.getCost(costFunction));          
+             if((args.length > 4)&&(args[4].contains(".eqn"))){ //caso arquivo de log
+               Logs.LogsWriteEqn(area.getEqn(),args[4]);  
              }
              return;
         }
         //----------------------------------------------------------------------        
         //--------------------MAP AREA FLOW COM AIG_INVERTERS-------------------
-        if(args[1].equals("-AI"))
+        if((args[1].equals("-AI"))&&(args.length >= 4))
         {
           AigInverter myAig             = new AigInverter(args[0]);  
           int sizeCut                   = Integer.valueOf(args[2]);
           CutterKCutsInverter    kcuts  = new CutterKCutsInverter(myAig, sizeCut);
-          float pArea            = Float.parseFloat(args[3]);
-          float pDelay           = Float.parseFloat(args[4]);
-          float pConsumption     = Float.parseFloat(args[5]);
-          float pInput           = Float.parseFloat(args[6]);
-          float pOutput          = Float.parseFloat(args[7]);
-          float pOther           = Float.parseFloat(args[8]);
-          CostAreaFlow   function= new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
-          AreaFlowInverter area  = new AreaFlowInverter(myAig,sizeCut,kcuts,function);
+          String function               = args[4];
+          CostAreaFlow   costFunction   = new CostAreaFlow(function);
+          AreaFlowInverter area  = new AreaFlowInverter(myAig,sizeCut,kcuts,costFunction);
           area.showCovering();
-          area.getEqn();
           CoveringAreaFlow areaT = area.getCovering();
-          System.out.println("Valor final:"+areaT.getCost(function));          
-          if((args.length > 9)&&(args[9].contains(".eqn"))){ //caso arquivo de log
-            Logs.LogsWriteEqn(area.getEqn(),args[9]);  
+          System.out.println("Valor final:"+areaT.getCost(costFunction));          
+          if((args.length > 4)&&(args[5].contains(".eqn"))){ //caso arquivo de log
+            Logs.LogsWriteEqn(area.getEqn(),args[5]);  
           }
           return;
         }   
         //------------------------------------------------------------------
         //--------------------MAP AREA FLOW C/Kcuts C/LIMITES de TREENODES----
-        if(args[1].equals("-AT")&&(args.length >= 9))
+        if(args[1].equals("-AT")&&(args.length >= 4))
         {
              Aig myAig                      = new Aig(args[0]);
              int sizeCut                    = Integer.valueOf(args[2]);
              CutterKCutsTreeNodes kcuts     = new CutterKCutsTreeNodes(myAig, sizeCut);
-             float pArea                    = Float.parseFloat(args[3]);
-             float pDelay                   = Float.parseFloat(args[4]);
-             float pConsumption             = Float.parseFloat(args[5]);
-             float pInput                   = Float.parseFloat(args[6]);
-             float pOutput                  = Float.parseFloat(args[7]);
-             float pOther                   = Float.parseFloat(args[8]);
-             CostAreaFlow   function        = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
-             AreaFlow area                  = new AreaFlow(myAig,sizeCut,kcuts,function);
+             String function                = args[3];
+             CostAreaFlow   costFunction    = new CostAreaFlow(function);
+             AreaFlow area                  = new AreaFlow(myAig,sizeCut,kcuts,costFunction);
              area.showCovering();
-             area.getEqn();
              CoveringAreaFlow areaT         = area.getCovering();
-             System.out.println("Valor final:"+areaT.getCost(function));                       
-             if((args.length > 9)&&(args[9].contains(".eqn"))){ //caso arquivo de log
-               Logs.LogsWriteEqn(area.getEqn(),args[9]);  
+             System.out.println("Valor final:"+areaT.getCost(costFunction));                       
+             if((args.length > 4)&&(args[4].contains(".eqn"))){ //caso arquivo de log
+               Logs.LogsWriteEqn(area.getEqn(),args[4]);  
              }
              return;
         }
         //----------------------------------------------------------------------        
         //--------------------MAP AREA FLOW C/KcutsLIBRARY----------------------
-        if(args[1].equals("-AL")&&(args.length >= 10))
+        if(args[1].equals("-AL")&&(args.length >= 5))
         {
              Aig myAig                = new Aig(args[0]);
              int sizeCut              = Integer.valueOf(args[2]);
              CutterKCutsLibrary kcuts = new CutterKCutsLibrary(myAig, sizeCut, args[3]);
-             float pArea              = Float.parseFloat(args[4]);
-             float pDelay             = Float.parseFloat(args[5]);
-             float pConsumption       = Float.parseFloat(args[6]);
-             float pInput             = Float.parseFloat(args[7]);
-             float pOutput            = Float.parseFloat(args[8]);
-             float pOther             = Float.parseFloat(args[9]);
-             CostAreaFlow   function  = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
-             AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,function);
+             String function          = args[4];
+             CostAreaFlow   costFunction  = new CostAreaFlow(function);
+             AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,costFunction);
              area.showCovering();
-             area.getEqn();
              CoveringAreaFlow areaT = area.getCovering();
-             System.out.println("Valor final:"+areaT.getCost(function));                       
-             if((args.length > 10)&&(args[10].contains(".eqn"))) 
+             System.out.println("Valor final:"+areaT.getCost(costFunction));                       
+             if((args.length > 5)&&(args[5].contains(".eqn"))) 
              {  //caso arquivo de log
-                Logs.LogsWriteEqn(area.getEqn(),args[10]);  
+                Logs.LogsWriteEqn(area.getEqn(),args[5]);  
              }
              return;
         }
         //----------------------------------------------------------------------        
         //--------------------MAP AREA FLOW C/KcutsINVERTER_LIBRARY----------------------
-        if(args[1].equals("-AIL")&&(args.length >= 10))
+        if(args[1].equals("-AIL")&&(args.length >= 5))
         {
              AigInverter myAig        = new AigInverter(args[0]);
              int sizeCut              = Integer.valueOf(args[2]);
-             CutterKCutsInverterLibrary kcuts = new CutterKCutsInverterLibrary(myAig, sizeCut, args[3]);
-             float pArea              = Float.parseFloat(args[4]);
-             float pDelay             = Float.parseFloat(args[5]);
-             float pConsumption       =  Float.parseFloat(args[6]);
-             float pInput             = Float.parseFloat(args[7]);
-             float pOutput            = Float.parseFloat(args[8]);
-             float pOther             = Float.parseFloat(args[9]);
-             CostAreaFlow   function  = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
-             AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,function);
+             String function          = args[4];
+             CutterKCutsInverterLibrary kcuts   = new CutterKCutsInverterLibrary(myAig, sizeCut, args[3]);
+             CostAreaFlow   costFunction        = new CostAreaFlow(function);
+             AreaFlowLibrary area               = new AreaFlowLibrary(myAig,sizeCut,kcuts,costFunction);
              area.showCovering();
-             area.getEqn();
              CoveringAreaFlow areaT = area.getCovering();
-             System.out.println("Valor final:"+areaT.getCost(function));                       
-             if((args.length > 10)&&(args[10].contains(".eqn"))) 
+             System.out.println("Valor final:"+areaT.getCost(costFunction));                       
+             if((args.length > 5)&&(args[5].contains(".eqn"))) 
              { //caso arquivo de log
-              Logs.LogsWriteEqn(area.getEqn(),args[10]);  
+              Logs.LogsWriteEqn(area.getEqn(),args[5]);  
              }
              return;
         }
         //----------------------------------------------------------------------        
         //--------------------MAP AREA FLOW SIMULATED ANNELING------------------
-        if(args[1].equals("-ASA")&&(args.length >= 9))
+        if(args[1].equals("-ASA")&&(args.length >= 4))
         {
-//             Aig myAig                          = new Aig(args[0]);
-//             int sizeCut                        = Integer.valueOf(args[2]);
-//             CutterKCuts kcuts                  = new CutterKCuts(myAig, sizeCut);
-//             float pArea                        = Float.parseFloat(args[3]);
-//             float pDelay                       = Float.parseFloat(args[4]);
-//             float pConsumption                 = Float.parseFloat(args[5]);
-//             float pInput                       = Float.parseFloat(args[6]);
-//             float pOutput                      = Float.parseFloat(args[7]);
-//             float pOther                       = Float.parseFloat(args[8]);
-//             CostAreaFlow   function            = new CostAreaFlow(pArea,pDelay,pConsumption,pInput,pOutput,pOther);
-//             AreaFlow area                      = new AreaFlow(myAig,sizeCut,kcuts,function);
-//             CoveringAreaFlow initialCovering   = area.getCovering();
-//             area.showCovering();
-//             System.out.println(initialCovering.getCost(function));
-//             
-//             SimulatedAnneling SA               = new SimulatedAnneling(myAig,kcuts,area.getBestCut(),initialCovering,function,100,1000,50);
-//             if((args.length > 9)&&(args[9].contains(".eqn"))) 
-//             { //caso arquivo de log
-//               Logs.LogsWriteEqn(area.getEqn(),args[10]);  
-//             }
-//             return;
+             Aig myAig                          = new Aig(args[0]);
+             int sizeCut                        = Integer.valueOf(args[2]);
+             CutterKCuts kcuts                  = new CutterKCuts(myAig, sizeCut);
+             String function                    = args[3];
+             CostAreaFlow   costFunction        = new CostAreaFlow(function);
+             SimulatedAnneling SA               = new SimulatedAnneling(myAig, kcuts, costFunction, 10000,(float)0.999);
+             if((args.length > 4)&&(args[4].contains(".eqn"))) 
+             { //caso arquivo de log
+               Logs.LogsWriteEqn(SA.getEqn(),args[5]);  
+             }
+             return;
         }
         //----------------------------------------------------------------------
         //--------------------ELIS----------------------------------------------

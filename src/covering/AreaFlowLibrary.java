@@ -39,11 +39,6 @@ public class AreaFlowLibrary
         this.tableArea  = new HashMap<NodeAig, Float>();
         this.levelNode  = new HashMap<NodeAig, Integer>();
         this.bestCell   = new HashMap<AigCutBrc, FunctionData>();
-//        
-//        if(this.kcuts.getCutsBrc().size() < myAig.getAllNodesAig().size()){
-//            System.out.println("Não possível encontrar matchings para todos os nodos");
-//            System.exit(-1);
-//        }
                       
         System.out.println("********* START AREAFLOW LIBRARY ******");
         mapAreaFlow();

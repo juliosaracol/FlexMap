@@ -1,224 +1,415 @@
 package covering;
 
-import FlexMap.CostAreaFlow;
-import FlexMap.CostFunction;
+import FlexMap.*;
 import aig.*;
+import io.LogsCoveringToEqn;
+import java.io.FileNotFoundException;
+import kcutter.*;
 import java.util.*;
-import kcutter.AigCut;
-import kcutter.CutterK;
 
 /**
  * Classe aplica SimulatedAnneling 
- * @author Julio Saraçol
+ * @author Matheus Nachtigall
  */
+
+/*
+ * temperature = 5000.0;
+ * cooling_rate = 0.9999 //Taxa de decaimento da temperatura
+ * epsilon = 0.001;  //Condição de parada do algoritmo
+ *
+ * best = Hash.new
+ * best[:route] = randomSolution
+ * best[:cost] = best[:route].cost
+ * 
+ * current = best
+ * while temperature > epsilon
+ *  candidate = current[:route].generateNeighbor
+ *  delta = current[:cost] - candidate[:cost]
+ *  if delta > 0                                        //Se o candidato é melhor, troca automaticamente
+ *    if best[:cost] > candidate[:cost]
+ *      best = candidate
+ *    end
+ *    current = candidate
+ *  else                                                //Caso contrario, troca com prob
+ *    if (Math.exp(delta/temperature) > rand()) #Simulated annealing  //Rand: Valor entre 0 e 1
+ *      current = candidate
+ *    end
+ *  end
+ * 
+ *  temperature *= cooling_rate
+ * end
+ 
+ */
+
 public class SimulatedAnneling
 {
-    protected int temp;
-    protected int initialTemp;
-    protected int finalTemp;
-    protected float step;
+    protected float temp;
     protected Aig myAig;
     protected CutterK   kcuts;
-    protected Map<NodeAig,Set<NodeAig>>  bestCut;
-    protected Map<NodeAig,Float>  bestCost;
-    protected Covering  initialCovering;
-    protected Covering  actualState;
     protected CostFunction function;
-    protected ArrayList<NodeAig> treeNodes;
     protected Map<NodeAig,Integer> levelNode;
+    protected float coolingRate;
+    // protected Map<NodeAig,Float> currentCostTable
+    protected Map<NodeAig,AigCut> bestCut;
+    protected Map<NodeAig,AigCut> bestCoverCut;
+    protected Map<NodeAig,Float> bestCostTable;
     
+    protected Map<NodeAig,AigCut> currentCut;
+    protected Map<NodeAig,AigCut> currentCoverCut;
+    protected Map<NodeAig,Float> currentCostTable;
+
     
-    public SimulatedAnneling(Aig myAig,CutterK kcuts,Map<NodeAig,Set<NodeAig>> bestCut, Covering initial, CostFunction function, int tempInitial, int tempFinal,int steps)
+    public SimulatedAnneling(Aig myAig, CutterK kcuts, CostFunction function, int tempInitial, float coolingRate)
     {
-        this.step               = (initialTemp-finalTemp)/steps;
-        this.initialTemp        = tempInitial;
-        this.finalTemp          = tempFinal;
-        this.temp               = tempInitial;
         this.myAig              = myAig;  
         this.kcuts              = kcuts;
-        this.initialCovering    = initial;
         this.function           = function;
-        this.bestCut            = bestCut;
+        this.levelNode          = new HashMap<NodeAig, Integer>();
+        this.bestCut            = new HashMap<NodeAig, AigCut>();
+        this.bestCoverCut       = new HashMap<NodeAig, AigCut>();
+        this.bestCostTable      = new HashMap<NodeAig, Float>();
+                
+        this.temp               = tempInitial;
+        this.coolingRate        = coolingRate;
+        this.currentCut         = new HashMap<NodeAig, AigCut>();
+        currentCoverCut         = new HashMap<NodeAig, AigCut>();
+        currentCostTable        = new HashMap<NodeAig, Float>();
+
+        //===========================================
+        randomInitialSolution();
+        //===========================================
+        //showCovering(bestCoverCut);
         
-         //**Profundidade de todos os nodos do grafo****************************
-         levelNode = new HashMap<NodeAig, Integer>();
-         dfsAigVisitorAreaGetLevel dfs = new dfsAigVisitorAreaGetLevel(this.levelNode);
-         for(NodeAig node: myAig.getNodeInputsAig())
+        // System.out.println("#Solução Inicial com custo:"+currentCover.getCost(function));
+
+         // //**Profundidade de todos os nodos do grafo****************************
+         // levelNode = new HashMap<NodeAig, Integer>();
+         // dfsAigVisitorAreaGetLevel dfs = new dfsAigVisitorAreaGetLevel(this.levelNode);
+         // for(NodeAig node: myAig.getNodeInputsAig())
+         //    this.levelNode.put(node,1);
+         // for(NodeAig node: myAig.getNodeOutputsAig())
+         // {
+         //   if((node.isOutput())&&(node.getParents().isEmpty())) //constant
+         //       this.levelNode.put(node,1);
+         //   else
+         //       node.accept(dfs);
+         // }
+         // //*********************************************************************
+         
+        run();
+        System.out.println("Custo Aig:"+getCostCovering(bestCoverCut, bestCostTable));   
+        
+     }
+        
+     //**Motor da engine simullatedAnelling*/
+     protected void run()
+     {      
+
+            // applyCovering(); //Faz a cobertura com a cover inicial aleatória
+
+            NodeAig randomNode = null;
+            AigCut candidateCut = null;
+            float candidateCutCost;
+            
+            AigCut singleCut = null;
+            float singleCutCost;
+            
+            float delta;
+            float epsilon = (float) 0.001;
+
+            this.currentCoverCut.clear();
+             //Copia a cobertura inicial e os valores para começar o SA
+            for(Map.Entry<NodeAig,AigCut> element: bestCoverCut.entrySet())
+                currentCoverCut.put(element.getKey(), element.getValue());
+            currentCostTable.clear();
+            for(Map.Entry<NodeAig,Float> element: bestCostTable.entrySet())
+                currentCostTable.put(element.getKey(), element.getValue());
+            
+            System.out.println("Custo Inicial:"+getCostCovering(currentCoverCut, currentCostTable));
+            
+            while (this.temp > epsilon)
+            {                       
+              randomNode = generateRandomNode(); //Escolhe um nodo aleatório do AIG
+              //Procura o corte atual e o custo do nodo escolhido
+              singleCut = currentCoverCut.get(randomNode);
+              singleCutCost = currentCostTable.get(randomNode);
+
+              //Escolhe um corte aleatório no nodo selecionado e calcula o custo
+              candidateCut = generateNeighbour(randomNode);
+              candidateCutCost =  sumCost(candidateCut, randomNode);
+
+              delta       = singleCutCost - candidateCutCost;
+
+              if (delta > 0){ //novo corte tem custo menor que o corte atual
+                      AigCut old = currentCoverCut.get(randomNode);
+                      if(old != null ){
+                         /**acerta pra tira o overlap caso seja possivel*/
+                          for(NodeAig cutIn: old.getCut()){
+                              boolean inputCut = false;
+                              for(Map.Entry<NodeAig,AigCut> cuts: currentCoverCut.entrySet()){
+                                  if(cuts.getValue().contains(cutIn)){
+                                      inputCut = true;
+                                      break;
+                                  }
+                              }
+                              if((!cutIn.isInput())&&(inputCut == false)){
+                                  currentCoverCut.remove(cutIn);
+                              }
+                          }
+                          /***-------------------------------------------*/
+                      }
+                      this.currentCut.put(randomNode, candidateCut);
+                      currentCoverCut.put(randomNode,candidateCut);      
+                      currentCostTable.put(randomNode, candidateCutCost);
+                      bfsAigVisitorCoveringSimulated mybfs = new bfsAigVisitorCoveringSimulated(currentCoverCut,currentCut);
+                      for(NodeAig father: candidateCut.getCut()){
+                         if(!father.isInput()){
+                              father.accept(mybfs);
+                         }
+                  }                     
+                  if (getCostCovering(currentCoverCut,currentCostTable) < getCostCovering(bestCoverCut, bestCostTable)){
+                     //Copia a cobertura inicial e os valores para começar o SA
+                    this.bestCoverCut.clear();
+                    for(Map.Entry<NodeAig,AigCut> element: currentCoverCut.entrySet())
+                            bestCoverCut.put(element.getKey(), element.getValue());
+                    this.bestCut.clear();
+                    for(Map.Entry<NodeAig,AigCut> element: currentCut.entrySet())
+                            bestCut.put(element.getKey(), element.getValue());
+                    bestCostTable.clear();
+                    for(Map.Entry<NodeAig,Float> element: currentCostTable.entrySet())
+                            bestCostTable.put(element.getKey(), element.getValue());
+//                      showCovering(bestCoverCut);
+                      
+                   //System.out.println("Custo Aig:"+getCostCovering(bestCoverCut, bestCostTable));   
+                      
+                  }
+                                     
+              }
+              else{ //Escolha probabilistica do SA
+                  if (Math.exp(delta/this.temp) > Math.random()){
+                      AigCut old = currentCoverCut.get(randomNode);
+                      if(old != null ){
+                         /**acerta pra tira o overlap caso seja possivel*/
+                          for(NodeAig cutIn: old.getCut()){
+                              boolean inputCut = false;
+                              for(Map.Entry<NodeAig,AigCut> cuts: currentCoverCut.entrySet()){
+                                  if(cuts.getValue().contains(cutIn)){
+                                      inputCut = true;
+                                      break;
+                                  }
+                              }
+                              if((!cutIn.isInput())&&(inputCut == false)){
+                                  currentCoverCut.remove(cutIn);
+                              }
+                          }
+                          /***-------------------------------------------*/
+                      }
+                      this.currentCut.put(randomNode, candidateCut);
+                      currentCoverCut.put(randomNode,candidateCut);      
+                      currentCostTable.put(randomNode, candidateCutCost);
+                      bfsAigVisitorCoveringSimulated mybfs = new bfsAigVisitorCoveringSimulated(currentCoverCut,currentCut);
+                      for(NodeAig father: candidateCut.getCut()){
+                         if(!father.isInput()){
+                              father.accept(mybfs);
+                         }                  
+                      }
+                  }
+              }
+                
+                
+              this.temp = this.temp * coolingRate;
+            }
+    }
+    
+    protected NodeAig generateRandomNode() 
+    {
+        NodeAig newNode             = null;
+        Set<NodeAig> allNodes       = myAig.getAllNodesAig();
+        Iterator<NodeAig> iterator  = allNodes.iterator();
+        int aigSize                 = allNodes.size();
+        int position                = new Random().nextInt(aigSize); 
+        
+        for(int i = 0 ; i<=position ; i=i+1){
+           newNode = iterator.next();
+        }
+//        System.out.print(" Tamanho do AIG: "+aigSize+
+//         " Nodo aleatório: "+newNode.getId()+
+//         " Nodo aleatório: "+newNode.getName()+"\n\n");
+//        System.out.print("Tamanho:"+aigSize+"Nodo aleatório: "+newNode.getId()+"\n");
+        return newNode;
+    }
+
+    protected AigCut generateNeighbour(NodeAig nodeActual) 
+    {
+        AigCut newCut      = null;
+        Set<AigCut> cuts = kcuts.getCuts().get(nodeActual); 
+        Iterator<AigCut> iterator = cuts.iterator();
+
+        //gerar tabela de custos de todos os cortes do nodo
+        int cutSize = cuts.size();
+        int position = new Random().nextInt(cutSize); 
+        for(int i = 0 ; i<=position ; i=i+1){
+           newCut = iterator.next();
+        }
+            
+        return newCut;
+    }
+
+protected void randomInitialSolution()
+    {
+        dfsAigVisitorAreaGetLevel dfs = new dfsAigVisitorAreaGetLevel(this.levelNode);
+        for(NodeAig node: myAig.getNodeInputsAig()){
+            System.out.println(node.getName());
             this.levelNode.put(node,1);
-         for(NodeAig node: myAig.getNodeOutputsAig())
-         {
+        }
+        for(NodeAig node: myAig.getNodeOutputsAig())
+        {
            if((node.isOutput())&&(node.getParents().isEmpty())) //constant
                this.levelNode.put(node,1);
            else
                node.accept(dfs);
-         }
-         //*********************************************************************
-         System.out.println("##############Solução Inicial com custo:"+initialCovering.getCost(function));
-        this.actualState = run();
-     }
-        
-     //**Motor da engine simullatedAnelling*/
-     public Covering run()
-     {        
-            Covering stateOriginal  = this.initialCovering; 
-            Covering stateBest      = stateOriginal; 
-            Covering stateNew; 
-            double prob;
-            double t = getTemp();
-            float energy        = stateOriginal.getCost(function);
-            float energyBest    = energy;
-            float energyNew;
-            float delta;
-            int countIterations = 0;
-
-            while (t > this.finalTemp)
-            {                       
-                stateNew    = perturbation(stateOriginal);
-                energyNew   = stateNew.getCost(function);
-                energy      = stateOriginal.getCost(function);
-                delta       = energyNew - energy;
-                prob        = Math.pow(Math.E,(-delta/t));
-
-                if ((delta <= 0) || (prob > randomize())) 
-                {
-                    stateOriginal = stateNew; 
-                    energy        = energyNew;
-                }
-
-                if (energy < energyBest) 
-                {
-                    stateBest   = stateNew; 
-                    energyBest  = energyNew;
-                }
-                countIterations++;
-                t = getTemp();                 
-            }
-            return stateBest;     
-    }
-        
-    //**Método que gera nova cobertura utilizando os Cuts dos teeeNodes*/
-    private Covering applyNewCovering(Covering state,Map<NodeAig,ArrayList<Set<NodeAig>>> cuts) 
-    {
-        Map<NodeAig,Float> cost = new HashMap<NodeAig, Float>();
-        System.out.println("###########NEWCOVERING#########################");
-        for(Map.Entry<NodeAig,Set<NodeAig>> set : this.bestCut.entrySet())
-        {
-           System.out.print("Nodo: "+ set.getKey().getName()+" [");            
-           if(cuts.containsKey(set.getKey()))
-           {
-               int index = (int) Math.random() * (cuts.get(set.getKey()).size()-1);
-               set.setValue(cuts.get(set.getKey()).get(index));
-           }
-           float output =1;
-           float inputs=0;
-           for(NodeAig cut: set.getValue())               
-           {
-               if(set.getKey().getChildren().size()>1)
-                   output = set.getKey().getChildren().size();
-               inputs += state.getCosts().get(cut);
-               System.out.print(cut.getName()+"-");
-           }
-           //**pegando profundidade do nodo********************************/
-           AigCut auxAigCut = new AigCut();
-           auxAigCut.addAll(set.getValue());
-           bfsAigVisitorAreaSumLevel bfs = new bfsAigVisitorAreaSumLevel(levelNode,auxAigCut);
-           set.getKey().accept(bfs);
-           /***************************************************************/
-           if(set.getKey().isInput())
-               cost.put(set.getKey(),(float)0);
-           else
-               cost.put(set.getKey(),function.eval(0, 0, 0, inputs,output,1));
-           System.out.print("] -("+cost.get(set.getKey())+") custo, level"+bfs.getLevel()+"\n");
-         }
-         this.bestCost = cost;
-         Covering finalCovering = covering(cost);         
-         System.out.println("################################################# custo:");
-         finalCovering.getCost(function);
-         return finalCovering;
-    }
-    
-    //**Método que aplica a cobertura baseado em bfs utilizando as areas calculadas
-    protected Covering covering(Map<NodeAig,Float> cost)
-    {
-        Map<NodeAig,Set<NodeAig>> selectedCuts = new HashMap<NodeAig, Set<NodeAig>>();
-        bfsAigVisitorSimulatedCovering bfs = new bfsAigVisitorSimulatedCovering(this,selectedCuts);
-        for(NodeAig nodeActual: myAig.getNodeOutputsAig())
-        {
-            if(!selectedCuts.containsKey(nodeActual))
-            {
-                selectedCuts.put(nodeActual, this.bestCut.get(nodeActual));
-                nodeActual.accept(bfs);     
-            }
         }
-        Covering newState = new CoveringAreaFlow(selectedCuts,bestCost);
-        return newState;
+        for(NodeAig node: myAig.getAllNodesAig())
+          getBestArea(node);
     }
-//        boolean signalOk = true;
-//        while(signalOk == true)
-//        {
-//          Map<NodeAig,AigCut> list = new HashMap<NodeAig, AigCut>();
-//          signalOk = false;  
-//          for(Map.Entry<NodeAig,AigCut> element: this.covering.entrySet())
-//              for(NodeAig node: element.getValue().getCut())
-//                if((!node.isInput())&&(!this.covering.containsKey(node)))
-//                {
-//                    list.put(node, this.bestCut.get(node));
-//                    signalOk = true;
-//                }
-//          this.covering.putAll(list);
-//        }
- //   }
 
-    /* Metodo responsável por gerar o valor da temperatura inicial entre min e max */
-    private float getTemp() 
+    protected  void getBestArea(NodeAig nodeActual)
     {
-        this.temp = (int) ((float)(Math.pow(temp, 2))-(temp*step));
-        System.out.println("TEMPERATURA: "+ temp);
-        return temp;
+        if(this.bestCoverCut.containsKey(nodeActual))
+          return;
+        Map<AigCut,Float> tableCost     = new HashMap<AigCut, Float>();
+        Set<AigCut> cuts                = kcuts.getCuts().get(nodeActual);
+        Iterator<AigCut> iterator       = cuts.iterator();
+        do
+        {          
+           AigCut cut = iterator.next(); 
+           if(nodeActual.isInput())
+           {
+              bestCoverCut.put(nodeActual, cut);
+              bestCut.put(nodeActual, cut);
+              bestCostTable.put(nodeActual,(float)0);              
+              break;
+           }
+           else
+           {
+              float cost  = sumCost(cut,nodeActual);
+              tableCost.put(cut, (Float)cost);              
+           }           
+        }while(iterator.hasNext()); //contabiliza areas
+        if(!nodeActual.isInput())
+            selectRandomCut(nodeActual,tableCost);
+        System.out.print(" BestArea Nodo: "+nodeActual.getName()+
+         " Custo: "+bestCostTable.get(nodeActual)+
+         " Profundidade: "+levelNode.get(nodeActual)+
+         " Corte:");
+        bestCoverCut.get(nodeActual).showCut();
+    }
+
+    protected float sumCost(AigCut cut, NodeAig nodeActual) 
+    {
+        float input     =0;
+        int output      =0;
+        if(nodeActual.getChildren().isEmpty())
+            output =1;//fanouts
+        else
+            output = nodeActual.getChildren().size(); //fanouts
+        if(cut.size()==1) //corte unitário sempre 1+entradas
+        {
+          for(NodeAig node: nodeActual.getParents())
+          {
+            if(!bestCostTable.containsKey(node))
+                getBestArea(node);
+            input+=bestCostTable.get(node);
+          }
+          return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1
+        }
+        for(NodeAig node:cut)
+        {
+            if(!bestCostTable.containsKey(node))
+                getBestArea(node);
+            input+=bestCostTable.get(node);
+        }
+        return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output, 0);
+    }
+
+    protected void selectRandomCut(NodeAig nodeActual, Map<AigCut, Float> tableCost) 
+    {
+        /*
+        criar uma solução inicial aleatória 
+        */
+
+        AigCut cut      = null;
+        AigCut cutBest  = bestCost(tableCost);
+        Set<AigCut> cuts = kcuts.getCuts().get(nodeActual); 
+        Iterator<AigCut> iterator = cuts.iterator();
+
+        int cutSize = cuts.size();
+        int position = new Random().nextInt(cutSize); 
+       
+        // System.out.print("Nodo: "+nodeActual.getName()+
+        //     " tamanho: "+cuts.size()+
+        //     " Rand: "+position+"\n");
+        
+        for(int i = 0 ; i<=position ; i=i+1){
+           cut = iterator.next();
+        }
+        cutBest = cut;   
+        bestCut.put(nodeActual, cut);
+        bestCoverCut.put(nodeActual,cutBest);      
+        bestCostTable.put(nodeActual, (tableCost.get(cutBest)));
+    }
+    //**Método contabiliza a profundidade utilizando bfs
+    protected Integer sumLevel(AigCut cut, NodeAig nodeActual)
+    {
+        if((nodeActual.isOutput())&&(nodeActual.getParents().isEmpty())) //constant
+            return 1;
+        bfsAigVisitorAreaSumLevel bfs = new bfsAigVisitorAreaSumLevel(levelNode, cut);
+        nodeActual.accept(bfs);
+        return bfs.getLevel();
+    }
+    protected AigCut bestCost(Map<AigCut, Float> tableCost) 
+    {
+        AigCut best = null;
+        for(Map.Entry<AigCut,Float> nodes: tableCost.entrySet())
+        {
+            if(best == null)
+                best = nodes.getKey();
+            else
+                if(tableCost.get(best) > nodes.getValue())
+                    best = nodes.getKey();
+        }
+        return best;            
     }
     
-    /* Metodo responsavel por gerar um numero aleatorio entre 0  e 1 */
-    private double randomize() 
+    void showCovering(Map<NodeAig,AigCut> current){
+        System.out.println("========COBERTURA========");
+        for(Map.Entry<NodeAig,AigCut> elem: current.entrySet()){
+            System.out.print(elem.getKey().getName()+" :");
+            elem.getValue().showCut();
+       }
+    } 
+    public float getCostCovering(Map<NodeAig,AigCut> covering, Map<NodeAig,Float> tableCost){
+        float costFinal = 0;
+        for(Map.Entry<NodeAig,AigCut> covered: covering.entrySet())
+            costFinal+=tableCost.get(covered.getKey());
+        return costFinal;
+    }
+    
+    
+    public String getEqn() throws FileNotFoundException
     {
-        return (double) (Math.random() * 1);
+       String eqn = LogsCoveringToEqn.coveringToEqn(myAig, bestCoverCut);
+       return eqn;
     }
-
-    /**Método responsável por gerar uma nova cobertura alterando cortes de treenodes*/
-    private Covering perturbation(Covering state)
-    {        
-        Map<NodeAig,ArrayList<Set<NodeAig>>> cuts  = getSetCutsTreeNodes();
-        Covering newCovering = applyNewCovering(state,cuts);
-        return newCovering;
-    }
-
-    //**Método que seleciona os possiveis Cuts que referenciam treeNodes*/
-    private Map<NodeAig, ArrayList<Set<NodeAig>>> getSetCutsTreeNodes() 
-    {
-         Map<NodeAig,ArrayList<Set<NodeAig>>> treeNodesCut = new HashMap<NodeAig, ArrayList<Set<NodeAig>>>();
-         for(Map.Entry<NodeAig,Set<NodeAig>> set: this.bestCut.entrySet())
-         {
-//           for(NodeAig nodeT: treeNodes)
-//           {
-//            if(set.getValue().contains(nodeT)) 
-//            {
-//              System.out.println("NOVO CORTE PARA NODO:"+ set.getKey().getName());  
-//              ArrayList<Set<NodeAig>> sets = new ArrayList<Set<NodeAig>>();   
-//              Set<AigCut>  cuts            = kcuts.getCuts().get(set.getKey());
-//              for(AigCut cut: cuts)
-//              {
-//                if(cut.size() > 1)
-//                {
-//                 Set<NodeAig> setCuts  = new HashSet<NodeAig>();
-//                 setCuts.addAll(cut.getCut());
-//                 if(!sets.contains(setCuts))
-//                     sets.add(setCuts);
-//                }
-//              }
-//              treeNodesCut.put(set.getKey(), sets);
-  //          }
- //          }
-         }
-         return treeNodesCut;       
-    }
-
+            
 }
+
+
+
+
+
+
+
+
+
+
