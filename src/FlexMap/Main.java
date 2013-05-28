@@ -225,14 +225,15 @@ public class Main
           AigInverter myAig             = new AigInverter(args[0]);  
           int sizeCut                   = Integer.valueOf(args[2]);
           CutterKCutsInverter    kcuts  = new CutterKCutsInverter(myAig, sizeCut);
-          String function               = args[4];
+          String function               = args[3];
           CostAreaFlow   costFunction   = new CostAreaFlow(function);
           AreaFlowInverter area  = new AreaFlowInverter(myAig,sizeCut,kcuts,costFunction);
           area.showCovering();
+          area.getEqn();
           CoveringAreaFlow areaT = area.getCovering();
           System.out.println("Valor final:"+areaT.getCost(costFunction));          
-          if((args.length > 4)&&(args[5].contains(".eqn"))){ //caso arquivo de log
-            Logs.LogsWriteEqn(area.getEqn(),args[5]);  
+          if((args.length > 4)&&(args[4].contains(".eqn"))){ //caso arquivo de log
+            Logs.LogsWriteEqn(area.getEqn(),args[4]);  
           }
           return;
         }   
@@ -247,6 +248,7 @@ public class Main
              CostAreaFlow   costFunction    = new CostAreaFlow(function);
              AreaFlow area                  = new AreaFlow(myAig,sizeCut,kcuts,costFunction);
              area.showCovering();
+             area.getEqn();
              CoveringAreaFlow areaT         = area.getCovering();
              System.out.println("Valor final:"+areaT.getCost(costFunction));                       
              if((args.length > 4)&&(args[4].contains(".eqn"))){ //caso arquivo de log
@@ -265,6 +267,7 @@ public class Main
              CostAreaFlow   costFunction  = new CostAreaFlow(function);
              AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,costFunction);
              area.showCovering();
+             area.getEqn();
              CoveringAreaFlow areaT = area.getCovering();
              System.out.println("Valor final:"+areaT.getCost(costFunction));                       
              if((args.length > 5)&&(args[5].contains(".eqn"))) 
@@ -284,6 +287,7 @@ public class Main
              CostAreaFlow   costFunction        = new CostAreaFlow(function);
              AreaFlowLibrary area               = new AreaFlowLibrary(myAig,sizeCut,kcuts,costFunction);
              area.showCovering();
+             area.getEqn();
              CoveringAreaFlow areaT = area.getCovering();
              System.out.println("Valor final:"+areaT.getCost(costFunction));                       
              if((args.length > 5)&&(args[5].contains(".eqn"))) 
@@ -302,6 +306,9 @@ public class Main
              String function                    = args[3];
              CostAreaFlow   costFunction        = new CostAreaFlow(function);
              SimulatedAnneling SA               = new SimulatedAnneling(myAig, kcuts, costFunction, 10000,(float)0.999);
+             SA.showCovering();
+             SA.getEqn();
+             CoveringAreaFlow areaSA = SA.getCovering();
              if((args.length > 4)&&(args[4].contains(".eqn"))) 
              { //caso arquivo de log
                Logs.LogsWriteEqn(SA.getEqn(),args[5]);  
@@ -415,15 +422,15 @@ public class Main
       System.out.println("--KCUTS_INVERTER C/BIBLIOTECA--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -KIL TamanhoDoCorte Biblioteca.genlib [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -A TamanhoDoCorte Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -A TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW COM AIG_INVERTER--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AI TamanhoDoCorte Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AI TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW COM BIBLIOTECA--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AIL TamanhoDoCorte Biblioteca.genlib Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AIL TamanhoDoCorte Biblioteca.genlib FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW C/TREENODES--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AT TamanhoDoCorte Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AT TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW E SIMULATED ANNELING--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -ASA TamanhoDoCorte Pesos[pArea pDelay pConsumption pInput pOutput pOther] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -ASA TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM ELIS--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -E s p [arquivoSaida.eqn (opcional)]");
       System.out.println("--BFS--");
