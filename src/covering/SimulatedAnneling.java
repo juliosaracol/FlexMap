@@ -99,6 +99,10 @@ public class SimulatedAnneling
             float delta;
             float epsilon = (float) 0.001;
 
+            this.currentCut.clear();
+             //Copia todos os cortes e os valores para começar o SA
+            for(Map.Entry<NodeAig,AigCut> element: bestCut.entrySet())
+                currentCut.put(element.getKey(), element.getValue());
             this.currentCoverCut.clear();
              //Copia a cobertura inicial e os valores para começar o SA
             for(Map.Entry<NodeAig,AigCut> element: bestCoverCut.entrySet())
@@ -123,32 +127,28 @@ public class SimulatedAnneling
               delta       = singleCutCost - candidateCutCost;
 
               if (delta > 0){ //novo corte tem custo menor que o corte atual
-                      AigCut old = currentCoverCut.get(randomNode);
-                      if(old != null ){
-                         /**acerta pra tira o overlap caso seja possivel*/
-                          for(NodeAig cutIn: old.getCut()){
-                              boolean inputCut = false;
-                              for(Map.Entry<NodeAig,AigCut> cuts: currentCoverCut.entrySet()){
-                                  if(cuts.getValue().contains(cutIn)){
-                                      inputCut = true;
-                                      break;
-                                  }
-                              }
-                              if((!cutIn.isInput())&&(inputCut == false)){
-                                  currentCoverCut.remove(cutIn);
-                              }
-                          }
-                          /***-------------------------------------------*/
-                      }
+//                      AigCut old = currentCoverCut.get(randomNode);
+//                      if(old != null ){
+//                         /**acerta pra tira o overlap caso seja possivel*/
+//                          for(NodeAig cutIn: old.getCut()){
+//                              boolean inputCut = false;
+//                              for(Map.Entry<NodeAig,AigCut> cuts: currentCoverCut.entrySet()){
+//                                  if(cuts.getValue().contains(cutIn)){
+//                                      inputCut = true;
+//                                      break;
+//                                  }
+//                              }
+//                              if((!cutIn.isInput())&&(inputCut == false)){
+//                                  currentCoverCut.remove(cutIn);
+//                              }
+//                          }
+//                          /***-------------------------------------------*/
+//                      }
                       this.currentCut.put(randomNode, candidateCut);
-                      currentCoverCut.put(randomNode,candidateCut);      
                       currentCostTable.put(randomNode, candidateCutCost);
-                      bfsAigVisitorCoveringSimulated mybfs = new bfsAigVisitorCoveringSimulated(currentCoverCut,currentCut);
-                      for(NodeAig father: candidateCut.getCut()){
-                         if(!father.isInput()){
-                              father.accept(mybfs);
-                         }
-                  }                     
+                      this.currentCoverCut.clear();
+                      covering();
+                      
                   if (getCostCovering(currentCoverCut,currentCostTable) < getCostCovering(bestCoverCut, bestCostTable)){
                      //Copia a cobertura inicial e os valores para começar o SA
                     this.bestCoverCut.clear();
@@ -165,36 +165,29 @@ public class SimulatedAnneling
               }
               else{ //Escolha probabilistica do SA
                   if (Math.exp(delta/this.temp) > Math.random()){
-                      AigCut old = currentCoverCut.get(randomNode);
-                      if(old != null ){
-                         /**acerta pra tira o overlap caso seja possivel*/
-                          for(NodeAig cutIn: old.getCut()){
-                              boolean inputCut = false;
-                              for(Map.Entry<NodeAig,AigCut> cuts: currentCoverCut.entrySet()){
-                                  if(cuts.getValue().contains(cutIn)){
-                                      inputCut = true;
-                                      break;
-                                  }
-                              }
-                              if((!cutIn.isInput())&&(inputCut == false)){
-                                  currentCoverCut.remove(cutIn);
-                              }
-                          }
-                          /***-------------------------------------------*/
-                      }
+//                      AigCut old = currentCoverCut.get(randomNode);
+//                      if(old != null ){
+//                         /**acerta pra tira o overlap caso seja possivel*/
+//                          for(NodeAig cutIn: old.getCut()){
+//                              boolean inputCut = false;
+//                              for(Map.Entry<NodeAig,AigCut> cuts: currentCoverCut.entrySet()){
+//                                  if(cuts.getValue().contains(cutIn)){
+//                                      inputCut = true;
+//                                      break;
+//                                  }
+//                              }
+//                              if((!cutIn.isInput())&&(inputCut == false)){
+//                                  currentCoverCut.remove(cutIn);
+//                              }
+//                          }
+//                          /***-------------------------------------------*/
+//                      }
                       this.currentCut.put(randomNode, candidateCut);
-                      currentCoverCut.put(randomNode,candidateCut);      
                       currentCostTable.put(randomNode, candidateCutCost);
-                      bfsAigVisitorCoveringSimulated mybfs = new bfsAigVisitorCoveringSimulated(currentCoverCut,currentCut);
-                      for(NodeAig father: candidateCut.getCut()){
-                         if(!father.isInput()){
-                              father.accept(mybfs);
-                         }                  
-                      }
+                      this.currentCoverCut.clear();
+                      covering();
                   }
               }
-                
-                
               this.temp = this.temp * coolingRate;
             }
     }
@@ -293,7 +286,7 @@ protected void randomInitialSolution()
                 getBestArea(node);
             input+=bestCostTable.get(node);
           }
-          return this.function.eval(1,this.levelNode.get(nodeActual),0,input, output,0);  //área do corte 1
+          return this.function.eval(0,this.levelNode.get(nodeActual),0,0,output,0);  //área do corte 1
         }
         for(NodeAig node:cut)
         {
@@ -309,7 +302,6 @@ protected void randomInitialSolution()
         /*
         criar uma solução inicial aleatória 
         */
-
         AigCut cut      = null;
         AigCut cutBest  = bestCost(tableCost);
         Set<AigCut> cuts = kcuts.getCuts().get(nodeActual); 
@@ -391,6 +383,34 @@ protected void randomInitialSolution()
             finalCov.put(cut.getKey(), cut.getValue().getCut());
         CoveringAreaFlow finalCovering = new CoveringAreaFlow(finalCov,bestCostTable);
         return finalCovering;
+    }
+    
+    
+    protected void covering()
+    {
+        bfsAigVisitorCoveringSimulated mybfs = new bfsAigVisitorCoveringSimulated(this.currentCoverCut,this.currentCut);
+        for(NodeAig nodeActual: myAig.getNodeOutputsAig())
+        {
+            if(!this.currentCoverCut.containsKey(nodeActual))
+            {
+                this.currentCoverCut.put(nodeActual, this.currentCut.get(nodeActual));
+                nodeActual.accept(mybfs);     
+            }
+        }
+        boolean signalOk = true;
+        while(signalOk == true)
+        {
+          Map<NodeAig,AigCut> list = new HashMap<NodeAig, AigCut>();
+          signalOk = false;  
+          for(Map.Entry<NodeAig,AigCut> element: this.currentCoverCut.entrySet())
+              for(NodeAig node: element.getValue().getCut())
+                if((!node.isInput())&&(!this.currentCoverCut.containsKey(node)))
+                {
+                    list.put(node,this.currentCut.get(node));
+                    signalOk = true;
+                }
+          this.currentCoverCut.putAll(list);
+        }
     }
             
 }

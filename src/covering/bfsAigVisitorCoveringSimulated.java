@@ -26,13 +26,12 @@ public class bfsAigVisitorCoveringSimulated extends bfsNodeAigVisitor{
         if(!this.coveringActual.containsKey(nodeAigActual))
         {                     
             for(Map.Entry<NodeAig,AigCut> entry: coveringActual.entrySet()) 
-            {                
+            {   
                 if(entry.getValue().contains(nodeAigActual))
                     flag = true;
             }
             if(flag == true){
                 coveringActual.put(nodeAigActual,this.bestCuts.get(nodeAigActual));
-                //System.out.println("trocando a cobertura"+nodeAigActual.getName()+" cut novo : "+this.bestCuts.get(nodeAigActual));
             }
         }
     }

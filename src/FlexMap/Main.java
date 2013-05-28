@@ -292,7 +292,7 @@ public class Main
              System.out.println("Valor final:"+areaT.getCost(costFunction));                       
              if((args.length > 5)&&(args[5].contains(".eqn"))) 
              { //caso arquivo de log
-              Logs.LogsWriteEqn(area.getEqn(),args[5]);  
+                  Logs.LogsWriteEqn(area.getEqn(),args[5]);  
              }
              return;
         }
@@ -305,13 +305,13 @@ public class Main
              CutterKCuts kcuts                  = new CutterKCuts(myAig, sizeCut);
              String function                    = args[3];
              CostAreaFlow   costFunction        = new CostAreaFlow(function);
-             SimulatedAnneling SA               = new SimulatedAnneling(myAig, kcuts, costFunction, 10000,(float)0.999);
+             SimulatedAnneling SA               = new SimulatedAnneling(myAig, kcuts, costFunction, 100000,(float)0.999);
              SA.showCovering();
              SA.getEqn();
              CoveringAreaFlow areaSA = SA.getCovering();
              if((args.length > 4)&&(args[4].contains(".eqn"))) 
              { //caso arquivo de log
-               Logs.LogsWriteEqn(SA.getEqn(),args[5]);  
+               Logs.LogsWriteEqn(SA.getEqn(),args[4]);  
              }
              return;
         }
