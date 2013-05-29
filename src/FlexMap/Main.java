@@ -25,8 +25,15 @@ public class Main
       { 
         if(!args[0].contains(".aag"))
         { // se nao conseguiu ler o arquivo
-          warning();
-          return;
+            if((args[0].contains(".eqn"))&&(args[1].equals("-AIG")))
+            {
+                 Eqn myEqn = new Eqn(args[0]);
+                 return;
+            }
+            else{
+                warning();
+                return;
+            }
         }  
         //--------------------ÁRVORES-----------------------------------------
         if((args[1].equals("-T")||args[1].equals("-TM"))&&(args.length >= 2))
@@ -201,7 +208,7 @@ public class Main
         }
         //----------------------------------------------------------------------
         //--------------------MAP AREA FLOW-------------------------------------
-        if((args[1].equals("-A"))&&(args.length >= 4))
+        if((args[1].equals("-AK"))&&(args.length >= 4))
         {
              Aig myAig              = new Aig(args[0]);
              int sizeCut            = Integer.valueOf(args[2]);
@@ -220,7 +227,7 @@ public class Main
         }
         //----------------------------------------------------------------------        
         //--------------------MAP AREA FLOW COM AIG_INVERTERS-------------------
-        if((args[1].equals("-AI"))&&(args.length >= 4))
+        if((args[1].equals("-AIK"))&&(args.length >= 4))
         {
           AigInverter myAig             = new AigInverter(args[0]);  
           int sizeCut                   = Integer.valueOf(args[2]);
@@ -239,7 +246,7 @@ public class Main
         }   
         //------------------------------------------------------------------
         //--------------------MAP AREA FLOW C/Kcuts C/LIMITES de TREENODES----
-        if(args[1].equals("-AT")&&(args.length >= 4))
+        if(args[1].equals("-AKT")&&(args.length >= 4))
         {
              Aig myAig                      = new Aig(args[0]);
              int sizeCut                    = Integer.valueOf(args[2]);
@@ -257,8 +264,27 @@ public class Main
              return;
         }
         //----------------------------------------------------------------------        
+         //--------------------MAP AREA FLOW C/KcutsINVERTER C/LIMITES de TREENODES----
+        if(args[1].equals("-AIKT")&&(args.length >= 4))
+        {
+//             AigInverter myAig              = new AigInverter(args[0]);
+//             int sizeCut                    = Integer.valueOf(args[2]);
+//             CutterKCutsTreeNodes kcuts     = new CutterKCutsTreeNodes(myAig, sizeCut);
+//             String function                = args[3];
+//             CostAreaFlow   costFunction    = new CostAreaFlow(function);
+//             AreaFlow area                  = new AreaFlow(myAig,sizeCut,kcuts,costFunction);
+//             area.showCovering();
+//             area.getEqn();
+//             CoveringAreaFlow areaT         = area.getCovering();
+//             System.out.println("Valor final:"+areaT.getCost(costFunction));                       
+//             if((args.length > 4)&&(args[4].contains(".eqn"))){ //caso arquivo de log
+//               Logs.LogsWriteEqn(area.getEqn(),args[4]);  
+//             }
+//             return;
+        }
+        //----------------------------------------------------------------------  
         //--------------------MAP AREA FLOW C/KcutsLIBRARY----------------------
-        if(args[1].equals("-AL")&&(args.length >= 5))
+        if(args[1].equals("-ALK")&&(args.length >= 5))
         {
              Aig myAig                = new Aig(args[0]);
              int sizeCut              = Integer.valueOf(args[2]);
@@ -277,8 +303,28 @@ public class Main
              return;
         }
         //----------------------------------------------------------------------        
+        //--------------------MAP AREA FLOW C/KcutsLIBRARY----------------------
+        if(args[1].equals("-ALKT")&&(args.length >= 5))
+        {
+//             Aig myAig                = new Aig(args[0]);
+//             int sizeCut              = Integer.valueOf(args[2]);
+//             CutterKCutsLibrary kcuts = new CutterKCutsLibrary(myAig, sizeCut, args[3]);
+//             String function          = args[4];
+//             CostAreaFlow   costFunction  = new CostAreaFlow(function);
+//             AreaFlowLibrary area     = new AreaFlowLibrary(myAig,sizeCut,kcuts,costFunction);
+//             area.showCovering();
+//             area.getEqn();
+//             CoveringAreaFlow areaT = area.getCovering();
+//             System.out.println("Valor final:"+areaT.getCost(costFunction));                       
+//             if((args.length > 5)&&(args[5].contains(".eqn"))) 
+//             {  //caso arquivo de log
+//                Logs.LogsWriteEqn(area.getEqn(),args[5]);  
+//             }
+//             return;
+        }
+        //----------------------------------------------------------------------  
         //--------------------MAP AREA FLOW C/KcutsINVERTER_LIBRARY----------------------
-        if(args[1].equals("-AIL")&&(args.length >= 5))
+        if(args[1].equals("-AILK")&&(args.length >= 5))
         {
              AigInverter myAig        = new AigInverter(args[0]);
              int sizeCut              = Integer.valueOf(args[2]);
@@ -297,6 +343,27 @@ public class Main
              return;
         }
         //----------------------------------------------------------------------        
+    
+        //--------------------MAP AREA FLOW C/KcutsINVERTER_LIBRARY----------------------
+        if(args[1].equals("-AILKT")&&(args.length >= 5))
+        {
+//             AigInverter myAig        = new AigInverter(args[0]);
+//             int sizeCut              = Integer.valueOf(args[2]);
+//             String function          = args[4];
+//             CutterKCutsInverterLibrary kcuts   = new CutterKCutsInverterLibrary(myAig, sizeCut, args[3]);
+//             CostAreaFlow   costFunction        = new CostAreaFlow(function);
+//             AreaFlowLibrary area               = new AreaFlowLibrary(myAig,sizeCut,kcuts,costFunction);
+//             area.showCovering();
+//             area.getEqn();
+//             CoveringAreaFlow areaT = area.getCovering();
+//             System.out.println("Valor final:"+areaT.getCost(costFunction));                       
+//             if((args.length > 5)&&(args[5].contains(".eqn"))) 
+//             { //caso arquivo de log
+//                  Logs.LogsWriteEqn(area.getEqn(),args[5]);  
+//             }
+//             return;
+        }
+        //----------------------------------------------------------------------    
         //--------------------MAP AREA FLOW SIMULATED ANNELING------------------
         if(args[1].equals("-ASA")&&(args.length >= 4))
         {
@@ -306,6 +373,44 @@ public class Main
              String function                    = args[3];
              CostAreaFlow   costFunction        = new CostAreaFlow(function);
              SimulatedAnneling SA               = new SimulatedAnneling(myAig, kcuts, costFunction, 100000,(float)0.999);
+             SA.showCovering();
+             SA.getEqn();
+             CoveringAreaFlow areaSA = SA.getCovering();
+             if((args.length > 4)&&(args[4].contains(".eqn"))) 
+             { //caso arquivo de log
+               Logs.LogsWriteEqn(SA.getEqn(),args[4]);  
+             }
+             return;
+        }
+        //----------------------------------------------------------------------
+        //--------------------MAP AREA FLOW SIMULATED ANNELING Treenodes------------------
+        if(args[1].equals("-ASAKT")&&(args.length >= 4))
+        {
+//             AigInverter myAig                  = new AigInverter(args[0]);
+//             int sizeCut                        = Integer.valueOf(args[2]);
+//             CutterKCutsTreeNodes kcuts         = new CutterKCutsTreeNodes(myAig, sizeCut);
+//             String function                    = args[3];
+//             CostAreaFlow   costFunction        = new CostAreaFlow(function);
+//             SimulatedAnnelingInverter SA       = new SimulatedAnnelingInverter(myAig, kcuts, costFunction, 100000,(float)0.999);
+//             SA.showCovering();
+//             SA.getEqn();
+//             CoveringAreaFlow areaSA = SA.getCovering();
+//             if((args.length > 4)&&(args[4].contains(".eqn"))) 
+//             { //caso arquivo de log
+//               Logs.LogsWriteEqn(SA.getEqn(),args[4]);  
+//             }
+//             return;
+        }
+        //----------------------------------------------------------------------
+        //--------------------MAP AREA FLOW SIMULATED ANNELING inverters--------
+        if(args[1].equals("-AISA")&&(args.length >= 4))
+        {
+             AigInverter myAig                  = new AigInverter(args[0]);
+             int sizeCut                        = Integer.valueOf(args[2]);
+             CutterKCutsInverter kcuts          = new CutterKCutsInverter(myAig, sizeCut);
+             String function                    = args[3];
+             CostAreaFlow   costFunction        = new CostAreaFlow(function);
+             SimulatedAnnelingInverter SA       = new SimulatedAnnelingInverter(myAig, kcuts, costFunction, 100000,(float)0.999);
              SA.showCovering();
              SA.getEqn();
              CoveringAreaFlow areaSA = SA.getCovering();
@@ -422,15 +527,17 @@ public class Main
       System.out.println("--KCUTS_INVERTER C/BIBLIOTECA--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -KIL TamanhoDoCorte Biblioteca.genlib [Nodo(opcional)] [arquivoSaida.txt(opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -A TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AK TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW COM AIG_INVERTER--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AI TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AIK TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW COM BIBLIOTECA--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AIL TamanhoDoCorte Biblioteca.genlib FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AILK TamanhoDoCorte Biblioteca.genlib FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW C/TREENODES--");
-      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AT TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AKT TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM AREAFLOW E SIMULATED ANNELING--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -ASA TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
+      System.out.println("--MAPEAMENTO COM AREAFLOW E SIMULATED ANNELING--");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -AISA TamanhoDoCorte FunçãoCusto[ex: area+input/output] [arquivoSaida.eqn (opcional)]");
       System.out.println("--MAPEAMENTO COM ELIS--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -E s p [arquivoSaida.eqn (opcional)]");
       System.out.println("--BFS--");
@@ -439,6 +546,8 @@ public class Main
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -DFS [Nodo (opcional)]");
       System.out.println("--EQN--");
       System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.aag -EQN [arquivoSaida.eqn(opcional)]");
+      System.out.println("--AIG--");
+      System.out.println("--    ~$ java -jar FlexMap.jar arquivoEntrada.eqn -AIG [return:arquivoEntrada.aag]");
       System.out.println("-------------------------------------------------------");
     }
 }

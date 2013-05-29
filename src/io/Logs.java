@@ -267,4 +267,23 @@ public class Logs
         buffStart.close();
         System.out.println("#Log Eqn Executado com Sucesso");
    }
+  
+  /**Método que escreve AIGER para arquivo de saída*/
+  public static void LogsWriteAig(String aig,String fileLog)throws FileNotFoundException, IOException
+   {
+        if(!fileLog.contains(".aag"))
+        {
+                System.out.println("ARQUIVO DE SAIDA ERRADO");
+                System.exit(-1);
+        }
+        File outFile = new File(fileLog);
+        FileOutputStream buffStart;
+        
+        outFile.setWritable(true);
+        buffStart = new FileOutputStream(outFile,true);
+        buffStart.write(aig.getBytes());
+        buffStart.write('\n');
+        buffStart.close();
+        System.out.println("#Log Aig Executado com Sucesso");
+   }
 }
