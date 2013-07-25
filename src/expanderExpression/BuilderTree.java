@@ -145,7 +145,7 @@ public class BuilderTree {
                     }
                 } else {
                     pos++;
-                    if ((s.charAt(posAuxSignal) == '!' && s.charAt(posAuxSignal+1) == '(') || s.charAt(posAuxSignal) == '(') {
+                    if (((s.charAt(0) == '!' && s.charAt(1) == '(') || (s.charAt(0) == '!' && s.charAt(1) == '!')) && signalRoot == -1) {
                         signalRoot = pos;
                     } else {
                         if (s.charAt(posAuxSignal) == '+' && s.charAt(pos) == '+') {

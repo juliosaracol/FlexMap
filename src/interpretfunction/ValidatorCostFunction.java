@@ -30,8 +30,7 @@ public class ValidatorCostFunction {
         while (splited.hasMoreTokens()) {
 
             token = splited.nextToken();
-                       
-            // "(\\d)+.(\\d)+"
+
             if ( !(Pattern.matches ("\\d+(\\.\\d+)?", token)) && !(isReservedWork(token)) ) {
                 return false;
             }
@@ -52,5 +51,14 @@ public class ValidatorCostFunction {
         }
     
     }
+
+    public ArrayList<String> getSetReservedWords() {
+        return setReservedWords;
+    }
+
+    public void setSetReservedWords(ArrayList<String> setReservedWords) {
+        this.setReservedWords = setReservedWords;
+    }
+        
         
 }
