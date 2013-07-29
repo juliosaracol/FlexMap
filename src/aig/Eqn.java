@@ -1,6 +1,9 @@
 package aig;
 
+import FlexMap.Algorithms;
+import expanderExpression.BuilderTree;
 import graph.*;
+import handleExpression.*;
 import io.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,13 +21,11 @@ public class Eqn extends Graph {
     //
     /**
      * Construtor
-     *
      * @param fileName (nomeArquivo de Eqn em ascii '.eqn')
-     *
      */
     public Eqn(String fileName) throws FileNotFoundException, IOException {
         System.out.println("#EQN carregado com sucesso");
-        parserEqn(fileName);
+        this.parserEqn(fileName);
     }
 
     public void parserEqn(String file) throws FileNotFoundException, IOException {
@@ -105,61 +106,68 @@ public class Eqn extends Graph {
 
                 while (lines.hasMoreElements()) {
                     String lineCurrent = lines.nextToken();
-
                     lineCurrent = lineCurrent.replace("[", "");
                     lineCurrent = lineCurrent.replace("]", "");
                     lineCurrent = lineCurrent.replace("=", " ");
-                    lineCurrent = lineCurrent.replace("(", "");
-                    lineCurrent = lineCurrent.replace(")", " ");
                     lineCurrent = lineCurrent.replace(";", "");
                     lineCurrent = lineCurrent.replace(";", "");
-                    lineCurrent = lineCurrent.replace("*", "");
-
-                    if (lineCurrent.contains("!")) {
-                        StringTokenizer tokenLine = new StringTokenizer(lineCurrent, " ");
-                        String lineCorrect = "";
-                        String inversor;
-                        while (tokenLine.hasMoreElements()) {
-                            inversor = tokenLine.nextToken();
-                            if (inversor.contains("!")) {
-                                StringTokenizer removeInversor = new StringTokenizer(inversor, "!");
-                                inversor = removeInversor.nextToken();
-                                lineCorrect += String.valueOf(Integer.parseInt(inversor) + 1);
-                            } else {
-                                lineCorrect += inversor;
-                            }
-                            lineCorrect += " ";
-                        }
-                        andGates.add(lineCorrect);
-                    } else {
-                        StringTokenizer tokenLine = new StringTokenizer(lineCurrent, " ");
-                        String lineCorrect = "";
-                        String inversor;
-                        while (tokenLine.hasMoreElements()) {
-                            inversor = tokenLine.nextToken();
-                            lineCorrect += inversor;
-                            lineCorrect += " ";
-                        }
-                        andGates.add(lineCorrect);
-                        lineCorrect = "";
-                    }
-                    this.numAndGates++;
+                    StringTokenizer tokenLine = new StringTokenizer(lineCurrent, " ");
+                    tokenLine.nextToken();
+                    lineCurrent = tokenLine.nextToken();
+                    System.out.println(lineCurrent);
+                    int index  = Algorithms.findRoot(lineCurrent);
+                    System.out.println(lineCurrent.charAt(index));
+                    BuilderTree myTree = new BuilderTree();
+                    myTree.run(lineCurrent);
+                    myTree.showQueue();
+//                    lineCurrent = lineCurrent.replace("*", "");
+//
+//                    if (lineCurrent.contains("!")) {
+//                        StringTokenizer tokenLine = new StringTokenizer(lineCurrent, " ");
+//                        String lineCorrect = "";
+//                        String inversor;
+//                        while (tokenLine.hasMoreElements()) {
+//                            inversor = tokenLine.nextToken();
+//                            if (inversor.contains("!")) {
+//                                StringTokenizer removeInversor = new StringTokenizer(inversor, "!");
+//                                inversor = removeInversor.nextToken();
+//                                lineCorrect += String.valueOf(Integer.parseInt(inversor) + 1);
+//                            } else {
+//                                lineCorrect += inversor;
+//                            }
+//                            lineCorrect += " ";
+//                        }
+//                        andGates.add(lineCorrect);
+//                    } else {
+//                        StringTokenizer tokenLine = new StringTokenizer(lineCurrent, " ");
+//                        String lineCorrect = "";
+//                        String inversor;
+//                        while (tokenLine.hasMoreElements()) {
+//                            inversor = tokenLine.nextToken();
+//                            lineCorrect += inversor;
+//                            lineCorrect += " ";
+//                        }
+//                        andGates.add(lineCorrect);
+//                        lineCorrect = "";
+//                    }
+//                    System.out.println(andGates.get(andGates.size()-1));
+//                    this.numAndGates++;
+//                }
+//
+//                this.definitionEqn.add(andGates);
+//                numMaxVarIndex = numInputs + numAndGates;
+//
+//                String fileOutput = "";
+//                fileOutput += ("aag " + numMaxVarIndex + " " + numInputs + " " + numLatch + " " + numOutputs + " " + numAndGates + "\n");
+//                for (ArrayList<String> elementExt : definitionEqn) {
+//                    for (String elementIn : elementExt) {
+//                        fileOutput += elementIn + "\n";
+//                    }
                 }
-
-                this.definitionEqn.add(andGates);
-                numMaxVarIndex = numInputs + numAndGates;
-
-                String fileOutput = "";
-                fileOutput += ("aag " + numMaxVarIndex + " " + numInputs + " " + numLatch + " " + numOutputs + " " + numAndGates + "\n");
-                for (ArrayList<String> elementExt : definitionEqn) {
-                    for (String elementIn : elementExt) {
-                        fileOutput += elementIn + "\n";
-                    }
-                }
-                fileOutput = fileOutput.substring(0, (fileOutput.length() - 1));
-                String newFile = file.replace(".eqn", ".aag");
-                System.out.println(fileOutput);
-                Logs.LogsWriteAig(fileOutput, newFile);
+//                fileOutput = fileOutput.substring(0, (fileOutput.length() - 1));
+//                String newFile = file.replace(".eqn", ".aag");
+//                System.out.println(fileOutput);
+//                Logs.LogsWriteAig(fileOutput, newFile);
                 break;
             }
         }

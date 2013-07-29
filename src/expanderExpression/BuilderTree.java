@@ -90,7 +90,7 @@ public class BuilderTree {
 
         return this.root;
     }
-
+    //*Método que dada uma expressão encontra o melhor caracter para colocar como raiz de um arvore de expressão
     private int findRoot(String s) {
 
         int contParentheses = 0;
@@ -391,5 +391,12 @@ public class BuilderTree {
             paste.add(copy.get(i));
         }
 
+    }
+
+    public void showQueue() {
+        System.out.println("na pilha");
+        for(Node element : this.queue)
+            System.out.println(element.getKeyValeu().toString());
+        
     }
 }

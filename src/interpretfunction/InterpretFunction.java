@@ -6,8 +6,8 @@ import java.util.HashMap;
 
 
 /**
- *
- * @author renato
+ * Classe que implementa o interpretador de funções
+ * @author Renato Souza
  */
 public class InterpretFunction {
 

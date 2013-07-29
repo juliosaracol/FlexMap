@@ -1,7 +1,7 @@
 package interpretfunction;
 /**
- *
- * @author renato
+ * Classe que implementa Heap para o interpreter
+ * @author Renato Souza
  */
 public class Heap {
 

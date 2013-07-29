@@ -1,8 +1,8 @@
 package handleExpression;
 
 /**
- *
- * @author Dani Rosado
+ * Classe que trata expressões
+ * @author Renato Souza
  */
 public class HandleExpression {
 

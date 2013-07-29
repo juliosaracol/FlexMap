@@ -5,8 +5,8 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 /**
- *
- * @author Renato
+ * Classe que implementa o validador para funções custo 
+ * @author Renato Souza
  */
 public class ValidatorCostFunction {
 
